@@ -191,7 +191,7 @@ theorem val_fr_oneA (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi
   · exact cube_one_left t (fun p : T ⟶ t.G => cv t.PP.L i0 z J p.left) b
   · exact cube_one_right t (fun p : T ⟶ t.G => cv t.PP.L i0 z J p.left) a
 
-set_option maxHeartbeats 4000000 in
+
 theorem ex_ph1A (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : (e0 t x0) ⁻¹ᵁ t.PP.L.U i0 = ⊤) :
     ∃ ph : MvPowerSeries (Fin 3 × Fin d) S, ∀ m, ∃ u : (Jet S (Fin 3 × Fin d) m)ˣ,
       (u : Jet S (Fin 3 × Fin d) m) = psJet m ph ∧ LB.Gen.Corr t.PP.L _ _ _ _
@@ -257,7 +257,7 @@ theorem ex_ph1A (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : 
       (fun m i j => by fin_cases i <;> exact hXX m _ j) (fun m i j => by fin_cases i <;> exact hXX m _ j) m y J hJ)
   exact ⟨_, hph1⟩
 
-set_option maxHeartbeats 4000000 in
+
 theorem ex_ph2A (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : (e0 t x0) ⁻¹ᵁ t.PP.L.U i0 = ⊤) :
     ∃ ph : MvPowerSeries (Fin 3 × Fin d) S, ∀ m, ∃ u : (Jet S (Fin 3 × Fin d) m)ˣ,
       (u : Jet S (Fin 3 × Fin d) m) = psJet m ph ∧ LB.Gen.Corr t.PP.L _ _ _ _
@@ -323,7 +323,7 @@ theorem ex_ph2A (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : 
       (fun m i j => by fin_cases i <;> exact hXX m _ j) (fun m i j => by fin_cases i <;> exact hXX m _ j) m y J hJ)
   exact ⟨_, hph2⟩
 
-set_option maxHeartbeats 4000000 in
+
 theorem ex_syA (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : (e0 t x0) ⁻¹ᵁ t.PP.L.U i0 = ⊤) :
     ∃ sy : MvPowerSeries (Fin 2 × Fin d) S, ∀ m, ∃ u : (Jet S (Fin 2 × Fin d) m)ˣ,
       (u : Jet S (Fin 2 × Fin d) m) = psJet m sy ∧ LB.Gen.Corr t.PP.L _ _ _ _ (frA hch i0 hi0 m)
@@ -367,7 +367,7 @@ theorem ex_syA (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : (
     rw [e1, uinv, map_inv, inv_mul_cancel_left]
   exact ⟨sy, hsy'⟩
 
-set_option maxHeartbeats 4000000 in
+
 theorem ex_adA (hch : IsChartG t x0 d F act tg uvec x) (i0 : t.PP.L.ι) (hi0 : (e0 t x0) ⁻¹ᵁ t.PP.L.U i0 = ⊤) (a : 𝓞 E)
     (wL : LB.Gen (LB.LinComb t.PP.L
       (Sum.elim (cφG t ![fst t.G t.G, snd t.G t.G ≫ t.act.act (H.bar a)]) (cφG t ![fst t.G t.G ≫ t.act.act a, snd t.G t.G]))

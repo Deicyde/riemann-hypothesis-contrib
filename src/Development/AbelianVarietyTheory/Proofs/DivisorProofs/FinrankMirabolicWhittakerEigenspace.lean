@@ -59,8 +59,8 @@ theorem card_mul_finrank_eig [FiniteDimensional ℂ V] [Finite G] (τ : Represen
     · intro v
       rw [mem_eig]
       intro g hg
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [he, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum]
+
+      simp only [he, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum]
       rw [smul_comm]
       congr 1
       rw [Finset.smul_sum]
@@ -75,8 +75,8 @@ theorem card_mul_finrank_eig [FiniteDimensional ℂ V] [Finite G] (τ : Represen
       rw [Finset.sum_congr rfl (g := fun _ => v) fun k _ => by
         rw [hv k k.2, smul_smul, ← AddChar.map_add_eq_mul, neg_add_cancel, AddChar.map_zero_eq_one, one_smul]]
       rw [Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hc, one_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hp.trace, he, map_smul, map_sum, smul_eq_mul, ← mul_assoc, mul_inv_cancel₀ hc, one_mul]
+
+  rw [← hp.trace, he, map_smul, map_sum, smul_eq_mul, ← mul_assoc, mul_inv_cancel₀ hc, one_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul]
 
@@ -520,7 +520,7 @@ theorem dm_perm_le (σ : Equiv.Perm (Fin n))
     · exact Or.inr (Or.inl h)
     · exact Or.inr (Or.inr ⟨hz _ _ h, hz _ _ h⟩)
 
-set_option maxHeartbeats 1000000 in
+
 theorem dm_perm (hψ : ψ ≠ 1) (hU : unip F n ≤ P) {a m : Fin n} {c : ℕ} (h : m.val = a.val + 1 + c)
     (hσ : ∀ σ : Equiv.Perm (Fin n), (∀ i, m ≤ i → σ i = i) →
       ∀ g : GL (Fin n) F, (∀ a j, (g : Matrix (Fin n) (Fin n) F) a j = if a = σ j then 1 else 0) → g ∈ P) :

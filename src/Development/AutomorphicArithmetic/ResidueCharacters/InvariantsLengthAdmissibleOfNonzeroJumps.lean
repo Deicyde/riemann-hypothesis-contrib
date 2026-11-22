@@ -52,8 +52,8 @@ theorem kill_of (i : D.nd.Loc) (N : ℕ) (hK : InvariantsKilledOverCyclotomic (D
     (fun τ a ha => h3 τ a ha) (fun τ => ((hM w hw C).2 τ).2)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 theorem invariants_length_admissible_of_nonzero_jumps (i : D.nd.Loc) (N : ℕ) (hK : InvariantsKilledOverCyclotomic (D.loc (D.nd.l i))) (hC : CycAt N i)
     (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i) (dc : TruncatedSeriesCountingIdentities.Decl D i) (h : ℕ)
     (hρ : Continuous fun g => ((ρ π g : GL (Fin D.R.r) (D.nd.O i)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)))

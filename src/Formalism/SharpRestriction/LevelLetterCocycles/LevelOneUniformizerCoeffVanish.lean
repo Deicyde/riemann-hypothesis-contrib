@@ -32,9 +32,9 @@ theorem smulS_map {V V' : Type} [AddCommGroup V] [Module LL V] [AddCommGroup V']
     show L (f k) = 0
     rw [hf0 k hk, map_zero]
   funext k
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [smulS_eq_sum hf' g k ((k - m).toNat + 1) (by omega), smulS_eq_sum hf g k ((k - m).toNat + 1) (by omega),
-    map_sum]
+
+  rw [smulS_eq_sum hf' g k ((k - m).toNat + 1) (by omega), smulS_eq_sum hf g k ((k - m).toNat + 1) (by omega),
+  map_sum]
   simp only [map_smul]
 
 theorem levB_smul (hEq : ∀ (T : LocLat G Qp LL O) (i : ZMod n) (ζ : LL) (x : ↥(W.N T)) (k : ℤ),
@@ -153,8 +153,8 @@ theorem hor_exp [IsDomain O] (Ti : Comparison₂ W levB) (hR : Formalism.MainNot
     have hcc : ∀ m, PowerSeries.constantCoeff ((∑ r ∈ Finset.range M, W.π₀ ^ r *
         algebraMap O (LetA O n) (y r m)) c') = y 0 m := by
       intro m
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_apply, map_sum, Finset.sum_eq_single 0]
+
+      rw [Finset.sum_apply, map_sum, Finset.sum_eq_single 0]
       · simp [Pi.mul_apply]
       · intro r _ hr
         simp only [Pi.mul_apply, Pi.pow_apply, map_mul, map_pow, show W.π₀ c' = W.π₀₁ from rfl,
@@ -331,13 +331,13 @@ theorem hor_mem (T : LocLat G Qp LL O) (c' : ZMod n) {d : ℕ} (b : Fin d → W.
     intro yy
     refine ⟨(W.N T).sum_mem fun m _ => (W.N T).smul_of_tower_mem _ ((hb.1 m).1.1), fun δ hδ => ?_⟩
     unfold Formalism.MainNotions.LiftingTheory.vecB
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun m _ => by rw [map_smul, (hb.1 m).1.2 δ hδ]
   refine ⟨?_, ?_⟩
   · refine ⟨(W.N T).sum_mem fun r _ => (W.N T).smul_mem _ (hvec (y r)).1, fun δ hδ => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun r _ =>
       (Formalism.MainNotions.UnusedSlot80.PhiPowers.smul_mem_NΔ W T (W.AΔ.pow_mem hπ r) (hvec (y r))).2 δ hδ
   · refine ⟨∑ r ∈ Finset.range M, W.π₀ ^ r • Formalism.MainNotions.LiftingTheory.vecB W T b (y r),

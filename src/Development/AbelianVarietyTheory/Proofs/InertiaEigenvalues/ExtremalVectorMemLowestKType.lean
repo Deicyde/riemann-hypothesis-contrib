@@ -13,8 +13,8 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0 FullRk SgJ
 open Formalism.L2.Host (embLL0 CharFrame)
 open GlobalTheory.TwSys GlobalTheory.TwAll GlobalTheory.SupLaw GlobalTheory.LiftLeaf
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -72,7 +72,7 @@ theorem extremalVector_mem_lowestKType (X : RealSide D) {j : Fin D.R.m}
   (hv.1 τ).2.1
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem harm_move (h : CopyTw D D' ι e) {ρ : Setup D.ntw} {ρ' : Setup D'.ntw} (hs : SameSetup ρ ρ') (i : D.ntw.Tw)
     (i' : D'.ntw.Tw) (hi : HEq i i') (j : Fin D.R.m) (b : Bool) (P : PolF D (Wc D j).rank (Vc D j).rank)
     (P' : PolF D' (Wc D' (h.cm j)).rank (Vc D' (h.cm j)).rank) (hP : HEq P P') (x : GLR D (Vc D j).rank)
@@ -116,7 +116,7 @@ theorem VV_le_span (h : CopyTw D D' ι e) (j : Fin D.R.m) :
   rintro _ ⟨P, hP, rfl⟩
   exact ⟨P, hP, HEq.rfl⟩
 
-set_option maxHeartbeats 6000000 in
+
 theorem scale_fwd (h : CopyTw D D' ι e) {X : RealSide D} {X' : RealSide D'} (m : RealMove X X' ι) {ρ : Setup D.ntw}
     {ρ' : Setup D'.ntw} (hs : SameSetup ρ ρ')
     (hv' : ∀ j, FWT.IsChosenExtremalVector X'.R.toRealDat j (sg0 D' X'.A3.A) (X'.geo.v₀ j _)) (i : D.ntw.Tw) (i' : D'.ntw.Tw)
@@ -190,7 +190,7 @@ theorem scale_fwd (h : CopyTw D D' ι e) {X : RealSide D} {X' : RealSide D'} (m 
   intro F'
   exact key F' (VV_le_span h j F'.2) F'.2
 
-set_option maxHeartbeats 6000000 in
+
 theorem scale_bwd (h : CopyTw D D' ι e) {X : RealSide D} {X' : RealSide D'} (m : RealMove X X' ι) {ρ : Setup D.ntw}
     {ρ' : Setup D'.ntw} (hs : SameSetup ρ ρ')
     (hv : ∀ j, FWT.IsChosenExtremalVector X.R.toRealDat j (sg0 D X.A3.A) (X.geo.v₀ j _)) (i : D.ntw.Tw) (i' : D'.ntw.Tw)

@@ -20,13 +20,13 @@ open CrystallineSemistableComparison.Ls CrystallineSemistableComparison.Pb.LsG C
 variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] [PerfectRing k l] {O : Type} [CommRing O]
   {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) (ρ : O →+* k) {n : ℕ} (hn : n ≠ 0)
 
-set_option maxHeartbeats 1000000 in
+
 theorem pt_qT (T : Thick (Wc.L l (B.schFn q) ρ (n + 1))) :
     pt (γ := Wc.pd l k n) (p := l) (q := q) (κ := (Wc.res l k n).comp ρ) (qT (F := B.schFn q) (ρ := ρ) hn T) =
       Spec.map (CommRingCat.ofHom (qe T)) ≫ pt (γ := Wc.pd l k (n + 1)) (p := l) (q := q) (κ := (Wc.res l k (n + 1)).comp ρ) T :=
   rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem inU_qT (T : Thick (Wc.L l (B.schFn q) ρ (n + 1))) {V : X.Opens}
     (hV : InU (γ := Wc.pd l k (n + 1)) (p := l) (q := q) (κ := (Wc.res l k (n + 1)).comp ρ) V T) :
     InU (γ := Wc.pd l k n) (p := l) (q := q) (κ := (Wc.res l k n).comp ρ) V (qT (F := B.schFn q) (ρ := ρ) hn T) := by

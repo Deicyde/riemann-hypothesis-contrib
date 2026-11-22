@@ -18,7 +18,7 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tensorLattice_mul_transpose_stable_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n d : ℕ)
     (X : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n) (W : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d) (w : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
     (K K' : Matrix (Fin d) (Fin d) (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))), K' * K = 1 →

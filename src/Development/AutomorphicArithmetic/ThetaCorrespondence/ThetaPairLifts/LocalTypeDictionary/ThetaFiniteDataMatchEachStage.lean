@@ -75,7 +75,7 @@ open GlobalTheory.SqTop
 open GlobalTheory.ConstRatio (NegIdx Factor)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.theta_finiteData_match_each_stage : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
     GBig fun {D} {T} {Lc} {sc} G _ _ _ _ => ∀ (W : G.Weil) (i j : Fin D.R.m) (p q : ℕ) (A A' WW : HSp D)
     (X : Tri T A A' WW), GlobalTheory.SqTower.IsStageC W i j p q X →

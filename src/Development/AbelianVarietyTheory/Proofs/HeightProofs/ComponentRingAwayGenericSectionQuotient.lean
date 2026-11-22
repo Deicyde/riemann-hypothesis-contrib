@@ -101,8 +101,8 @@ theorem genericSection_away_quotient {K Ω Kl K' : Type} [Field K] [Field Ω] [A
   have hu : IsUnit u :=
     (IsUnit.mk0 _ hv).map (Algebra.TensorProduct.includeRight (R := K) (A := K') (B := Ω))
   have hea : ∀ i, e (a i) = u * ∑ k, t (i, eN k) ⊗ₜ[K] (v (eN k) / v (eN j₀)) := fun i => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, map_sum, Finset.mul_sum, ← Equiv.sum_comp eN]
+
+    rw [ha, map_sum, Finset.mul_sum, ← Equiv.sum_comp eN]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [he, Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_div_cancel₀ _ hv]
   have hΨ : ∀ r, (Φ'.comp e.toAlgHom) r = Φ (e r) := fun _ => rfl
@@ -143,8 +143,8 @@ theorem componentRing_sec_eq_sum (i : Fin (WeightFamilies.dimY D j + 1)) :
     rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w i) =
       ∑ k, @algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (i, k)) ⊗ₜ[X.Kl la]
         ((1 : X.Kl la) ⊗ₜ[B.KO] gF (X.inc wL (w k))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
+
+  rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, rzMap_emb, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
 

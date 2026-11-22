@@ -14,7 +14,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetDerivativ
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 namespace GlobalTheory.CompHS
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.TangentOrigin

@@ -31,19 +31,19 @@ local notation "D₀" => col.D Z
 local notation "D₁" => col.D (setDivZ Z N h)
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def datBk {Lev : Type} (w : Dat D₁ Lev) : Dat D₀ Lev := { w with }
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def mdlT {p : ℕ} [Fact p.Prime] {M : ℕ} {rk : DV.Emb D₀ p → ℕ} (m : DV.Mdl D₀ p M rk) : DV.Mdl D₁ p M rk := { m with }
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def locT {M j p : ℕ} (l : ModuliIntegralCharts.Loc D₀ M j p) : ModuliIntegralCharts.Loc D₁ M j p := { l with }
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def padT {M j : ℕ} {Comp : Type} {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D₀ p → (DV.KW p →+* ℂ)} {ng : NgPkg}
     (P : PadPkg D₀ M j Comp jC ng) : PadPkg D₁ M j Comp jC ng :=
   { P with
@@ -55,7 +55,7 @@ set_option maxHeartbeats 4000000 in
     md := fun p _ la z => mdlT col Z N h (padMd P p la z) }
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def shimUT {G : DV.Geo (D₀).what₂.LL} {Lev : Type} {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D₀ p → (DV.KW p →+* ℂ)} {ng : NgPkg}
     {w : Dat D₁ Lev} (U : ShimU D₀ G jC ng (datBk col Z N h w)) : ShimU D₁ G jC ng w :=
   { U with alg := { U.alg with }, pad := padT col Z N h U.pad }
@@ -63,7 +63,7 @@ set_option maxHeartbeats 4000000 in
 @[reducible] def wtB {j : ℕ} (w : WeightFamilies.Wt D₁ j) : WeightFamilies.Wt D₀ j := { w with }
 
 
-set_option maxHeartbeats 8000000 in
+
 @[reducible] def formsT {G : DV.Geo (D₀).what₂.LL} {NW : ℕ → ℕ} {CompW : ℕ → Type} [∀ j, Fintype (CompW j)]
     {algW : ∀ j, AlgPkg G (D₀).what₂.Tau (NW j) (CompW j)} {PtY : ℕ → ℕ → Type}
     (P : FormsPkg D₀ G NW CompW algW PtY) :
@@ -117,14 +117,14 @@ set_option maxHeartbeats 8000000 in
   shortTh := fun j w => P.shortTh j (wtB col Z N h w)
 
 
-set_option maxHeartbeats 8000000 in
+
 def famT {G : DV.Geo (D₀).what₂.LL} {Lev : Type} (F : ShimFam D₀ G Lev) : ShimFam D₁ G Lev :=
   { F with
     U := fun w => shimUT col Z N h (F.U (datBk col Z N h w))
     forms := formsT col Z N h F.forms }
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem heq_mdlT {p : ℕ} [Fact p.Prime] {A A' : Type} {M M' : ℕ} {rk rk' : DV.Emb D₀ p → ℕ}
     (f : A → DV.Mdl D₀ p M rk) (g : A' → DV.Mdl D₀ p M' rk') (hA : A = A') (hM : M = M') (hrk : rk = rk')
     (hfg : HEq f g) : HEq (fun z => mdlT col Z N h (f z)) (fun z => mdlT col Z N h (g z)) := by
@@ -133,7 +133,7 @@ theorem heq_mdlT {p : ℕ} [Fact p.Prime] {A A' : Type} {M M' : ℕ} {rk rk' : D
   rfl
 
 
-set_option maxHeartbeats 8000000 in
+
 theorem geoTiedP_divTr {X : DivX D₀} {inK : X.Lev → ℕ → Prop} (hg : GeoTiedP X inK) :
     GeoTiedP (divXTr col Z N h X) inK := by
   obtain ⟨F, ePl, eC, hT, hJ, hC, hI, hL⟩ := hg
@@ -156,7 +156,7 @@ end GeoDivTr
 
 open GeoDivTr
 
-set_option maxHeartbeats 8000000 in
+
 theorem divT_setDiv : ∀ {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T)
     (Z : w.Lt) {Wt : Set B.places.Pl} {nch : NChoice (w.D Z)} (n : NchT w Z Wt nch)
     (Y : DivX (w.D Z)) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ),

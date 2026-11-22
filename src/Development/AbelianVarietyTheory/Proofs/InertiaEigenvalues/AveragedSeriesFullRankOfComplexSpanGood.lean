@@ -8,8 +8,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Form
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0 FullRk SgJ BasisOf)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 

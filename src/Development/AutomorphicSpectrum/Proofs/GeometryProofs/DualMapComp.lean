@@ -133,7 +133,7 @@ theorem dualMap_comp' {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (a :
     dualMap (b.comp a) = (dualMap b).comp (dualMap a) := by
   ext x <;> simp [dualMap]
 
-set_option maxHeartbeats 1000000 in
+
 theorem core (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l)
     (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F))
     (Sys : PB.AnSys (Top.dimFl (CMType H) (D.p + D.q)) (Option (RootIx D))) (Fx : FixedData Y Sys)

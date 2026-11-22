@@ -100,7 +100,7 @@ theorem act_actA (ta : WeightPf.Te D.toPre I e ⟶ WeightPf.Te D.toPre I e)
     lift_fst_assoc, lift_snd, hia]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem mA_chiP (ta : WeightPf.Te D.toPre I e ⟶ WeightPf.Te D.toPre I e)
     (hta : TorusEndOf D.toPre.X (fun χ => star a • χ) ta) (χ : D.toPre.X)
     (W2 W' : (WeightPf.Te D.toPre I e ⊗ thickObj R I e G).left.Opens)

@@ -33,8 +33,8 @@ theorem GenericFormsKer.proof : GenericFormsKer.Statement := by
       simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
         smul_eq_mul] at this
       exact this.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hexp, map_sum, map_mul, Finset.mul_sum, c', Finset.sum_mul]
+
+    simp only [hexp, map_sum, map_mul, Finset.mul_sum, c', Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun m _ => by ring
 
@@ -55,8 +55,8 @@ theorem GenericFormsKer.proof : GenericFormsKer.Statement := by
   have hPM : (aeval u : MvPolynomial (Fin e × ι) F →ₐ[F] L).toRingHom.mapMatrix P = M := by
     ext i l
     change aeval u (∑ j, X (Fin.castLE hr' i, j) * C (v l j)) = M i l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, aeval_X, aeval_C, M]
+
+    simp only [map_sum, map_mul, aeval_X, aeval_C, M]
 
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective V.subtype V.ker_subtype
   let A₀ : Fin r' → ι → F := fun l j => B.repr (g (Pi.single j 1)) l
@@ -66,9 +66,9 @@ theorem GenericFormsKer.proof : GenericFormsKer.Statement := by
       funext k
       simp [v, Finset.sum_apply, Pi.single_apply]
     have := congrArg (fun x => B.repr (g x) i) hvl
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul,
-      Pi.smul_apply, smul_eq_mul] at this
+
+    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul,
+    Pi.smul_apply, smul_eq_mul] at this
     rw [← LinearMap.comp_apply, hg, LinearMap.id_apply, Module.Basis.repr_self_apply] at this
     have hil : (if i = l then (1 : F) else 0) = if l = i then 1 else 0 := by
       by_cases hh : i = l
@@ -82,8 +82,8 @@ theorem GenericFormsKer.proof : GenericFormsKer.Statement := by
   have hPx : (eval x).mapMatrix P = 1 := by
     ext i l
     change eval x (∑ j, X (Fin.castLE hr' i, j) * C (v l j)) = (1 : Matrix (Fin r') (Fin r') F) i l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, eval_X, eval_C, Matrix.one_apply]
+
+    simp only [map_sum, map_mul, eval_X, eval_C, Matrix.one_apply]
     rw [← hA₀]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp [x, Fin.castLE]

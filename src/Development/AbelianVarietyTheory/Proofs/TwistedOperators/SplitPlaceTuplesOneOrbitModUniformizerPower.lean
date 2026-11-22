@@ -185,8 +185,8 @@ theorem core_coord {O k : Type} [CommRing O] [Field k] [Algebra O k] (hinj : Fun
     intro p q
     apply hinj
     have e1 : algebraMap O k (η q ⬝ᵥ ξ p) = ∑ i, algebraMap O k (η q i) * algebraMap O k (ξ p i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [dotProduct, map_sum]
+
+      simp [dotProduct, map_sum]
     rw [e1, ← hsum1, hpair, hsum2]
     split_ifs <;> simp
   obtain ⟨K, hKI, hKcol, hKrow⟩ :=
@@ -208,8 +208,8 @@ theorem core_coord {O k : Type} [CommRing O] [Field k] [Algebra O k] (hinj : Fun
     rw [Matrix.mul_apply, hQ]
     calc ∑ i, (Q + QA) q i * (K.1.map (algebraMap O k)) i j
         = (t q)⁻¹ * algebraMap O k (∑ i, η q i * K.1 i j) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.mul_sum]
+
+          rw [map_sum, Finset.mul_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [hQA', Matrix.map_apply, map_mul, mul_assoc]
       _ = (t q)⁻¹ * (if j = ι' q then 1 else 0) := by
@@ -316,7 +316,7 @@ theorem uni_last {D : D7} {ρ : ℕ} (u : UX D (ρ + 1)) (j : Fin (ρ + 1)) :
     exact (hu (Fin.last ρ) (Fin.last ρ)).2
   · exact (hu (Fin.last ρ) j).1 (lt_of_le_of_ne (Fin.le_last j) hj)
 
-set_option maxHeartbeats 1000000 in
+
 theorem one_orbit : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   (p : GlobalTheory.FinPl.SplitPt D k) (W : HSp D) (ρ : ℕ) (β : GlobalTheory.FinPl.Frame p W (Fin W.rank)) (x : Mx D W.rank (ρ + 1))
   (ι ι' : Fin (ρ + 1) → Fin W.rank) (s t : Fin (ρ + 1) → k) (e : ℕ), 0 < e → Function.Injective ι → Function.Injective ι' →

@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SchurEq
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.jacobi_trudi_alternant_expansion : ∀ {A : Type} [CommRing A] (m d : ℕ) (h : ℕ → A),
     GlobalTheory.JSW.alternant A m (GlobalTheory.JSW.staircase m) *
                  ∑ k ∈ Finset.Nat.antidiagonalTuple m d, ∏ j, MvPolynomial.C (h (k j)) * MvPolynomial.X j ^ (k j) =

@@ -16,7 +16,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open scoped InnerProductSpace TensorProduct
@@ -31,7 +31,7 @@ noncomputable section
 namespace GlobalTheory.MiTop.BotTwo
 variable {D : D7}
 end GlobalTheory.MiTop.BotTwo
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.MiTop.BotTwo in
 theorem GlobalTheory.MiTop.botRel_of_pin_of_mem_center : GlobalTheory.Published.DiscreteSeriesClassification → GlobalTheory.Published.CuspRapidDecay → ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX} (W : _root_.GlobalTheory.MiS.RealPackAlt ex), _root_.GlobalTheory.MiTop.BottomHypotheses W → ∀ z ∈ GfC (D.sp.Y 0), z ∈ Subgroup.center (GA D (D.sp.Y 0)) → ∀ u (d : _root_.GlobalTheory.MiTop.BottomData W u), d.Pin z → _root_.GlobalTheory.MiTop.BottomRelation W z d := by
   intro _ hCR D L hT Gi Gl Kc Yd cX ex W hB z hzf hzc u d hP
@@ -103,8 +103,8 @@ theorem GlobalTheory.MiTop.botRel_of_pin_of_mem_center : GlobalTheory.Published.
       intro C₁
       rw [← hcf]
       funext g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [SBes.colForm, Finsupp.sum, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply]
+
+      simp only [SBes.colForm, Finsupp.sum, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply]
     rw [hlin C, hlin C',
       GlobalTheory.SeeSaw.perSum_all D W.Q.Rl.ψ hψ D.R.rS d.B.lev _ (contAut_rTrans _ (contAut_multT hT v)) _ cf.support cf
         (fun i => d.B.colForm C.1 (ξ i)) (fun i _ => hcont C (ξ i)),

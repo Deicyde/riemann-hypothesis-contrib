@@ -13,7 +13,7 @@ open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doublin
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.block_weil_action_theta_unfolding : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsCharAF D.host.F ψ → ∀ (V : HSp D) (r s : ℕ)
     (b : Matrix (Fin r) (Fin r) D.host.E), (b.map (D.sp.cm.sig : D.host.E → D.host.E)).transpose = b →
     ∀ (a : Matrix (Fin (r + s)) (Fin (r + s)) D.host.E), IsUnit a.det →

@@ -74,8 +74,8 @@ theorem mem_of_filtration {V W K ι : Type} [AddCommGroup V] [Module ℂ V] [Add
     have hE : ∀ ψ ∈ E, LinearMap.compRight (M := W) ℂ A ψ ∈ E := fun ψ hψ =>
       ⟨fun k w => by
         change A (ψ (ρ k w)) = act k (A (ψ w))
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [hA, hψ.1, map_sum, hR, hL], fun w => by
+
+        simp only [hA, hψ.1, map_sum, hR, hL], fun w => by
         change A (ψ w) ∈ _
         rw [hA]
         exact Submodule.sum_mem _ fun i _ => hRL i _ _ (hψ.2 w)⟩
@@ -112,14 +112,14 @@ theorem fis_X_mul (v : σ) (P Q : MvPolynomial σ ℂ) : fis (X v * P) Q = fis P
 theorem fis_sum_left {α : Type} (s : Finset α) (f : α → MvPolynomial σ ℂ) (Q : MvPolynomial σ ℂ) :
     fis (∑ i ∈ s, f i) Q = ∑ i ∈ s, fis (f i) Q := by
   unfold fis
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ReciprocityTheory.PGsh.fischer_sum_left]
+
+  rw [map_sum, ReciprocityTheory.PGsh.fischer_sum_left]
 
 theorem fis_sum_right {α : Type} (s : Finset α) (P : MvPolynomial σ ℂ) (f : α → MvPolynomial σ ℂ) :
     fis P (∑ i ∈ s, f i) = ∑ i ∈ s, fis P (f i) := by
   unfold fis
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ReciprocityTheory.PGsh.fischer_sum_right]
+
+  rw [map_sum, ReciprocityTheory.PGsh.fischer_sum_right]
 
 theorem fis_zero_left (Q : MvPolynomial σ ℂ) : fis 0 Q = 0 := by
   simpa using fis_smul_left 0 0 Q
@@ -202,8 +202,8 @@ theorem mem_of_raise : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.W
   have hdeg : ∃ d, ∀ w', (φ w').totalDegree ≤ d := by
     let b := Module.finBasis ℂ W
     refine ⟨Finset.univ.sup fun j => (φ (b j)).totalDegree, fun w' => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr w', map_sum]
+
+    rw [← b.sum_repr w', map_sum]
     refine totalDegree_finsetSum_le fun j _ => ?_
     rw [map_smul]
     exact (totalDegree_smul_le _ _).trans

@@ -47,8 +47,8 @@ theorem UpperTheory.V.AlgebraTools.Det.genHomog :
         MvPolynomial.aeval b (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
     rw [← D.nat (MvPolynomial (Fin m) A) B (MvPolynomial.aeval b)]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GDet.gen, map_sum]
+
+    simp only [GDet.gen, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     ext g
     simp [MonoidAlgebra.mapRingHom]

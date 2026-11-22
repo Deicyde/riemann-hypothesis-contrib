@@ -43,8 +43,8 @@ theorem sumI_of_ker {R : Type} [CommRing R] [IsNoetherianRing R] (I : Ideal R) {
       (Ideal.pow_le_pow_right (Nat.le_succ _) (hS T hT k)) Submodule.mem_top
   have m₃ := (hc (n + c) (Nat.le_add_left _ _)).le ⟨m₂, m₁⟩
   rw [Nat.add_sub_cancel] at m₃
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_sub, ← Submodule.map_smul'']
+
+  rw [← map_sum, ← map_sub, ← Submodule.map_smul'']
   exact ⟨_, Submodule.smul_mono le_rfl inf_le_right m₃, rfl⟩
 
 section
@@ -90,9 +90,9 @@ theorem comp_eq_zero {g : R →+* R'} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRin
 
 theorem loc₀_sub_sum {Ix : Type} (v₀ : Fin P.a → R) (v : Ix → Fin P.a → R) (T : Finset Ix) (i : P.I) :
     loc₀ P (v₀ - ∑ j ∈ T, v j) i = loc₀ P v₀ i - ∑ j ∈ T, loc₀ P (v j) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [loc₀, Pi.sub_apply, Finset.sum_apply, map_sub, map_sum, sub_mul, Finset.sum_mul,
-    Finset.sum_sub_distrib]
+
+  simp only [loc₀, Pi.sub_apply, Finset.sum_apply, map_sub, map_sum, sub_mul, Finset.sum_mul,
+  Finset.sum_sub_distrib]
   rw [Finset.sum_comm]
 
 end
@@ -166,9 +166,9 @@ theorem sumF_of_sum_on_thickenings : LL → AllD fun {R} _ _ {I} D F _ _ => ∀ 
     have e₁ := fun j => gs_loc₀ P (hv' j) _ p hp hJ'
     rw [gs_eq _ p _ hp] at e₀
     simp only [gs_eq _ p _ hp] at e₁
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [loc₀_sub_sum, gs_eq _ p _ hp, map_sub, map_sub, map_sum, map_sum, e₀, Finset.sum_congr rfl fun j _ => e₁ j,
-      ← Finset.mul_sum]
+
+    rw [loc₀_sub_sum, gs_eq _ p _ hp, map_sub, map_sub, map_sum, map_sum, e₀, Finset.sum_congr rfl fun j _ => e₁ j,
+    ← Finset.mul_sum]
     exact sub_eq_zero.2 (congrArg _ h₃)
 
 end GlobalTheory.SecAdicSum

@@ -40,8 +40,8 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eEx
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 
 namespace GlobalTheory.BigOn.Exp.TupLe

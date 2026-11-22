@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V UpperTheory.V.Hi
@@ -75,7 +75,7 @@ private theorem sr_abs {R A K M W ι ι' : Type} [CommRing R] [CommRing A] [Alge
   exact fun F hF => Submodule.mem_iSup_of_mem μ (Module.End.mem_eigenspace_iff.2 (hμ F hF))
 attribute [local instance 2000] UpperTheory.V.W.coefLocal
 attribute [-instance] GlobalTheory.AdmLoc.modFun
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.sphRed_alt :
     ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c), H.Ax →
     ∀ (A : Type) [CommRing A] [Algebra c.O A] [Alg.IsCO c.O A] (θ : H.X.I.T →* Aˣ), H.IsWt θ →

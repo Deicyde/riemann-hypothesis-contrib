@@ -13,6 +13,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.transfer_of_rule4' : ∀ κ : Rule, Rule4 κ → Transfer κ := by
   first | exact @GlobalTheory.MBLow.KeyTop.transfer_of_rule4 | exact GlobalTheory.MBLow.KeyTop.transfer_of_rule4 | (intros; apply GlobalTheory.MBLow.KeyTop.transfer_of_rule4 <;> assumption)

@@ -97,7 +97,7 @@ private theorem ot_exists_log_le_rpow (C a : ℝ) (hC : 0 < C) (ha : 0 < a) :
       _ = x ^ a / 2 := by field_simp
   linarith
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.BernoulliSumsFrobeniusOrbits.orbit_terms :
     ∀ eps Co Lb : ℝ, 0 < eps → ∃ Cb x₀ : ℝ, 0 < Cb ∧ ∀ x ≥ x₀, ∀ n L₂ : ℕ, x ^ (eps / 4) ≤ (n : ℝ) → (n : ℝ) ≤ Co * x ^ hE eps →
       (L₂ : ℝ) ≤ Lb →

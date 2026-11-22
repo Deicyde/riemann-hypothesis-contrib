@@ -65,7 +65,7 @@ end GlobalTheory.Mem.LiteralAutomorphy
 namespace GlobalTheory.Mem.LiteralAutomorphy
 
 
-set_option maxHeartbeats 3200000 in
+
 theorem exGrid_of : WeilEx → IsEx → NFAll → NFSq → CarryG → CarryW → CarryS → TrEasy → TrPhase → TrJet → TrBot → TrSq → KeyFin →
     GKeyFin → ExGrid := by
   classical
@@ -120,8 +120,8 @@ theorem exGrid_of : WeilEx → IsEx → NFAll → NFSq → CarryG → CarryW →
         (∀ i, ((bK i : K) : ℂ) ∈ Set.range X.toD7.what₂.embLL) → Set.range (algebraMap K ℂ) ⊆ Set.range X.toD7.what₂.embLL := by
       intro K _ bK hK
       rintro _ ⟨y, rfl⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← bK.sum_repr y, map_sum]
+
+      rw [← bK.sum_repr y, map_sum]
       refine X.toD7.what₂.embLL.fieldRange.sum_mem fun i _ => ?_
       rw [Rat.smul_def, map_mul, map_ratCast]
       exact X.toD7.what₂.embLL.fieldRange.mul_mem (SubfieldClass.ratCast_mem _ _) (hK i)

@@ -91,10 +91,10 @@ theorem sum_pow_int {l : ℕ} (hl : l.Prime) (k : ℕ) {R : Type} [CommRing R] {
   have h := aeval_eq_zero_of_complex hN hζ ht
     (∑ a ∈ (Finset.range (l ^ (k + 1))).filter (fun a => ¬ l ∣ a), (Polynomial.X ^ j) ^ a
       - (c : Polynomial ℤ)) (by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, map_pow, Polynomial.aeval_X, map_intCast, hc, sub_self])
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, map_pow, Polynomial.aeval_X, map_intCast, sub_eq_zero] at h
+
+      simp only [map_sub, map_sum, map_pow, Polynomial.aeval_X, map_intCast, hc, sub_self])
+
+  simp only [map_sub, map_sum, map_pow, Polynomial.aeval_X, map_intCast, sub_eq_zero] at h
   refine ⟨c, ?_⟩
   rw [← h]
   exact Finset.sum_congr rfl fun a _ => by rw [← pow_mul, ← pow_mul, mul_comm]
@@ -126,8 +126,8 @@ theorem coe_lvlPoly (l : ℕ) (O : Type) [CommRing O] (k : ℕ) :
 
 theorem algHom_lvl (l : ℕ) {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (k : ℕ)
     (f : O⟦X⟧ →ₐ[O] R) : f (lvl l O k) = ∑ i ∈ Finset.range l, (f (1 + X) ^ l ^ k) ^ i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [GlobalTheory.CycFr.lvl, map_sum, map_pow]
+
+  simp only [GlobalTheory.CycFr.lvl, map_sum, map_pow]
 
 theorem lvlPoly_monic {l : ℕ} (hl : l.Prime) (O : Type) [CommRing O] [Nontrivial O] (k : ℕ) :
     (lvlPoly l O k).Monic := by
@@ -140,8 +140,8 @@ theorem lvlPoly_monic {l : ℕ} (hl : l.Prime) (O : Type) [CommRing O] [Nontrivi
 
 theorem lvlPoly_map (l : ℕ) {O F : Type} [CommRing O] [CommRing F] (j : O →+* F) (k : ℕ) :
     (lvlPoly l O k).map j = lvlPoly l F k := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [lvlPoly, Polynomial.map_sum]
+
+  simp [lvlPoly, Polynomial.map_sum]
 
 theorem lvlPoly_of_char {l : ℕ} [Fact l.Prime] {F : Type} [CommRing F] [IsDomain F]
     (h : (l : F) = 0) (k : ℕ) : lvlPoly l F k = Polynomial.X ^ (l ^ k * (l - 1)) := by

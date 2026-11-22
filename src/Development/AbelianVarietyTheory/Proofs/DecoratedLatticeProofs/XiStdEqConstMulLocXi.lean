@@ -137,8 +137,8 @@ theorem intAt_sub_of_near {P : HeightOneSpectrum (𝓞 E)} {q : E} (hq : P.valua
   have e : f y i - y i = ∑ j, (f (Pi.single j 1) i - if i.val = j.val then 1 else 0) * y j := by
     simp only [_root_.sub_mul, Finset.sum_sub_distrib, ← Fin.ext_iff, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [pi_eq_sum_univ' y, map_sum, Finset.sum_apply]
+
+    conv_lhs => rw [pi_eq_sum_univ' y, map_sum, Finset.sum_apply]
     exact Finset.sum_congr rfl fun j _ => by rw [map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
   rw [e]
   refine intAt_sum _ fun j _ => ?_
@@ -203,7 +203,7 @@ theorem prV_eq_zero {D : D7} {Q : GlobalTheory.FinPl.Pl D → Prop} {x : AE D} (
   rw [show GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D v (finPart D x) = 0 from h, RingHom.map_zero]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem finM_map_prV {D : D7} (S : HSp D) {n : ℕ} (hn : S.rank = n) {Q : GlobalTheory.FinPl.Pl D → Prop} {h : GA D S}
     (hh : h ∈ GlobalTheory.FinPl.grpAt S Q) {v : GlobalTheory.FinPl.Pl D} (hv : ¬ Q v) : (finM S hn h).map (Formalism.UG.prV (E := D.host.E) v) = 1 := by
   subst hn

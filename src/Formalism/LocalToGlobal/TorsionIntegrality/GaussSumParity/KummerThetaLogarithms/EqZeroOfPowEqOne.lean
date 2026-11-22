@@ -78,8 +78,8 @@ lemma coeff_gLog_zero (φ : ZMod d → τ) (s : ZMod d) (n : τ →₀ ℕ)
 lemma map_gLog (ρ : K →+* K) (φ : ZMod d → τ) (s : ZMod d) :
     map ρ (gLog K l φ s) = gLog K l φ s := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coeff_map, coeff_gLog, map_sum]
+
+  rw [coeff_map, coeff_gLog, map_sum]
   refine Finset.sum_congr rfl fun e _ => ?_
   split_ifs <;> simp
 
@@ -244,17 +244,17 @@ lemma combo [IsUltrametricDist K] {l d : ℕ} [NeZero d] (hl : l ≠ 0) (σ : K 
   · have key : (∑ s, C (a s) * L s) - C ((l : K)⁻¹) *
           frobVar (l ^ 2) (map (σ.comp σ) (∑ s, C (a s) * L s)) =
         ∑ s, C (a s) * (L s - C ((l : K)⁻¹) * frobVar (l ^ 2) (map (σ.comp σ) (L (s - 2)))) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Formalism.InvariantFactorPaths.G7.frobVar_eq_expand hq, map_sum, map_mul, MvPowerSeries.map_C,
-        MvPowerSeries.expand_C, Finset.mul_sum, mul_sub, Finset.sum_sub_distrib]
+
+      simp only [Formalism.InvariantFactorPaths.G7.frobVar_eq_expand hq, map_sum, map_mul, MvPowerSeries.map_C,
+      MvPowerSeries.expand_C, Finset.mul_sum, mul_sub, Finset.sum_sub_distrib]
       congr 1
       rw [← (Equiv.subRight (2 : ZMod d)).sum_comp]
       refine Finset.sum_congr rfl fun s _ => ?_
       simp only [Equiv.subRight_apply, hshift]
       ring
     intro n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [key, map_sum]
+
+    rw [key, map_sum]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun s _ => ?_
     rw [coeff_C_mul, norm_mul]
     exact mul_le_one₀ (hle s) (norm_nonneg _) ((hL s).2 n)

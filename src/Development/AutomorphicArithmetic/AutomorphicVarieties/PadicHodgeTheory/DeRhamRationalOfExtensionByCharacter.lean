@@ -130,7 +130,7 @@ private theorem blocks {n : ℕ} (r : ↥Gw →* GL (Fin (n + 1)) (Om l)) (r' : 
 
 end Blocks
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.deRham_rational_of_extension_by_character :
     GlobalTheory.Published.DeRhamPotSemistable → ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A w) {n : ℕ} (r : ↥(Dec (F := F) A) →* GL (Fin (n + 1)) (Qbar l)) (r' : ↥(Dec (F := F) A) →* GL (Fin n) (Qbar l)) (ψ : ↥(Dec (F := F) A) →* (Qbar l)ˣ), Continuous r → (∀ g (i : Fin n), (r g : Matrix (Fin (n + 1)) (Fin (n + 1)) (Qbar l)) i.succ 0 = 0) → (∀ g, (r g : Matrix (Fin (n + 1)) (Fin (n + 1)) (Qbar l)) 0 0 = (ψ g : Qbar l)) → (∀ g (i j : Fin n), (r g : Matrix (Fin (n + 1)) (Fin (n + 1)) (Qbar l)) i.succ j.succ = (r' g : Matrix (Fin n) (Fin n) (Qbar l)) i j) → ∀ (c : (F →+* Qbar l) → ℤ) (HT : (F →+* Qbar l) → Multiset ℤ) (β : ↥(Weil h) → ℂ) (Q : ↥(Weil h) → ℂ[X]), DRat ι h r (fun τ => c τ ::ₘ HT τ) (fun s => (X - C (β s)) * Q s) → DRat ι h (GlobalTheory.TripleGal.rk1 ψ) (fun τ => {c τ}) (fun s => X - C (β s)) → DRat ι h r' HT Q := by
   intro hB F Ω _ _ _ _ _ l _ ι A w h n r r' ψ hc h0 h1 h2 c HT β Q hr hψ O _ _ _ Bw hj

@@ -71,7 +71,7 @@ private theorem half (D c : ℝ) (hD : 0 ≤ D) (hc : 0 < c) : D * Real.exp (-(2
   have := Real.add_one_le_exp (2 * D)
   linarith
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.V.Lit.Geo.Cs.galois_twist_preserves_siegel_bound (h1 : LamEx) (h2 : DescEx) (h3 : DescFun) (h4 : RapidAll) (h5 : CorrSz) (h6 : DecP)
     (h7 : DecK) (h8 : Loc) (h9 : GeoSum) (h10 : GeoRet) (h11 : Supp) : G2 := by
   intro E _ _ _ a ha U hUo hUc Ξ q ω hω hd hR

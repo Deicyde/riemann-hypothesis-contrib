@@ -15,7 +15,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CompletionDegree
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_decompositionGroup_equiv_padicGalois : ∀ (p : ℕ) [Fact p.Prime] (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
     [IsAlgClosure F Ω] (A : ValuationSubring Ω) (j : Ω →+* PadicAlgCl p), (∀ x, x ∈ A ↔ ‖j x‖ ≤ 1) →
     ∃ i : ↥(A.decompositionSubgroup F) ≃ₜ*

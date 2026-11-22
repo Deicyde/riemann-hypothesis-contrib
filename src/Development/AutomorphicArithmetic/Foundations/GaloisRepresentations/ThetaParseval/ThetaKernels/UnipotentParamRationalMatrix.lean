@@ -10,7 +10,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -34,9 +34,9 @@ theorem rel_aniso_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (η 
     apply τ.injective
     simpa [z] using congrFun h i
   have key : τ (HeckeCharacterZeroLocus.SiegelWeilU.hE σ (_root_.PositivityTheory.SiegelWeilFormula.KWhit.Jd_k d η) y y) = τ η * (z ⬝ᵥ (d.A.J.map τ) *ᵥ star z) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [HeckeCharacterZeroLocus.SiegelWeilU.hE, HeckeCharacterZeroLocus.SiegelWeilU.hform, _root_.PositivityTheory.SiegelWeilFormula.KWhit.Jd_k, Matrix.mulVec, dotProduct, map_sum, map_mul,
-      Matrix.transpose_apply, Matrix.smul_apply, smul_eq_mul, Matrix.map_apply, Finset.mul_sum, Pi.star_apply]
+
+    simp only [HeckeCharacterZeroLocus.SiegelWeilU.hE, HeckeCharacterZeroLocus.SiegelWeilU.hform, _root_.PositivityTheory.SiegelWeilFormula.KWhit.Jd_k, Matrix.mulVec, dotProduct, map_sum, map_mul,
+    Matrix.transpose_apply, Matrix.smul_apply, smul_eq_mul, Matrix.map_apply, Finset.mul_sum, Pi.star_apply]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     simp only [z]

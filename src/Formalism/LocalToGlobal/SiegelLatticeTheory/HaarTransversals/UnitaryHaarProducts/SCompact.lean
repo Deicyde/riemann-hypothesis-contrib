@@ -101,9 +101,9 @@ theorem hJ_sum_right' {ι : Type*} (s : Finset ι) (x : Fin n → ℂ) (c : ι �
 
 theorem hJ_conj' (x y : Fin n → ℂ) : hJ ε x y = starRingEnd ℂ (hJ ε y x) := by
   unfold hJ Formalism.REAL.Jm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec_diagonal, dotProduct, map_sum, map_mul, Pi.star_apply, RCLike.star_def,
-    Complex.conj_conj]
+
+  simp only [Matrix.mulVec_diagonal, dotProduct, map_sum, map_mul, Pi.star_apply, RCLike.star_def,
+  Complex.conj_conj]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   split_ifs <;> simp <;> ring
 
@@ -299,9 +299,9 @@ theorem hJ_rv_sc (I : AutInst) (v : InfinitePlace I.F) (x y : Fin I.n → I.E) :
   unfold hJ
   rw [key, dotProduct_mulVec, hx]
   unfold Formalism.UG.hform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, dotProduct, Matrix.mulVec, Pi.star_apply, Matrix.map_apply,
-    starRingEnd_apply, PI.UnitaryGroupMassFormula.LCG.ap_star, Finset.mul_sum]
+
+  simp only [map_sum, map_mul, dotProduct, Matrix.mulVec, Pi.star_apply, Matrix.map_apply,
+  starRingEnd_apply, PI.UnitaryGroupMassFormula.LCG.ap_star, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 

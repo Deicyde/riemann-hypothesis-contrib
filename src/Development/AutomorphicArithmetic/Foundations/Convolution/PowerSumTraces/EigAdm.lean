@@ -74,7 +74,7 @@ private theorem fin_of_compact {H : Type*} [NormedAddCommGroup H] [InnerProductS
   show T (prj W f) = c • f
   rw [prj_self W h1, h2]
 
-set_option maxHeartbeats 2000000 in
+
 theorem UpperTheory.ConvolutionTheory.C.eigAdm :
     UpperTheory.ConvolutionTheory.C.EigAdm := by
   intro K _ _ n hn μ _ ν _ a x hx P U hU

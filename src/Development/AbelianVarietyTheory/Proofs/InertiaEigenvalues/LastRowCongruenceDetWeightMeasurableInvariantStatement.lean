@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsP
 
 open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.RSJ GlobalTheory.MirTower GlobalTheory.CuspGeneric Formalism.L2.Host
 open scoped ENNReal NNReal ComplexConjugate
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lastRowCongruenceDetWeight_measurable_invariant : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m N : ℕ) (x : ℝ),
     Measurable (GlobalTheory.ZUnf.wt (E := E) (m := m) N x) ∧
     (∀ γ ∈ mirU E (m + 1) m, ∀ g, GlobalTheory.ZUnf.wt N x (ratGL E (m + 1) γ * g) = GlobalTheory.ZUnf.wt N x g) ∧

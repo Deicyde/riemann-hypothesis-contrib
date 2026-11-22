@@ -148,8 +148,8 @@ theorem exists_eeTie [IsDomain O] [CharZero O] [NeZero n] (hp : PD.p = l) (R : F
         choose a ha using fun i => (hr (a' i)).2 fun d hd => congrFun (h d hd) i
         exact ⟨a, funext ha⟩)
     (fun a' d hd => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← sum_DelF_mul W (fun δ => W.γA δ a') d hd]
+
+      rw [map_sum, ← sum_DelF_mul W (fun δ => W.γA δ a') d hd]
       refine Finset.sum_congr rfl fun δ _ => funext fun i => ?_
       change W.γ₀ d (W.γ₀ δ (a' i)) = W.γ₀ (d * δ) (a' i)
       rw [map_mul]; rfl)
@@ -303,8 +303,8 @@ theorem π₀₁_spec (hl : l ≠ 2) (hc : W.DelF.card = l - 1) :
     rw [LocWach.π₀₁, hp]
   refine ⟨by rw [e, hc]; exact a1, fun d hd => ?_, by rw [e]; convert a2 using 1; ring⟩
   have h2 : W.γ₀ d (∑ δ ∈ W.DelF, W.γ₀ δ (1 + X)) = ∑ δ ∈ W.DelF, W.γ₀ δ (1 + X) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← sum_DelF_mul W (fun δ => W.γ₀ δ (1 + X)) d hd]
+
+    rw [map_sum, ← sum_DelF_mul W (fun δ => W.γ₀ δ (1 + X)) d hd]
     exact Finset.sum_congr rfl fun δ _ => by rw [map_mul]; rfl
   rw [e, map_add (f := _), h2, map_sub, map_one, map_natCast]
 
@@ -318,8 +318,8 @@ theorem eq_neg_of_root {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomai
     have h5 : lvl l O 0 = ∑ i ∈ Finset.range l, ((1 + X) ^ i - C ζ ^ i) := by
       rw [Finset.sum_sub_distrib]
       simp only [← map_pow]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, hζ.geom_sum_eq_zero (Fact.out : l.Prime).one_lt]
+
+      rw [← map_sum, hζ.geom_sum_eq_zero (Fact.out : l.Prime).one_lt]
       simp [lvl]
     rw [h5]
     refine Finset.dvd_sum fun i _ => ?_

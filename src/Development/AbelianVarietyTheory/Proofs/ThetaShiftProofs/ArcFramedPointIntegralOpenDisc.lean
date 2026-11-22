@@ -15,7 +15,7 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.Polarisat
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

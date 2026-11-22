@@ -168,7 +168,7 @@ theorem idem_mul_span_mem (V : HSp D) (he : e * e = e) (h : Comparison₂ P e) {
     rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_basis (V : HSp D) (he : e * e = e) (h : Comparison₂ P e) :
     ∃ B : Matrix (Fin V.rank) (Fin V.rank) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E),
       (∀ z, IntVec z → (fun a => finPart D e * B.mulVec z a) ∈ LamHat V) ∧
@@ -207,7 +207,7 @@ theorem exists_basis (V : HSp D) (he : e * e = e) (h : Comparison₂ P e) :
       rw [Matrix.mulVec_neg, Pi.neg_apply, Pi.neg_apply, mul_neg, mul_neg, congrFun hu a]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_component (he : e * e = e) (h : Comparison₂ P e) :
     ∃ (φ : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E →+* P.adicCompletion D.host.E)
       (s : P.adicCompletion D.host.E → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E),

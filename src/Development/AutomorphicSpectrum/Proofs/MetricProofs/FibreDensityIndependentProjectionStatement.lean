@@ -18,7 +18,7 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CxSimple
 open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Pub.CxInt GlobalTheory.CompanionTheory.Ar.Pub.CxComp Filter Topology
 open ReciprocityTheory.AnForm.R (conePts)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.fibre_density_independent_projection : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
     (Q : Ideal (MRingOver ℂ ι)) (e : ℕ) (Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
     (L : Fin e → HermLine ι) (g : ((Σ k, ι k) → ℂ) → ℝ) (z : (Σ k, ι k) → ℂ),

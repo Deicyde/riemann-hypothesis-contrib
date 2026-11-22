@@ -218,7 +218,7 @@ end Kept
 variable {R : RealDat3 a.D A Ks} {F : Face3 a.D A}
 
 
-set_option maxHeartbeats 800000 in
+
 theorem weakCharInertPart_realAdelicDataTransport (s : SameGrp a b) (h : R.WeakCharacterisation F) : letI := alg b iK; (real3 b R).WeakCharacterisation (face3 b F) := by
   letI := alg b iK
   constructor

@@ -137,8 +137,8 @@ theorem step_left {n : ℕ} {ψ₁ : Fin n → Sm E r} {ψ₂ : Fin n → Sm E s
   apply Subtype.ext
   funext b
   have := hc b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, Submodule.coe_sum, Finset.sum_apply, mul_comm] using this
+
+  simpa [map_sum, Submodule.coe_sum, Finset.sum_apply, mul_comm] using this
 
 theorem step_right {n : ℕ} {ψ₁ : Fin n → Sm E r} {ψ₂ : Fin n → Sm E s} {m₁ : GA E r} (f : Sm E s →ₗ[ℂ] Sm E s)
     (h : f (∑ i, (ψ₁ i).1 m₁ • ψ₂ i) ≠ 0) : ∃ b₂, ∑ i, (ψ₁ i).1 m₁ * (f (ψ₂ i)).1 b₂ ≠ 0 := by
@@ -148,8 +148,8 @@ theorem step_right {n : ℕ} {ψ₁ : Fin n → Sm E r} {ψ₂ : Fin n → Sm E 
   apply Subtype.ext
   funext b
   have := hc b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, Submodule.coe_sum, Finset.sum_apply] using this
+
+  simpa [map_sum, Submodule.coe_sum, Finset.sum_apply] using this
 
 theorem inj_of_irred {N : ℕ} {V : Submodule ℂ (Sm E N)} (hV : IsDiscrete V) {T : Sm E N →ₗ[ℂ] Sm E N}
     (hT : ∀ o, ∀ φ ∈ V, T (act o φ) = act o (T φ)) (hne : ∃ φ ∈ V, T φ ≠ 0) : ∀ φ ∈ V, T φ = 0 → φ = 0 := by

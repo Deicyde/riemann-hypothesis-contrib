@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Algeb
 @[expose] public section
 
 open CategoryTheory Polynomial GlobalTheory.NormalDescent
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.charpolyMulBaseChangeFinite_map_of_isPushout : ∀ {A B A' B' K K' : Type} [CommRing A] [CommRing B] [CommRing A'] [CommRing B'] [Field K] [Field K']
     [Algebra A K] [Algebra A' K'] (φ : A →+* B) (α : A →+* A') (β : B →+* B') (φ' : A' →+* B'),
     IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom α) (CommRingCat.ofHom β) (CommRingCat.ofHom φ') →

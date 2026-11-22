@@ -12,7 +12,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open GlobalTheory.CompanionTheory.Ar.TorusUnif
 open scoped CategoryTheory.Obj
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.analytic_points_finite_compact : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
     (y : (Σ k, J k) → Ω) (ξ : Sp Ω ⟶ X), (∀ q : X, genPt ξ ⤳ q) →
     CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → ∀ (Z' : Scheme.{0}) (f : Z' ⟶ XQ X), IsFinite f →

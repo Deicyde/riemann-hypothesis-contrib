@@ -95,7 +95,7 @@ theorem natCast_p_ne_zero' : (p : 𝒪) ≠ 0 := fun h => by
   exact hp.out.ne_zero this
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_natCast_dvd_sub_of_dvd_pow_sub {v : 𝒪} (hv : (p : 𝒪) ∣ v ^ p - v) :
     ∃ a : ℕ, a < p ∧ (p : 𝒪) ∣ v - a := by
   obtain ⟨g, hg⟩ := exists_prod_range_sub_eq v
@@ -131,7 +131,7 @@ end Residue
 section Approx
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_int_dvd_sub (m : ℕ) : ∀ v : 𝒪, (∃ c : ℕ → 𝒪, ∀ k : ℕ,
     (p : 𝒪) ^ m ∣ v - ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c i ^ p ^ k) →
     ∃ z : ℤ, (p : 𝒪) ^ m ∣ v - z := by
@@ -222,7 +222,7 @@ theorem isClosed_range_algebraMap_padic : IsClosed (Set.range (algebraMap ℚ_[p
   (AddMonoidHomClass.isometry_of_norm _ norm_algebraMap_padic).isUniformInducing.isComplete_range.isClosed
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem theta_mem_range_of_phi_eq {y : ACris ℂ_[p] p} (hy : phi ℂ_[p] p y = y) :
     ∃ q : ℚ_[p], ((theta ℂ_[p] p y : 𝒪) : ℂ_[p]) = algebraMap ℚ_[p] ℂ_[p] q := by
   have happrox : ∀ m : ℕ, ∃ z : ℤ,
@@ -276,7 +276,7 @@ theorem mem_pow_of_p_pow_mul_phi_eq {a : ACris ℂ_[p] p} {m : ℕ} (hm : 1 ≤ 
     ring
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem eq_zero_of_p_pow_mul_phiPlus_eq {y : BCrisPlus ℂ_[p] p} {m : ℕ} (hm : 1 ≤ m)
     (hy : (p : BCrisPlus ℂ_[p] p) ^ m * phiPlus ℂ_[p] p y = y) : y = 0 := by
   obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers (p : ACris ℂ_[p] p)) y
@@ -311,7 +311,7 @@ theorem periodTPlus_mul_left_cancel {a b : BCrisPlus ℂ_[p] p}
   iotaPlus_injective (K := ℂ_[p]) (p := p) (mul_left_cancel₀ (iotaPlus_periodTPlus_ne_zero hε hζ)
     (by rw [← map_mul, ← map_mul, h]))
 
-set_option maxHeartbeats 1600000 in
+
 theorem iterate_phiPlus_eq_pow_mul {y : BCrisPlus ℂ_[p] p} {n : ℕ}
     (hy : phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y) (k : ℕ) :
     (phiPlus ℂ_[p] p)^[k] y = ((p : BCrisPlus ℂ_[p] p) ^ n) ^ k * y := by
@@ -323,7 +323,7 @@ theorem iterate_phiPlus_eq_pow_mul {y : BCrisPlus ℂ_[p] p} {n : ℕ}
 
 
 include hε hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_eq_algebraMap_of_phiPlus_eq {y : BCrisPlus ℂ_[p] p}
     (hy : phiPlus ℂ_[p] p y = y) : ∃ q : ℚ_[p], y = algebraMap ℚ_[p] (BCrisPlus ℂ_[p] p) q := by
   obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers (p : ACris ℂ_[p] p)) y
@@ -364,7 +364,7 @@ theorem exists_eq_algebraMap_of_phiPlus_eq {y : BCrisPlus ℂ_[p] p}
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_eq_algebraMap_mul_pow_of_phiPlus_eq (n : ℕ) : ∀ {y : BCrisPlus ℂ_[p] p},
     phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y →
     iotaPlus ℂ_[p] p y ∈ Ideal.span {fontaineT ε hε ^ n} →

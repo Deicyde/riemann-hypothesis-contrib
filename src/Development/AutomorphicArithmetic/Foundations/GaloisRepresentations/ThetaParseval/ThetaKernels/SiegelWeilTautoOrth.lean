@@ -9,7 +9,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -107,11 +107,11 @@ theorem exists_twist_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (
     simpa [hSw] using this
   set q : ℂ := piInf (τ w) ((incM F S₀ * incM F S₀).trace) with hq
   have hqe : q = -(((ε : ℤ) : ℂ)) * ∑ i, ∑ j, ((Complex.normSq (Sw i j) : ℝ) : ℂ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
+
+    rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+    rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     change Sw i j * Sw j i = _

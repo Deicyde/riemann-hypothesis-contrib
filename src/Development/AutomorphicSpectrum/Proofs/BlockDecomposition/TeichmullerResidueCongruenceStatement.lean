@@ -15,7 +15,7 @@ open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual Recipro
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 open GlobalTheory.CompanionTheory.LTPer.Tilt
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.teichmuller_residue_congruence : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (f : ℕ), 0 < f → qOf π = l ^ f →
     ‖(l : ℂ_[l])‖ ≤ ‖oc K π‖ → ‖oc K π‖ < 1 → π ≠ 0 → ∀ (x : Tl l) (c : ↥(OL K)), x ^ l ^ f = x →
     ‖sh x - oc K c‖ ≤ ‖oc K π‖ → ∃ c' : ↥(OL K), sh x = oc K (c + π * c') := by

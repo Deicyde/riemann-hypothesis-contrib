@@ -17,8 +17,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.TypeSupportLift
 
@@ -40,8 +40,8 @@ theorem idem_add_conj_mul {P : Finset (Pl D.host.E)} (hP : SplitSet P) {PP : Pl 
     rw [idem, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => hP.mul_conj hq hPP
   have e3 : cA D (idem P) * idemAt PP = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [idem, map_sum, Finset.sum_mul]
+
+    rw [idem, map_sum, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => by rw [mul_comm]; exact hP.mul_conj hPP hq
   have e4 : cA D (idem P) * cA D (idemAt PP) = cA D (idemAt PP) := by rw [← RingHom.map_mul, e1]
   rw [add_mul, mul_add, mul_add, e1, e2, e3, e4, add_zero, zero_add]

@@ -244,8 +244,8 @@ private theorem hop_mul (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
         exact ⟨⟨⟨c, hc⟩, ⟨d, hd⟩⟩, rfl⟩
   rw [ContinuousLinearMap.comp_apply, e2, e1, e3, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun c _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun d _ => ?_
   rw [rmul, ContinuousLinearMap.comp_apply]
 

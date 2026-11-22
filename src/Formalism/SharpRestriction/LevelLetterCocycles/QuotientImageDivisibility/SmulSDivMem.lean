@@ -34,8 +34,8 @@ theorem smulS_linMap {V' : Type} [AddCommGroup V'] [Module LL V'] (Φ : V →ₗ
   have hf' : LB m (fun j => Φ (f j)) := fun j hj => by simp [hf j hj]
   obtain ⟨N, hN⟩ : ∃ N : ℕ, k - m < N :=
     ⟨Int.toNat (k - m) + 1, by have := Int.self_le_toNat (k - m); push_cast; omega⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [smulS_eq_sum hf g k N hN, smulS_eq_sum hf' g k N hN, map_sum]
+
+  rw [smulS_eq_sum hf g k N hN, smulS_eq_sum hf' g k N hN, map_sum]
   simp [map_smul]
 
 end Div2

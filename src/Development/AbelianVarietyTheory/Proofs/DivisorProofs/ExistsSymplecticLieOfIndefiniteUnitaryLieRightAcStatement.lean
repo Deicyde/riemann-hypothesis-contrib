@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 open scoped TensorProduct Matrix
 open MeasureTheory Formalism.BasicNotions.TH GlobalTheory.RealLift GlobalTheory.RealWeil
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_symplecticLie_of_indefiniteUnitaryLie_rightAction : ∀ (ι l : Type) [Fintype ι] [DecidableEq ι] [Fintype l] [DecidableEq l] (P Q R S : ℕ)
     (φ : (ι → Matrix (Ix P Q) (Ix R S) ℂ) ≃ₗ[ℝ] (l ⊕ l → ℝ)),
     (∀ c c', sympl (φ c) (φ c') = 2 * (∑ w, ∑ a, ∑ b, lineSign a b * c w a b * star (c' w a b)).im) →

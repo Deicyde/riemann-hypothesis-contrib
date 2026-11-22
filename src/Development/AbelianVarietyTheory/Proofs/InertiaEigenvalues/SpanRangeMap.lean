@@ -21,8 +21,8 @@ theorem repr_of_fixed (e : Module.Basis (Fin r) R M) (τ : R →+* R) (A : M →
     e.repr (A x) i = τ (e.repr x i) := by
   have h : A x = ∑ k, τ (e.repr x k) • e k := by
     conv_lhs => rw [← e.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hA, he]
+
+    simp only [map_sum, hA, he]
   rw [h, e.repr_sum_self]
 
 theorem isUnit_matrix (e : Module.Basis (Fin r) R M) (σ : R →+* R) (Φ : M →+ M)
@@ -32,8 +32,8 @@ theorem isUnit_matrix (e : Module.Basis (Fin r) R M) (σ : R →+* R) (Φ : M �
   have hle : Submodule.span R (Set.range Φ) ≤ Submodule.span R (Set.range fun j => Φ (e j)) := by
     rw [Submodule.span_le]
     rintro _ ⟨x, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e.sum_repr x, map_sum]
+
+    rw [← e.sum_repr x, map_sum]
     refine Submodule.sum_mem _ fun k _ => ?_
     rw [hΦ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -62,8 +62,8 @@ theorem change_basis (e : Module.Basis (Fin r) R M) (σ : R →+* R) (Φ : M →
     ext m
     have hm := congrFun (congrFun h m) j
     simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.map_apply] at hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hL, map_sum, hΦ, map_smul, smul_eq_mul, Finsupp.single_apply]
+
+    simp [hL, map_sum, hΦ, map_smul, smul_eq_mul, Finsupp.single_apply]
     simpa only [mul_comm] using hm
   rw [key, Module.Basis.repr_sum_self]
 

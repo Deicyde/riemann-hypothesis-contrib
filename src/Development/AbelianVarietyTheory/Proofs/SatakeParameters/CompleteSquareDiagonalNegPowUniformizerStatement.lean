@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemIntMat
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.completeSquare_diagonalNegPowUniformizer : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (σ : L →+* L) (q : ℕ) (δ : L)
     (n n' : ℕ) (A B : Matrix (Fin n) (Fin n) L) (ψ : AddChar L ℂ),
     Formalism.UG.IsUnramInv ϖ σ q → Odd q → (∀ i j, A i j ∈ Formalism.UG.intL L) → (∀ i j, B i j ∈ Formalism.UG.intL L) → A * B = 1 →

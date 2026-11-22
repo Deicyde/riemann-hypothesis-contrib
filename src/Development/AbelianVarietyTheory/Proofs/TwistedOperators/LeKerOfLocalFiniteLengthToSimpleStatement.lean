@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SimpleOve
 
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.le_ker_of_local_finite_length_to_simple : ∀ {M W : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup W] [Module ℂ W]
     (Op : Set (Module.End ℂ M)) (Rel K : Submodule ℂ M) (φ : M →ₗ[ℂ] W)
     (act : Module.End ℂ M → Module.End ℂ W) (B : Set (Module.End ℂ W)),

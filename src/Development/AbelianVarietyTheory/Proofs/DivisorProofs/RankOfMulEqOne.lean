@@ -217,13 +217,13 @@ def latOf (r : ↥(GK K) →* GL (Fin n) ↥(OL LL)) (hr : Cont r) : LocLat ↥(
         by_cases h : j' = j <;> simp [stdMap_apply, Pi.single_apply, h] }
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def basisOf (r : ↥(GK K) →* GL (Fin n) ↥(OL LL)) (hr : Cont r) :
     Module.Basis (Fin n) ↥(OL LL) ↥(latOf r hr).L.T :=
   (Pi.basisFun ↥(OL LL) (Fin n)).map (LinearEquiv.ofInjective _ stdMap_injective)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def homOf {r : ↥(GK K) →* GL (Fin n) ↥(OL LL)} (hr : Cont r) {r' : ↥(GK K) →* GL (Fin n') ↥(OL LL)} (hr' : Cont r')
     (A : Mx ↥(OL LL) n' n) (hA : Tw r r' A) : LatHom (latOf r hr).L (latOf r' hr').L where
   f := Matrix.toLin' (A.map (algebraMap ↥(OL LL) ↥LL.1))

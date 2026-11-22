@@ -25,7 +25,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.Local
 
 open GlobalTheory.AdelicU GlobalTheory.WeilM
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.localAddCharComponent_trivial_integers_eventually : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), Continuous ψ →
     ∀ᶠ v in Filter.cofinite, ∀ x ∈ (v : HeightOneSpectrum (𝓞 F)).adicCompletionIntegers F, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.psiLoc ψ v x = 1 := by
   first | exact @GlobalTheory.psiLoc_eventually_trivial_integers | exact GlobalTheory.psiLoc_eventually_trivial_integers | (intros; apply GlobalTheory.psiLoc_eventually_trivial_integers <;> assumption)

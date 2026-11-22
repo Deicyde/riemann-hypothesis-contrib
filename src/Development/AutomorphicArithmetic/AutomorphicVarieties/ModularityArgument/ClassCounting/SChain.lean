@@ -43,8 +43,8 @@ private theorem bd_cm (G H : Type) [Group G] [Group H] (f : G →* H) (m : ℕ) 
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | single g a =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cm_single, bd_single, bd_single, map_add (f := _), cm_single, map_sum]
+
+    rw [cm_single, bd_single, bd_single, map_add (f := _), cm_single, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, cm_single]
@@ -71,8 +71,8 @@ private theorem cm_prism (G H : Type) [Group G] [Group H] (f : G →* H) (k : G)
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | single g a =>
     rw [cm_single]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [prism, Finsupp.linearCombination_single, Finset.smul_sum, map_sum, map_smul, cm_single]
+
+    simp only [prism, Finsupp.linearCombination_single, Finset.smul_sum, map_sum, map_smul, cm_single]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [key g i]
 

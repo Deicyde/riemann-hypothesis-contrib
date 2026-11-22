@@ -23,7 +23,7 @@ open GlobalTheory.NormRatio
 open scoped nonZeroDivisors
 open GlobalTheory.CosetOrth
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.valued_finiteUnitary_le_one_off_openSubset : ∀ {D : D7} (V : HSp D) (g : GA D V) (y : Formalism.MainNotions.StandardLatticesGL3.GA D V.rank) (Sf : Finset (FinPl D)), V.gram = 1 →
   GlobalTheory.BotFormula.IsFinPt V g y → g ∈ openOff V (stdLat V) Sf →
   ∀ w : HeightOneSpectrum (𝓞 D.host.E), w.under (𝓞 D.host.F) ∉ Sf → ∀ i j,

@@ -78,7 +78,7 @@ theorem norm_alg {I : Type} [Fintype I] (T T₀ h K : I → ℝ) (sg ex n : I �
   have := (zpow_pos (hT i) (ex i)).ne'
   field_simp
 
-set_option maxHeartbeats 800000 in
+
 theorem core {r : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {h : GenFrEx Xo c} {e : Comp Xo c → Rul Xo c}
     (hL : CompLaws U h e) {x : ℝ} (hx : ∀ σ, GoodEmb c σ → ∀ k (τ : E →+* ℂ), ‖τ ((U σ).X k).ξ0‖ = x)
     {Fr : Small.GenFrame Or} {Z : Comp Xo c} (Rd : Reading Fr h Z) {A : Subring RM.Ω} (hG : GoodRing Fr A)

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLinearHomP
 @[expose] public section
 
 open NumberField
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.sum_smul_differential_mem_eigenLattice : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E),
     GlobalTheory.IndefiniteRowSideFullHecke.EigenvectorLieDegree.IsHostField H → ∀ (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (p : ℕ)
     (X : GlobalTheory.CM.CMObj H K ρ σ₁ p 0), ∀ (FP : GlobalTheory.CM.GenFib (X.A true).pol) (FB : GlobalTheory.CM.GenFib X.B.pol)

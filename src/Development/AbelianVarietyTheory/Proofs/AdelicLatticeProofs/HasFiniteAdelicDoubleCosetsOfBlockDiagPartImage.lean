@@ -262,8 +262,8 @@ private lemma linExt_map_algebraMap {R : Type} [CommRing R] [Algebra ℚ R] (c :
     (X : Matrix ι ι ℚ) : (_root_.GlobalTheory.ClassFin.linExt c X).map (algebraMap ℚ R) =
       _root_.GlobalTheory.ClassFin.linExt c (X.map (algebraMap ℚ R)) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [_root_.GlobalTheory.ClassFin.linExt, map_sum, map_mul]
+
+  simp [_root_.GlobalTheory.ClassFin.linExt, map_sum, map_mul]
 
 
 open Matrix in

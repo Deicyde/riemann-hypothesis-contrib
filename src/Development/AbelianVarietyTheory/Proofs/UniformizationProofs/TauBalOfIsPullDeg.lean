@@ -187,7 +187,7 @@ theorem ros_pull (hG : GlobalFnsSt) (hD : IsPullDeg φ D D') {f g : D.P.A ⟶ D.
   rw [← hm]
   exact (val_pull hJ _ _ _).symm.trans (key.trans (hv' _ _ z J J' hJ hJ'))
 
-set_option maxHeartbeats 1000000 in
+
 theorem tauBal_pull (hG : GlobalFnsSt) (hD : IsPullDeg φ D D') {f g : D.P.A ⟶ D.P.A} {f' g' : D'.P.A ⟶ D'.P.A}
     [IsMonHom f] [IsMonHom g] (hr : RosatiAdj D.P.A D.P.L f g)
     (hf : f' ≫ hD.e.hom = hD.e.hom ≫ (Over.pullback (specOf φ)).map f)

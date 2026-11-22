@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AntiCols
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_inverse_integral_matrices_preserving_doubled_lattice : ∀ (A O : Type) [CommRing A] [CommRing O] (ι : O →ₙ+* A) (n : ℕ) (P Q : Matrix (Fin n) (Fin n) A)
     (Λ : Set (Fin n → A)), Function.Injective ι → P * Q = ι 1 • (1 : Matrix (Fin n) (Fin n) A) →
     Q * P = ι 1 • (1 : Matrix (Fin n) (Fin n) A) → ι 1 • P = P → ι 1 • Q = Q →

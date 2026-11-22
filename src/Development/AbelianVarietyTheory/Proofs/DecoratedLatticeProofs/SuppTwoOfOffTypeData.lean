@@ -16,7 +16,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
 
 namespace GlobalTheory.FinPl.SuppTwoAsm
 
-set_option maxHeartbeats 800000 in
+
 theorem ginf_le_grpOff {D : D7} (V : HSp D) (P : Pl D → Prop) : GinfC V ≤ grpOff V P := by
   intro a ha
   rw [GinfC, MonoidHom.mem_ker] at ha

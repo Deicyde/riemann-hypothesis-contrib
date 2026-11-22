@@ -341,8 +341,8 @@ lemma shift_periods [Algebra (FractionRing ℂ) ℂ] (hσ : GoodEmb c σ) (hU : 
       Finset.sum_neg_distrib, _root_.mul_assoc]
     ring
   rw [e0, e1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_smul, map_sum, hP, hh]
+
+  simp only [map_add (f := _), map_smul, map_sum, hP, hh]
   refine Prod.ext (AddMonoidHom.ext fun z => ?_) ?_
   · let ev : (A.X →+ ℂ) →+ ℂ := { toFun := fun f => f z, map_zero' := rfl, map_add' := fun _ _ => rfl }
     have hsum (f : Fin n → A.X →+ ℂ) : (∑ i, f i) z = ∑ i, f i z :=

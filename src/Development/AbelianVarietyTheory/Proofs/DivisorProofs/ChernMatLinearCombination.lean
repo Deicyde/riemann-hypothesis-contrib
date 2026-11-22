@@ -47,8 +47,8 @@ theorem chernMat_comb : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ 
     [Fintype κ] (L : κ → HermLB p) (n : κ → ℤ) (c : AlgChart p σ D), ∀ y ∈ c.e.source,
     chernMat ((ArInt.comb L n).φ σ) c y = ∑ j, (n j : ℂ) • chernMat ((L j).φ σ) c y := by
   intro k _ X p σ D κ _ L n c y hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← chernHom_icls c hy, icls_comb, map_sum]
+
+  rw [← chernHom_icls c hy, icls_comb, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_zsmul, chernHom_icls, Int.cast_smul_eq_zsmul]
 

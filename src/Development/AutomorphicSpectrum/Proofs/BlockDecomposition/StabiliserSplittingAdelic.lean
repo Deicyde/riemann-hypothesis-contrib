@@ -203,16 +203,16 @@ theorem exists_ker_top [CharZero E] (hσ : ∀ x, σ (σ x) = x) (hJ : ∀ i j, 
   have hsw : ∀ a, sigR R σ (w a) = u a := fun a => hsR _
   have e1 : hv (sigR R σ) (JR R J) w (fun i => inclR R (Y j' i)) =
       ∑ a, u a * inclR R ((J *ᵥ Y j') a) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hv, rowv, hsw, Finset.sum_mul, Matrix.mulVec, dotProduct, map_sum, map_mul,
-      Finset.mul_sum, JR, Matrix.map_apply]
+
+    simp only [hv, rowv, hsw, Finset.sum_mul, Matrix.mulVec, dotProduct, map_sum, map_mul,
+    Finset.mul_sum, JR, Matrix.map_apply]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
   have e2 : ∀ v : Fin M → E, ∑ a, u a * inclR R (v a) = -∑ j, t j * inclR R ((C *ᵥ v) j) := by
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [u, neg_mul, Finset.sum_neg_distrib, Finset.sum_mul, Matrix.mulVec, dotProduct,
-      map_sum, map_mul, Finset.mul_sum]
+
+    simp only [u, neg_mul, Finset.sum_neg_distrib, Finset.sum_mul, Matrix.mulVec, dotProduct,
+    map_sum, map_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine congrArg Neg.neg (Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_)
     ring

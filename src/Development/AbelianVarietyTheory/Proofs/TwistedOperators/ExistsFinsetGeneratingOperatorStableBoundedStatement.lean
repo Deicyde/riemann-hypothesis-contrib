@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SimpleOve
 
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_finset_generating_operator_stable_bounded : ∀ {M : Type} [AddCommGroup M] [Module ℂ M] (Op : Set (Module.End ℂ M)) (Rel : Submodule ℂ M),
     (∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ M), StrictMono N →
         (∀ j, Rel ≤ N j ∧ ∀ g ∈ Op, ∀ x ∈ N j, g x ∈ N j) → m ≤ L) →

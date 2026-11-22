@@ -37,7 +37,7 @@ theorem above_eq {P : HeightOneSpectrum (𝓞 D.host.E)} [DecidableEq (HeightOne
   exact ⟨eq_or_eq_cP, by rintro (rfl | rfl); exacts [rfl, under_cP P]⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem val_mul_val (hv : ∀ (k : D.host.E) (Q : HeightOneSpectrum (𝓞 D.host.E)),
       (cP Q).valuation D.host.E (star k) = Q.valuation D.host.E k)
     (χ : HChar D.host.E) {P : HeightOneSpectrum (𝓞 D.host.E)} (hP : cP P ≠ P)
@@ -195,7 +195,7 @@ theorem det_unitary (V : HSp D) (hg : V.gram = 1) (h : GA D V) :
   exact h2
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_ideal (V : HSp D) (hg : V.gram = 1) (hL : Bridge.hLat V 1 = stdLat D.host.E V.rank) (h : GA D V)
     (e : AE D) (P : Finset (HeightOneSpectrum (𝓞 D.host.E))) (y : (AE D)ˣ) (he : Formalism.IndefR.Datum.IsIdemSum e P)
     (hs : SuppAt e V h) (hy : IsDetAt e V h y) (b : ℕ) (hb : ∀ Q ∈ P, (b : 𝓞 D.host.E) ∉ Q.asIdeal)
@@ -217,16 +217,16 @@ theorem exists_ideal (V : HSp D) (hg : V.gram = 1) (hL : Bridge.hLat V 1 = stdLa
   simp only [← hev] at hid hcj
   obtain ⟨⟨es, hes, hsum⟩, horth⟩ := he
   have e0 : infPart D e = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum]
+
+    rw [hsum, map_sum]
     exact Finset.sum_eq_zero fun Q hQ => (hid _ _ (hes Q hQ)).1
   have e1 : ∀ Q ∈ P, ev Q e = 1 := fun Q hQ => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum, Finset.sum_eq_single Q (fun Q' h' hne => (hid _ _ (hes Q' h')).2.2 Q hne.symm)
-      (fun h' => absurd hQ h'), (hid _ _ (hes Q hQ)).2.1]
+
+    rw [hsum, map_sum, Finset.sum_eq_single Q (fun Q' h' hne => (hid _ _ (hes Q' h')).2.2 Q hne.symm)
+    (fun h' => absurd hQ h'), (hid _ _ (hes Q hQ)).2.1]
   have e2 : ∀ Q, Q ∉ P → ev Q e = 0 := fun Q hQ => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum]
+
+    rw [hsum, map_sum]
     exact Finset.sum_eq_zero fun Q' h' => (hid _ _ (hes Q' h')).2.2 Q fun hh => hQ (hh ▸ h')
   have hP : ∀ Q ∈ P, cP Q ∉ P := fun Q hQ hQ' => by
     have a := congrArg (ev (cP Q)) horth

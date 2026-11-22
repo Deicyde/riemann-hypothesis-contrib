@@ -8,14 +8,14 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Lift
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain
 open Formalism.L2.NT
 namespace Formalism.L2
-set_option synthInstance.maxHeartbeats 400000 in
+
 structure NTiedAllAlt (D : D7) (C : NChoice D) (I : TwIn D) where
   gal : _root_.Formalism.L2.NGalTiedAlt D
   n : _root_.GlobalTheory.HeightCounting.NTiedGPlaceholder D

@@ -17,7 +17,7 @@ open PositivityTheory.Rg.BcB.F.Tail
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace GlobalTheory.CompanionTheory.ReadLevel
 
@@ -123,7 +123,7 @@ theorem levi_of_mem {E : Type} [Field E] [NumberField E] [IsCMField E] {n a b : 
   obtain ⟨X, hX⟩ := GlobalTheory.T.parabolic_element_block_form E n a b h w p
   exact hKQ _ X (hX ▸ hp)
 
-set_option maxHeartbeats 1000000 in
+
 theorem rReadLev : RReadLev := by
   intro hR hJ E _ _ _ n a b h μ s₁ s₂ Pa Pb D c w K L G hKo hKc hLo hKL hG hG0 hGL
   obtain ⟨x, hx0, hx⟩ := exists_fixed_of_sep (hR E a b s₁ s₂ Pa Pb w c.g₁ c.g₂ c.u₁ c.u₂ c.t₁ c.t₂) hLo hG hG0 hGL

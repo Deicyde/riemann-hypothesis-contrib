@@ -1714,7 +1714,7 @@ namespace Formalism.FourierDecayAlt.P.JCTx6.Pos
 
 open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
 
-set_option maxHeartbeats 1000000 in
+
 theorem posCore : PosCore := by
   intro hIntG hTrans
   obtain ⟨CcU, hCcU⟩ := Formalism.FourierDecayAlt.P.corollary_u2_germ_hypothesis 127 0

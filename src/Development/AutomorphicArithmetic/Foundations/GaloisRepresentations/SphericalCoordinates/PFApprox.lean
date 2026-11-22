@@ -38,8 +38,8 @@ private theorem span_top (τ : J → F →+* PadicAlgCl p)
   have hsum : ∀ w : (∀ i, L i), φ w = ∑ i, ψ i (w i) := by
     intro w
     conv_lhs => rw [← Finset.univ_sum_single w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     rfl
   have hrep : ∀ i, ∃ a : L i, ∀ y, ψ i y = Algebra.trace ℚ_[p] (L i) (a * y) := by
     intro i
@@ -120,8 +120,8 @@ private theorem span_top (τ : J → F →+* PadicAlgCl p)
       intro i
       rw [ha i, trace_eq_sum_embeddings]
       simp only [map_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun i _ => hi i), ← map_sum]
+
+    rw [Finset.sum_congr rfl (fun i _ => hi i), ← map_sum]
     have := hsum (fun i => (⟨τ i x, hm i x⟩ : L i))
     rw [← this, hφf x, map_zero])
   have ha0 : ∀ i, a i = 0 := by

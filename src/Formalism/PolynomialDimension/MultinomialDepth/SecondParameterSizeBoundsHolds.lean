@@ -245,7 +245,7 @@ lemma pII0_om (r N n' c₀ c'' : ℕ) (hr : 1 ≤ r) (hN : 1 ≤ N) : (c₀ : �
   have h2 : (0 : ℝ) ≤ 2 * r * n' * c'' := by positivity
   nlinarith
 
-set_option maxHeartbeats 1000000 in
+
 theorem secondParameterSizeBounds_holds : ParamsII0 := by
   intro CE C₂ hCE hC₂
   refine ⟨64 * CE + 400 + C₂, by linarith, ?_⟩

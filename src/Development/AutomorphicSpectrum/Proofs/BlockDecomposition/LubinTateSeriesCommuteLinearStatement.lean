@@ -11,7 +11,7 @@ open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual Recipro
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lubin_tate_series_commute_linear : ∀ {B : Type} [CommRing B] {S : Subring B} {F : ℕ → Ideal B} {ϖ : B} {R : Type} [CommRing R], PerEnv S F ϖ → ∀ (ϖ' : B), ϖ * ϖ' = 1 →
     ∀ (h : R →+* B), (∀ c, h c ∈ S) → ∀ (π : R), h π = ϖ → ∀ (q : ℕ), 2 ≤ q → (∃ s ∈ S, (q : B) = ϖ * s) →
     ∀ (φ : PowerSeries R), PowerSeries.constantCoeff φ = 0 →

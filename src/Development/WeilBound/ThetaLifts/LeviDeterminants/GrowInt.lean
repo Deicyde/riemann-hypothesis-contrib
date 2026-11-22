@@ -182,8 +182,8 @@ def wordL (hψ : IsStd ψ) (l : List (V F κ × V F κ)) : schA F κ →ₗ[ℂ]
 
 theorem linForm_sum {ι : Type} [Fintype ι] (a : ι → ℝ) (b : ι → V F κ) (p : V F κ) :
     linForm (∑ j, a j • b j) p = ∑ j, a j * linForm (b j) p := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [linForm_apply, Finset.sum_apply, Pi.smul_apply, Finset.mul_sum, mul_smul_comm, map_sum, map_smul, smul_eq_mul]
+
+  simp only [linForm_apply, Finset.sum_apply, Pi.smul_apply, Finset.mul_sum, mul_smul_comm, map_sum, map_smul, smul_eq_mul]
   exact Finset.sum_comm
 
 theorem dR_sum (hψ : IsStd ψ) {ι : Type} [Fintype ι] (a : ι → ℝ) (b : ι → V F κ × V F κ) {Φ : (κ → AF F) → ℂ}
@@ -192,10 +192,10 @@ theorem dR_sum (hψ : IsStd ψ) {ι : Type} [Fintype ι] (a : ι → ℝ) (b : �
   | mem x hx =>
     obtain ⟨f, g, hg, rfl⟩ := hx
     funext x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dR_pure hψ, Finset.sum_apply, Pi.smul_apply, pureA, dS_apply, Prod.fst_sum, Prod.snd_sum, Prod.smul_fst,
-      Prod.smul_snd, linForm_sum, map_sum, map_smul, smul_eq_mul, Complex.real_smul, Complex.ofReal_sum, Complex.ofReal_mul,
-      Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+
+    simp only [dR_pure hψ, Finset.sum_apply, Pi.smul_apply, pureA, dS_apply, Prod.fst_sum, Prod.snd_sum, Prod.smul_fst,
+    Prod.smul_snd, linForm_sum, map_sum, map_smul, smul_eq_mul, Complex.real_smul, Complex.ofReal_sum, Complex.ofReal_mul,
+    Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun j _ => by ring
   | zero =>
     have : ∀ w : V F κ × V F κ, dR ψ w 0 = 0 := fun w => by
@@ -241,8 +241,8 @@ theorem word_bound (hψ : IsStd ψ) {μ : @Measure (κ → AF F) (borel _)} (hμ
         have := dR_sum hψ (b.repr w) b hΦ
         rw [b.sum_repr] at this
         simpa using this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [e1, e2, map_sum]
+
+      rw [e1, e2, map_sum]
       simp only [map_smul]
       rfl
     rw [e, mul_assoc, Finset.sum_mul]

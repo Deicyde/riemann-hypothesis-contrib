@@ -46,8 +46,8 @@ theorem frames_read : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : 
         R.toRealDat.WS F.lv2 b i σ)) := by
     rw [lin_apply]
     have e : ∀ x : ↥(R.toRealDat.WS F.lv2 b i σ), Tw.mk s x = Tw.mkL s ↥(R.toRealDat.WS F.lv2 b i σ) x := fun _ => rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum]
+
+    rw [e, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ]
     show v.embedding (c k) • _ = _
@@ -59,8 +59,8 @@ theorem frames_read : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : 
       (((Real.sqrt (RealDat.nP F.lv2 b))⁻¹ : ℝ) : ℂ) • (R.FW i).j σ (∑ k, c k • R.toRealDat.bL F.lv2 b i k) := by
     rw [Submodule.coe_sum]
     simp only [Submodule.coe_smul, RealDat.bC]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum]
+
+    rw [map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ, smul_comm]
   calc ‖Tw.mk s (∑ k, σ (c k) • (⟨R.toRealDat.bC F.lv2 b i σ k, Submodule.subset_span ⟨k, rfl⟩⟩ :

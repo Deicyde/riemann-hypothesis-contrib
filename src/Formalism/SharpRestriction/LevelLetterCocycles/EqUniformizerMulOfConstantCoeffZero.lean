@@ -324,7 +324,7 @@ namespace Formalism.MainNotions.CrystallineLiftingInputs.truncatedSeriesData
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
 
 
-set_option maxHeartbeats 400000 in
+
 theorem gamma_lemma_of_crystalline (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (h9 : Formalism.MainNotions.DeltaInvariantLattices.P9 D HW F) :
     ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (hg : Good K 1 LL)
       [NeZero (Module.finrank ℚ_[l] ↥(K0 K))], Formalism.MainNotions.N.Pv.LocalLengthBound.WachGammaDerivation ((HW l).W K 1 LL hg) := by

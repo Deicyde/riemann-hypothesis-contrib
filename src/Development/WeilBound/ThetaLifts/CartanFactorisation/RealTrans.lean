@@ -99,8 +99,8 @@ theorem move_sum {n d : ℕ} {Y : Spc F E n} {W : Spc F E d} {M : Model σ Y W} 
     (hT : IsArchOp o x T) {m : ℕ} (f : Fin m → SInf F (Fin n × Fin d)) (φ : Fin m → ∀ v : Pl F, (Fin n × Fin d → Fv F v) → ℂ)
     (h1 : ∀ i v, φ i v ∈ SB _) (h2 : ∀ i, ∀ᶠ v in cofinite, φ i v = M.vac v) :
     o x (∑ i, pure (f i) (φ i)) = ∑ i, pure (T (f i)) (φ i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   obtain ⟨g, hg, e⟩ := pure_eq_pureA hM (φ i) (h1 i) (h2 i)
   rw [e, e, hT.1 _ g hg]

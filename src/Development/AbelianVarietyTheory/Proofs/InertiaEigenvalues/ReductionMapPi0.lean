@@ -27,9 +27,9 @@ theorem map_pi0 : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Typ
   have hl : (l : k⟦X⟧) = 0 := by
     rw [← map_natCast (PowerSeries.C : k →+* k⟦X⟧), CharP.cast_eq_zero, map_zero]
   unfold LocWach.π₀₁
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sub, map_one, map_natCast, hp, hl, sub_zero, map_sum, ← Finset.sum_coe_sort W.DelF,
-    Finset.sum_congr rfl fun δ _ => by rw [he, map_add (f := _), map_one, PowerSeries.map_X, hsub],
-    ← finsum_comp_equiv e, finsum_eq_sum_of_fintype]
+
+  rw [map_add (f := _), map_sub, map_one, map_natCast, hp, hl, sub_zero, map_sum, ← Finset.sum_coe_sort W.DelF,
+  Finset.sum_congr rfl fun δ _ => by rw [he, map_add (f := _), map_one, PowerSeries.map_X, hsub],
+  ← finsum_comp_equiv e, finsum_eq_sum_of_fintype]
 
 end GlobalTheory.RedFun

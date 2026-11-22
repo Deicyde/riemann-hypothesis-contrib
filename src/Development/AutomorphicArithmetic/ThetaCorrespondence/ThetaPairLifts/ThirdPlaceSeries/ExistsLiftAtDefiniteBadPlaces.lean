@@ -39,7 +39,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -98,7 +98,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lifts_badAt_last_of_green_cuspidal : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → GlobalTheory.Published.GreenCuspidal → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.LiftsCondition fun Fm x _ ι p i _ _ => (i : ℕ) + 1 = (Fm.D x ι).R.m → BadAt p i := by
   first | exact @_root_.GlobalTheory.CovTop.definite_bad_place_lift_alt | exact _root_.GlobalTheory.CovTop.definite_bad_place_lift_alt | (intros; apply _root_.GlobalTheory.CovTop.definite_bad_place_lift_alt <;> assumption)
 end

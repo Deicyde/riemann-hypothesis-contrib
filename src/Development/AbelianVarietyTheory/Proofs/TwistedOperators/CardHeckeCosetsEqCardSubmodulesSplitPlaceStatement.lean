@@ -15,7 +15,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 open NumberField
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.card_hecke_cosets_eq_card_submodules_split_place : ∀ (D : D7), GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.HeckePointLaws → GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.SplitLinearModel D → GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.VacFixed D →
     ∀ (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m)
     (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F) (F : Face D A)

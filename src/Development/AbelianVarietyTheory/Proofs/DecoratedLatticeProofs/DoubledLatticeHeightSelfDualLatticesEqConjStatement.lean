@@ -15,6 +15,6 @@ open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.doubledLatticeHeight_selfDual_lattices_eq_conj : ∀ (D : D7) (A : HSp D) (L L' : Lat A), IsSelfDualC A L → IsSelfDualC A L' → ∃ k ∈ GfC A, ∀ (a : GL (Fin A.rank) (AE D)), IsMaj A a → ∀ g, hgtL A L' a g = hgtL A L a (k⁻¹ * g * k) := by
   exact GlobalTheory.Core.Rk.IP.hgtL_eq_conj_of_selfDual

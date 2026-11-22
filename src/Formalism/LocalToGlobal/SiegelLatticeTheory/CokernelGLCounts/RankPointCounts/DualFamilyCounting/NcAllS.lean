@@ -35,7 +35,7 @@ variable {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubg
   (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
   (i0 i0' : ∀ _ : NumberField.InfinitePlace X.B.I.F, Fin D.R.k) (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
 
-set_option maxHeartbeats 4000000 in
+
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
 theorem ncTieAllS_of (hSplit : Formalism.L2.SG.Pf.NcSplitS.SplitOm) (hRB : Formalism.L2.SG.Pf.NcReal.RealBracket)
     (hHyp : HypX X hb FdN FdN' u u') (hMC : MeasCompatψ X ψ) (hStd : StdHyp X.B.I.cm.sig X.B.I.J ψ)
@@ -109,7 +109,7 @@ theorem ncTieAllS_of (hSplit : Formalism.L2.SG.Pf.NcSplitS.SplitOm) (hRB : Forma
   exact Formalism.L2.SG.Pf.NcLeaves.ncTieC_of_leaves X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq a' ha
     hP hM hMs hL hO hTy hV hVG hStd.2.2.1 hStd.2.2.2 hcong hRR hS hR hVo hVt hIx hOm hFD hPC
 
-set_option maxHeartbeats 4000000 in
+
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
 theorem ncTie0All_of (hRB : Formalism.L2.SG.Pf.NcReal.RealBracket) (hSW : PI.VolStabS.MassDataS.SWXS)
     (hHyp : HypX X hb FdN FdN' u u') (hMC : MeasCompatψ X ψ) (hStd : StdHyp X.B.I.cm.sig X.B.I.J ψ)

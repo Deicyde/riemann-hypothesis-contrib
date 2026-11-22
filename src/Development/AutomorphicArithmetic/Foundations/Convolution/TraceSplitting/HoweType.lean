@@ -75,8 +75,8 @@ private theorem local_type (k E : Type) [Field k] [CharZero k] [ValuativeRel k] 
       rw [e1, galIsom k E]
       exact hy' i j
     · have hsd : GlobalTheory.Whittaker.superDiag (Matrix.GeneralLinearGroup.map (s : E →+* E) y) = s (GlobalTheory.Whittaker.superDiag y) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [GlobalTheory.Whittaker.superDiag, map_sum, hent]
+
+        simp only [GlobalTheory.Whittaker.superDiag, map_sum, hent]
       change ((ψ (GlobalTheory.Whittaker.superDiag (Matrix.GeneralLinearGroup.map (s : E →+* E) y)) : Circle) : ℂ) = _
       rw [hsd, hinv]
 

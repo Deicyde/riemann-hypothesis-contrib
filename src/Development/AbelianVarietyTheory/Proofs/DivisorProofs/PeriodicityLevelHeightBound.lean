@@ -143,8 +143,8 @@ theorem transport_denom : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
     intro t ht
     refine ⟨?_, fun v => ?_⟩
     · change fstA F (∑ j, y j * t j) = 0
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [map_mul]
       change (y j).1 * _ = 0

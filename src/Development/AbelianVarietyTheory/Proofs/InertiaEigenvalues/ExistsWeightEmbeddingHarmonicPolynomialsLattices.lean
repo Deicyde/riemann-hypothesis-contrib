@@ -26,8 +26,8 @@ open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MtRead
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.MtRead.WtEmb
@@ -134,8 +134,8 @@ theorem linInd_mapVV {ι' : Type} [Fintype ι'] {n : ℕ} {K : Type} [Field K] (
   · rw [← GlobalTheory.CoefModel.span_mapVV φ lam, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     dsimp only
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← c.sum_repr (bVV K lam i), map_sum]
+
+    rw [← c.sum_repr (bVV K lam i), map_sum]
     refine Submodule.sum_mem _ fun x _ => ?_
     rw [LinearMap.map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, rfl⟩)
@@ -200,8 +200,8 @@ theorem exists_wtMap : ∀ (D : D7) (S T : HSp D) (B : GlobalTheory.ExportSeries
     intro w y h
     rw [show Ω w = sumMap e b₁ v w from rfl, sumMap_apply]
     conv_rhs => rw [← c₀.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [LinearMap.map_smulₛₗ, h x]
     rfl
@@ -321,8 +321,8 @@ theorem exists_wtMap : ∀ (D : D7) (S T : HSp D) (B : GlobalTheory.ExportSeries
     have hgind : LinearIndependent K₀ fun i => mapK s B.w.lam (bVV (↥D.LL0) B.w.lam i) := by
       refine Fintype.linearIndependent_iff.2 fun k hk i => ?_
       have h1 := congrArg (GlobalTheory.CoefModel.mapVV (e.comp f) B.w.lam) hk
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at h1
+
+      rw [map_sum, map_zero] at h1
       simp only [LinearMap.map_smulₛₗ, mapVV_mapK] at h1
       rw [hsO] at h1
       have := Fintype.linearIndependent_iff.1 (GlobalTheory.CoefModel.linearIndependent_mapVV (embLL0 D) B.w.lam)

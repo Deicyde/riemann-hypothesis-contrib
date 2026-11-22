@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 @[expose] public section
 
 open scoped Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tendsto_slope_metaplecticLift_schwartz : ∀ (l : Type) [Fintype l] [DecidableEq l] (G : Type) [Group G] (pr : G →* Matrix.symplecticGroup l ℝ)
     (om : G →* (GlobalTheory.RealWeil.L2 l ≃ₗᵢ[ℂ] GlobalTheory.RealWeil.L2 l)) (omS : G →* (GlobalTheory.RealWeil.Sch l →L[ℂ] GlobalTheory.RealWeil.Sch l)),
     (∀ (g : G) (w : l ⊕ l → ℝ) (f : GlobalTheory.RealWeil.L2 l),

@@ -14,7 +14,7 @@ open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published U
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.InertialTypesAlt.cuspIne :
     TameRead → TypeChar → NameOf → BaseQ → CuspIne := by
   intro hT hC hN hB

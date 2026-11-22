@@ -21,7 +21,7 @@ open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
 open ValuativeRel
 open scoped GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.heisenbergLatticeVacuum_unique_up_to_scalar : ∀ {D : D7} {a a' : ℕ} (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base D.host.F D.host.E) (Γ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo D.sp.cm.sig a a')
     (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := D.host.F)) (L₁ : Submodule (𝓞 D.host.E) (Fin a' → D.host.E))
     (L₂ : Submodule (𝓞 D.host.E) (Fin (a + a') → D.host.E)) (θ : 𝓞 D.host.E),

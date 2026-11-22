@@ -265,7 +265,7 @@ namespace GlobalTheory.Unfold.IotaGlob
 
 variable {D : D7}
 
-set_option maxHeartbeats 1000000 in
+
 theorem graph_sub (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS) (Tn T'n : ℕ)
     (F : LFlag (D.sp.Y 0) D.R.rS (Tn : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (T'n : D.host.E))
     (hB : Based Z FP Tn T'n F F') (Λ₁ Λ₂ : LV D)

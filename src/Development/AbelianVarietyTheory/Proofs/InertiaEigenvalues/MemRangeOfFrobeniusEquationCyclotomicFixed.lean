@@ -87,11 +87,11 @@ theorem approx_step {ι : A →+* R} {p : ℕ} {t : R} {τ : A} (hτ : ι τ = t
     | succ N ih =>
       intro u h1 h2
       refine ih (fun i => ∑ j, M i j * φ (u j) + c i) (fun i => ?_) (fun i => ?_)
-      set_option synthInstance.maxHeartbeats 100000 in
-        · rw [map_add (f := _), map_sum]
-          refine add_mem (sum_mem fun j _ => ?_) (pow_mem_of_le hD (Nat.zero_le N) (hc i))
-          rw [map_mul]
-          exact mul_mem (pow_mem_of_le hD (Nat.zero_le N) (hM i j)) (h1 j)
+
+      · rw [map_add (f := _), map_sum]
+        refine add_mem (sum_mem fun j _ => ?_) (pow_mem_of_le hD (Nat.zero_le N) (hc i))
+        rw [map_mul]
+        exact mul_mem (pow_mem_of_le hD (Nat.zero_le N) (hM i j)) (h1 j)
       · have e : w i - (∑ j, M i j * φ (u j) + c i) = ∑ j, M i j * φ (w j - u j) := by
           rw [hw i]
           simp only [map_sub, mul_sub, Finset.sum_sub_distrib]
@@ -133,8 +133,8 @@ theorem padic_step {io : E →+* R} {φ : R →+* R} {φE : E → E} {p : ℕ}
         intro i
         have := hc i
         simp only [her, map_add (f := _), map_mul, map_natCast, mul_add, Finset.sum_add_distrib] at this
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sub, map_add (f := _), map_sum, map_mul, hφ, mul_sub, Finset.mul_sum]
+
+        simp only [map_sub, map_add (f := _), map_sum, map_mul, hφ, mul_sub, Finset.mul_sum]
         have e2 : ∑ j, (p : R) * (io (M i j) * φ (r j)) = ∑ j, io (M i j) * (p * φ (r j)) :=
           Finset.sum_congr rfl fun j _ => by ring
         rw [e2]
@@ -221,8 +221,8 @@ theorem exists_series_sum (a : ℕ → LetA O n) :
       - ∑ j ∈ Finset.range m, X ^ j * a j i := fun i => by
     rw [X_pow_dvd_iff]
     intro k hk
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, coeff_mk, map_sum, map_sum, sub_eq_zero]
+
+    rw [map_sub, coeff_mk, map_sum, map_sum, sub_eq_zero]
     refine Finset.sum_subset (Finset.range_subset_range.2 hk) fun j _ hj => ?_
     rw [coeff_X_pow_mul', if_neg]
     simpa using hj
@@ -732,7 +732,7 @@ theorem lift_closure {LL : FinExt l} (D : Subring (RW LL)) (T : Set (OCb l))
   exact ⟨w, e, hw⟩
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem mem_range_of_fixed : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))) (E : EtSit P AI K s LL h W) (ι : Type) [Fintype ι] (M : ι → ι → W.EE) (c : ι → W.EE) (w : ι → RW LL), (∀ g : ↥(GK K), W.resΓ g = 1 → ∀ i, AI.gRW LL (g : GQ l) (w i) = w i) → (∀ i, w i = ∑ j, E.tie.ioE (M i j) * φRW LL (w j) + E.tie.ioE (c i)) → ∀ i, ∃ e : W.EE, E.tie.ioE e = w i := by
   intro l _ P AI K s LL h W E I _ M c w hw hc i
   have hO : Function.Injective (algebraMap ↥(OL LL) ↥LL.1) := Subtype.val_injective

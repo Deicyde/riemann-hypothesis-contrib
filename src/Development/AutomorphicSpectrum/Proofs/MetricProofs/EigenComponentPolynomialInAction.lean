@@ -85,8 +85,8 @@ theorem eigComp_eq_sum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
       t (algebraMap (𝓞 E) E b) • eigComp R.B (t.comp (algebraMap (𝓞 E) E)) z := by
     intro b
     conv_lhs => rw [← hsum z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun t _ => hB b t
   calc eigComp R.B s z
       = ∑ t : E →+* ℂ, (if t = extend s then (1 : ℂ) else 0) •

@@ -168,8 +168,8 @@ theorem ptId : PtId := by
     rw [hxZ]
     conv_lhs => rw [decomp M]
     rw [Matrix.add_mul, map_add (f := _), hlaw _ (by simp)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.sum_mul, map_sum, Matrix.add_mul, Matrix.smul_mul, map_add (f := _), map_smul, smul_eq_mul, hdK]
+
+    simp only [Matrix.sum_mul, map_sum, Matrix.add_mul, Matrix.smul_mul, map_add (f := _), map_smul, smul_eq_mul, hdK]
     congr 1
     · simp [Matrix.trace_sub]
   rw [hL]

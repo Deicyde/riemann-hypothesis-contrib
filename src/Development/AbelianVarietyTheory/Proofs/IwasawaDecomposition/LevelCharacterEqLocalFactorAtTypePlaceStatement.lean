@@ -11,12 +11,12 @@ open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 open GlobalTheory.LevCmp
 open GlobalTheory.TwistChoice (Reading ReadsAt)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.levelCharacter_eq_localFactor_at_typePlace : ∀ (D : D7) (i : D.ntw.Tw) (j : ℕ) (b : Bool) (k : ℕ) (Q : Finset (PlE D.host))
     (ψ : G D.host.E D.nd.Om →* (D.ntw.Ok i k)ˣ) (e : ℤ) (W₀ : Type) [AddCommGroup W₀] [Module (FractionRing (D.ntw.O i)) W₀]
     (ρ₀ : Representation (FractionRing (D.ntw.O i)) (GQ D.host.E D.R.nV) W₀)

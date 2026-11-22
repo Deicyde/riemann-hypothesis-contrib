@@ -5322,7 +5322,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option genInjectivity false in

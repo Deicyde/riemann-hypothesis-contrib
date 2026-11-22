@@ -22,8 +22,8 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries GlobalTheory.ConjTwist Formalism.IndefR.Lev
 open GlobalTheory.BigOn.Exp.TwConj GlobalTheory.IdemSupport
 open Formalism.L2.Host (HChar IsDelta IsPsi)
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp.TwConj.LevAt

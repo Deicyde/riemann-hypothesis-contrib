@@ -45,8 +45,8 @@ theorem basis_fixed_bc {L k : Type} [CommRing L] [CommRing k] (ψ : L →+* k) {
     simp [Finset.sum_apply]
   refine ⟨fun i => ∑ j, c' j * ψ (M j i), ?_, fun a ha => ?_⟩
   · show c' = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← hc, ← hs c', map_sum]
+
+    conv_lhs => rw [← hc, ← hs c', map_sum]
     simp only [map_smul, h1, Finset.smul_sum, Finset.sum_smul, smul_smul]
     exact Finset.sum_comm
   · funext i

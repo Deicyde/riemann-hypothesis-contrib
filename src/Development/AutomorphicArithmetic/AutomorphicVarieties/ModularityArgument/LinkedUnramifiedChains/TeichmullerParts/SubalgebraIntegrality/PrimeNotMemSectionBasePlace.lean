@@ -18,7 +18,7 @@ open UpperTheory.V.Z.Mult (Cp)
 open UpperTheory.V.Z.J.D
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 section Alg
 

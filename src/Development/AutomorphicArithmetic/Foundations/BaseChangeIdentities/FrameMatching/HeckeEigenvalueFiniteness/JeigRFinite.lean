@@ -13,7 +13,7 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation Posi
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.HeckeLevelFrameExistence.Ev
 

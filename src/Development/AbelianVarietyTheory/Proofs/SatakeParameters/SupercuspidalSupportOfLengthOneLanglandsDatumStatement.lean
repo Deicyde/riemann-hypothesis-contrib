@@ -16,7 +16,7 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.Loc
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.supercuspidalSupport_of_lengthOne_langlandsDatum : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (c : ℕ) (Δ : Fin c → Segment k) (x : IrrGL (k := k)), (∀ i, (Δ i).len = 1) →
     IsL ((List.ofFn Δ : List (Segment k)) : Multiset (Segment k)) x.rep →

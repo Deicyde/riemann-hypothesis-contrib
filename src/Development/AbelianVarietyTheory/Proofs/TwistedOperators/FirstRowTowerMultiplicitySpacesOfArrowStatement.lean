@@ -12,6 +12,6 @@ open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheor
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.firstRowTower_multiplicitySpaces_of_arrow : RowModels → RowStep → RowTower := by
   first | exact @GlobalTheory.SepRows.rowTower_of_step | exact GlobalTheory.SepRows.rowTower_of_step | (intros; apply GlobalTheory.SepRows.rowTower_of_step <;> assumption)

@@ -11,7 +11,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
   IsDedekindDomain NumberField Formalism.IndefR.PHeisFC Formalism.IndefR.Eqv
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin.VacEx
 

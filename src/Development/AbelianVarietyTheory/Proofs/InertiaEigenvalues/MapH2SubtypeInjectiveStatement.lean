@@ -8,7 +8,7 @@ public import ReciprocityTheory.ReductiveGroups.TraceFormulas.LatDefs
 
 open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2
 open Formalism.NG (KO)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.map_H2_subtype_injective : ∀ {O : Type} [CommRing O] [TopologicalSpace O] {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G]
     {ε : G →* Oˣ} (Θ : NatInv ε (fun M _ _ _ => IsFGTop O M))
     {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M] [IsTopologicalAddGroup M]

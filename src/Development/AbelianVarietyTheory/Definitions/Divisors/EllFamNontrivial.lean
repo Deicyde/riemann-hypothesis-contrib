@@ -78,8 +78,8 @@ theorem Close.map {W : Opens (Tot I g)} {C C' : Type} [CommRing C] [CommRing C']
   | tail _ hs ih =>
     obtain ⟨n, hn, hnn, hρ⟩ := hs
     refine ih.tail ⟨fun a ↦ φ (n a), fun a ↦ hφ _ (hn a), fun a b ↦ by rw [← map_mul, hnn, map_zero], fun f ↦ ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RingHom.comp_apply, hρ, map_add (f := _), map_sum, map_mul]
+
+    simp only [RingHom.comp_apply, hρ, map_add (f := _), map_sum, map_mul]
 
 theorem Close.comap {W W' : Opens (Tot I g)} {C : Type} [CommRing C] {J : Ideal C}
     {ρ₁ ρ₂ : Hol W' →+* C} (h : Close J ρ₁ ρ₂) (ψ : Hol W →+* Hol W') (hψ : ∀ a f, dw a (ψ f) = ψ (dw a f)) :

@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorRatAlg
 @[expose] public section
 
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tensor_rat_algebra_decomp_factorwise : ∀ (S F B : Type) [Field S] [CharZero S] [Field F] [Algebra ℚ F] [FiniteDimensional ℚ F] [Ring B]
     [Algebra F B] [Algebra ℚ B] [IsScalarTower ℚ F B],
     ∃ (ι : Type) (_ : Fintype ι) (L : ι → Type) (_ : ∀ i, Field (L i)) (_ : ∀ i, CharZero (L i))

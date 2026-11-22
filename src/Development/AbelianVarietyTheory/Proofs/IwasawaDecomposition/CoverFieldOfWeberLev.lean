@@ -85,7 +85,7 @@ theorem lg_weberLev (K : Ctx) : large₂ K WeberLev := by
   exact Set.mem_biUnion (x := χ) hχ hr
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem coverField_of_weberLev {B : Base} {f : Fr B.toPre} {T : TwDat B} (hW : WeberLev B f T) (w : ColW B f T) (Z : w.Lt)
     (hX : B.fields.Ok) (Wt : Set B.places.Pl) (z : R3.Dat (w.st Z) w.I hX T Wt) :
     GlobalTheory.TwistField.CoverField z.core z.R.toRealDat := by

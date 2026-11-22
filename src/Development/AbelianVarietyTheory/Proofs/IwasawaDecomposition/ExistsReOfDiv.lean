@@ -18,7 +18,7 @@ open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 4000000
+
 
 section Trans
 

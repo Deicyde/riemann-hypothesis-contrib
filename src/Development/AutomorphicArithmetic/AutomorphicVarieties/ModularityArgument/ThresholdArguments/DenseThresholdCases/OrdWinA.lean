@@ -11,8 +11,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -68,8 +68,8 @@ private theorem map_dc (σ : Representation ℂ Γ X) (τ : Representation ℂ �
   have hx0 : x ≠ 0 := fun e => hx (by rw [e, map_zero])
   rcases finite_or_infinite (MulAction.orbit K (a : Γ ⧸ K)) with hf | hf
   · haveI := Fintype.ofFinite (MulAction.orbit K (a : Γ ⧸ K))
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Hi.dc, finsum_eq_sum_of_fintype, LinearMap.sum_apply, map_sum, hT]
+
+    simp only [Hi.dc, finsum_eq_sum_of_fintype, LinearMap.sum_apply, map_sum, hT]
   · rw [Hi.dc, Hi.dc, finsum_of_infinite_support, finsum_of_infinite_support]
     · simp
     · rw [Function.support_eq_univ fun _ => ne_zero_rep σ hx _]

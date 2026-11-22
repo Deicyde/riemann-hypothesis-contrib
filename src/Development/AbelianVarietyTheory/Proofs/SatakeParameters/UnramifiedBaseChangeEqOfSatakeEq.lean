@@ -111,8 +111,8 @@ theorem ne_zero_of_symJ (α : Fin m → ℂˣ) (α₀ : Fin m → ℂ) (i₀ : F
     refine hli (funext fun k => ?_)
     have := h k.toAdd
     simp only [symJ, monoJ_single] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, powersHom_apply] using this
+
+    simpa [map_sum, powersHom_apply] using this
   have h1 := DFunLike.congr_fun e 0
   rw [Finsupp.finsetSum_apply, Finsupp.finsetSum_apply, Finset.sum_eq_zero (s := Finset.univ)
     (f := fun w : Sgn m => (Finsupp.single (actJ w (fun j => (α j : ℂ)) i₀) (1 : ℂ)) 0) fun w _ =>

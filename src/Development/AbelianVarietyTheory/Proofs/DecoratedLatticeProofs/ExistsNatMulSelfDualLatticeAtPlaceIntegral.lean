@@ -14,8 +14,8 @@ open NumberField
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.IwaPlace.SDBound
 
@@ -80,8 +80,8 @@ theorem exists_mul_mem_intAt : ∀ (D : D7) (S : HSp D) (v : Pl D) (Λ : AddSubg
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [RingHom.map_mul, map_natCast, Nat.cast_mul]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e2, map_sum]
+
+  rw [e2, map_sum]
   refine sum_mem fun k _ => ?_
   rw [RingHom.map_mul]
   exact FrameLat.mul_mem_intAE (finPart_incA_mem (hint l k)) (key k)

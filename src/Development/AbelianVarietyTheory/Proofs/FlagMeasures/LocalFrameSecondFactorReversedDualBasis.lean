@@ -100,8 +100,8 @@ theorem reversed_relation_mod : ∀ (F : Type) [Field F] [NumberField F] (v : He
     apply hinj
     have := congrFun (congrFun hrel x) y
     simp only [Matrix.mul_apply, Matrix.transpose_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hφA, hφM, hφR]
+
+    simp only [map_sum, map_mul, hφA, hφM, hφR]
     exact this
   have hg0 : ρ (g : v.adicCompletionIntegers F) = 0 := by
     refine (IsLocalRing.residue_eq_zero_iff _).2 ?_
@@ -114,8 +114,8 @@ theorem reversed_relation_mod : ∀ (F : Type) [Field F] [NumberField F] (v : He
   have hρA : ∀ a c, ρ (Ao a c) = redM F v A a c := fun a c => (show redM F v A a c = ρ (Ao a c) from dif_pos (hA a c)).symm
   have hρM : ∀ a c, ρ (Mo a c) = redM F v M a c := fun a c => (show redM F v M a c = ρ (Mo a c) from dif_pos (hM a c)).symm
   have h := congrArg ρ hE
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hρR, hρA, hρM] at h
+
+  simp only [map_sum, map_mul, hρR, hρA, hρM] at h
   rw [← h]
   refine Finset.sum_congr rfl fun l _ => ?_
   simp
@@ -420,14 +420,14 @@ theorem local_frame_second_factor : ∀ (F E : Type) [Field F] [NumberField F] [
         ∑ x : Fin n, ∑ y : Fin n, (if (x : ℕ) + 1 = y then (f x y : v.adicCompletion F) else 0) := by
     intro f
     show algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F) _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, apply_ite (algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F)), map_zero]
+
+    simp only [map_sum, apply_ite (algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F)), map_zero]
     rfl
   have hrr : ∀ i j, ((rr i j : v.adicCompletionIntegers F) : v.adicCompletion F) = ∑ l, sR l (Fin.rev i) * A l j := by
     intro i j
     show algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F) _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [rr, map_sum, map_mul]
+
+    simp only [rr, map_sum, map_mul]
     rfl
   have hterm : ∀ i j, (sp (hR cm.sig J (v.adicCompletion F) (bd i) (y.1 *ᵥ b j))).2 =
       A i j + (g : v.adicCompletion F) * (rr i j : v.adicCompletion F) := by
@@ -438,8 +438,8 @@ theorem local_frame_second_factor : ∀ (F E : Type) [Field F] [NumberField F] [
         simp [Matrix.mulVec, dotProduct, Matrix.mul_apply]
       rw [e1, hfA, Matrix.mul_apply]
       simp only [Matrix.mulVec, dotProduct]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Prod.snd_sum]
+
+      rw [map_sum, Prod.snd_sum]
       refine Finset.sum_congr rfl fun d _ => ?_
       rw [map_mul, Prod.snd_mul, hfrBE, ← h1]
       rfl
@@ -455,8 +455,8 @@ theorem local_frame_second_factor : ∀ (F E : Type) [Field F] [NumberField F] [
   have hss : sp (supSum (hR cm.sig J (v.adicCompletion F)) b bd y.1) =
       (0, (sO : v.adicCompletion F) + (g : v.adicCompletion F) * (rO : v.adicCompletion F)) := by
     unfold supSum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Prod.ext ?_ ?_
     · rw [Prod.fst_sum]
       refine Finset.sum_eq_zero fun i _ => ?_
@@ -492,7 +492,7 @@ theorem local_frame_second_factor : ∀ (F E : Type) [Field F] [NumberField F] [
     · rw [if_neg h, if_neg (fun h' => h h'.1)]
   rw [hlam, hsupM, map_neg]
   congr 2
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sO, map_sum, apply_ite (IsLocalRing.residue (v.adicCompletionIntegers F)), map_zero, hredA]
+
+  simp only [sO, map_sum, apply_ite (IsLocalRing.residue (v.adicCompletionIntegers F)), map_zero, hredA]
 
 end GlobalTheory.St.G

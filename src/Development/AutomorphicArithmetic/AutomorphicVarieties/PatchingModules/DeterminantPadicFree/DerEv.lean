@@ -85,11 +85,11 @@ theorem UpperTheory.V.Pa.Det.derEv :
   let D' : Matrix (Fin n) (Fin n) F →ₗ[F] Matrix (Fin n) (Fin n) F :=
     d - (LinearMap.mulLeft F Y - LinearMap.mulRight F Y)
   have hD : D' x = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.matrix_eq_sum_single x, map_sum]
+
+    rw [Matrix.matrix_eq_sum_single x, map_sum]
     refine Finset.sum_eq_zero fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_eq_zero fun j _ => ?_
     by_cases hij : ((i : ℕ) < a ↔ (j : ℕ) < a)
     · have hs : Matrix.single i j (x i j) = x i j • E i j := by

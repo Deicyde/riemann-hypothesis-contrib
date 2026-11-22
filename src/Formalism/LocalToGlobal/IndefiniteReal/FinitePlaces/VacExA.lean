@@ -11,8 +11,8 @@ noncomputable section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
-set_option maxHeartbeats 400000
+
+
 
 namespace Formalism.IndefR.Fin.VacEx
 

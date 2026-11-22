@@ -33,7 +33,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -46,7 +46,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 namespace GlobalTheory.CovTop.DeepGoodAll
 theorem deepGood_alt_alt : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted →
@@ -84,7 +84,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.deepGood_of_toroidal_and_semiabelian : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted → GlobalTheory.Published.SiegelToroidalIntegral → GlobalTheory.Published.ToroidalForFanKS → GlobalTheory.Published.SemiAbelianLieSeminegative → _root_.GlobalTheory.CovTop.DeepGoodness := by
   first | exact @_root_.GlobalTheory.CovTop.DeepGoodAll.deepGood_alt_alt | exact _root_.GlobalTheory.CovTop.DeepGoodAll.deepGood_alt_alt | (intros; apply _root_.GlobalTheory.CovTop.DeepGoodAll.deepGood_alt_alt <;> assumption)
 end

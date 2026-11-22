@@ -34,16 +34,16 @@ theorem piInf_inclR' {w : InfinitePlace F} (τ : EmbOver E w) (e : E) : piInf τ
 theorem incM_mul'' {α β γ : Type} [Fintype β] (X : Matrix α β E) (Z : Matrix β γ E) :
     incM F (X * Z) = incM F X * incM F Z := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [incM, Matrix.mul_apply, map_sum]
+
+  simp [incM, Matrix.mul_apply, map_sum]
 
 theorem incM_map {α β : Type} (X : Matrix α β E) : incM F (X.map σ) = (incM F X).map (cA σ) := by
   ext i j
   simp [incM, cA_inclR']
 
 theorem trace_incM {k : ℕ} (X : Matrix (Fin k) (Fin k) E) : (incM F X).trace = inclR (F := F) (AF F) X.trace := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [incM, Matrix.trace, map_sum]
+
+  simp [incM, Matrix.trace, map_sum]
 
 theorem frame_sign (d : SD σ) : ∃ ε : ℤˣ, FrameEq σ d.Y d.b ε ∧
     ∀ i j, d.A.J j i = -(((ε : ℤ) : E)) * σ (d.A.J i j) := by
@@ -154,11 +154,11 @@ theorem exists_twist (d : SD σ) (ε : ℤˣ) (S₀ : Matrix (Fin d.n) (Fin d.n)
     simpa [hSw] using this
   set q : ℂ := piInf (τ w) ((incM F S₀ * incM F S₀).trace) with hq
   have hqe : q = -(((ε : ℤ) : ℂ)) * ∑ i, ∑ j, ((Complex.normSq (Sw i j) : ℝ) : ℂ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
+
+    rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+    rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     change Sw i j * Sw j i = _

@@ -16,8 +16,8 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.TopFlip
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 namespace GlobalTheory.TopFlip.ChartB
 

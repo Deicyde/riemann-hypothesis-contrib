@@ -12,7 +12,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open Formalism.IndefR.Datum
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin.PDB
 
@@ -350,7 +350,7 @@ lemma uniform_nat {ι : Type*} [Fintype ι] (P : ι → ℕ → Prop) (hP : ∀ 
   exact hP i _ _ (hPk i)
 
 
-set_option maxHeartbeats 800000 in
+
 lemma lower (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT) :
     ∃ c : ℕ, 0 < c ∧ ∀ Z : WO S T, (∀ i j, IntF (Z i j)) → c • Z ∈ latAll S T ΛS ΛT := by
   classical
@@ -464,7 +464,7 @@ lemma intF_gen {α : Af D.host.F} (hα : α ∈ intAf D.host.F) (o : 𝓞 D.host
   ⟨by rw [tmul_fI]; rfl, AddSubgroup.subset_closure ⟨α, hα, o, rfl⟩⟩
 
 
-set_option maxHeartbeats 800000 in
+
 lemma upper (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT) :
     ∃ c : ℕ, 0 < c ∧ ∀ t ∈ latAll S T ΛS ΛT, ∀ i j, IntF ((c • t) i j) := by
   obtain ⟨d₀, hd₀, hAA⟩ := AA_denom' (D := D)

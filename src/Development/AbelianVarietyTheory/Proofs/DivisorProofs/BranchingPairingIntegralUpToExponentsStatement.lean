@@ -18,7 +18,7 @@ open Formalism.DivisionValues (vw lw)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.branchingPairing_integral_upToExponents : ∀ {E K ι : Type} [Field E] [NumberField E] [Field K] [NumberField K] [StarRing K] [Fintype ι] (emb : ι → E →+* K) {n N : ℕ}
     (hN : N = n + 1) (Λ : ι → DomWeight N) (σ : ι → DomWeight n),
     (∀ τ, Formalism.L2.Col.Br.Interlace hN (Λ τ) (σ τ)) → (∀ τ, Formalism.L2.Col.Br.SameShift (Λ τ) (σ τ)) →

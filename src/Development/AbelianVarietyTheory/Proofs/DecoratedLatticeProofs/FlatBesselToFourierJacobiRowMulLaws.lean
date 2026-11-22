@@ -141,9 +141,9 @@ theorem core_val {ρ : ℕ} {B : BesLev D ρ} {s : k} {n : Type} [Fintype n] [De
       -(if i.val + 1 = ρ then 1 else 0) * prH p ((star B.ζ ᵥ* (B.o.iBᴴ * B.V₀.gram)) x) := by
     intro x
     rw [← Matrix.vecMul_vecMul, ← Matrix.star_mulVec]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.map_apply, Matrix.mul_apply, adj, yZero, zEll, Matrix.transpose_apply, Matrix.neg_apply,
-      Matrix.vecMulVec_apply, ell, ratV, Matrix.vecMul, dotProduct, map_sum, Finset.mul_sum, gA, rat]
+
+    simp only [Matrix.map_apply, Matrix.mul_apply, adj, yZero, zEll, Matrix.transpose_apply, Matrix.neg_apply,
+    Matrix.vecMulVec_apply, ell, ratV, Matrix.vecMul, dotProduct, map_sum, Finset.mul_sum, gA, rat]
     refine Finset.sum_congr rfl fun d _ => ?_
     split_ifs
     · rw [mul_one, map_neg, GlobalTheory.DualPairCheck.cA_incA, neg_mul, ← map_mul, map_neg, neg_one_mul]; rfl
@@ -155,8 +155,8 @@ theorem core_val {ρ : ℕ} {B : BesLev D ρ} {s : k} {n : Type} [Fintype n] [De
       intro y
       have : ((star B.ζ ᵥ* (B.o.iBᴴ * B.V₀.gram)) ᵥ* B.o.iA) y = 0 := by
         rw [Matrix.vecMul_vecMul, B.o.orth, Matrix.vecMul_zero]; rfl
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_mul, ← map_sum]
+
+      simp only [← map_mul, ← map_sum]
       rw [← map_zero (prH p), ← this]; rfl
     have h3 : ∑ x, prH p ((star B.ζ ᵥ* (B.o.iBᴴ * B.V₀.gram)) x) * F₀.β x (Sum.inl a) = 0 := by
       have e : ∀ x, F₀.β x (Sum.inl a) = ∑ y, prH p (B.o.iA x y) * FA.β y a := fun x => h.1 x a
@@ -167,8 +167,8 @@ theorem core_val {ρ : ℕ} {B : BesLev D ρ} {s : k} {n : Type} [Fintype n] [De
   · have h3 : ∑ x, prH p ((star B.ζ ᵥ* (B.o.iBᴴ * B.V₀.gram)) x) * F₀.β x (Sum.inr ()) = s * p.hz B := by
       have : star B.ζ ⬝ᵥ B.L.gram *ᵥ B.ζ = (star B.ζ ᵥ* (B.o.iBᴴ * B.V₀.gram)) ⬝ᵥ vecB B.o B.ζ := by
         rw [← B.o.isoB, vecB, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Place.hz, this, pr_eq, dotProduct, map_sum, Finset.mul_sum]
+
+      rw [Place.hz, this, pr_eq, dotProduct, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun x _ => ?_
       rw [h.2, map_mul, pr_eq]; ring
     rw [h3]; by_cases e : i.val + 1 = ρ <;> simp [e]

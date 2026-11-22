@@ -24,9 +24,9 @@ theorem mem_self_dual_lattice_set (V : HSp D) (x : Fin V.rank → D.host.E) : x 
 
 theorem hT_crd (V : HSp D) (x y : Fin V.rank → D.host.E) :
     V.hT (crd V x) (crd V y) = ∑ i, ∑ j, star (x i) * V.gram i j * y j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [crd, Module.Basis.equivFun_symm_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
+
+  simp only [crd, Module.Basis.equivFun_symm_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [RingHom.id_apply, starRingEnd_apply]

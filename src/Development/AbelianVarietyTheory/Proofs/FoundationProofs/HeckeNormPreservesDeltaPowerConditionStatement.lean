@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 
 open GlobalTheory.KZ GlobalTheory.CyclotomicQExpansion GlobalTheory.Glue
 open scoped MatrixGroups
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.heckeNorm_preserves_delta_powerCondition : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (N l : ℕ) [Fact l.Prime] (n : ℕ), 0 < n → ¬ l ∣ N → ∀ f : X.K,
   Inv X (CongruenceSubgroup.Gamma1 (N * l ^ n)) f →
   (∀ δ ∈ CongruenceSubgroup.Gamma1 N, -δ ∈ CongruenceSubgroup.Gamma (l ^ n) →

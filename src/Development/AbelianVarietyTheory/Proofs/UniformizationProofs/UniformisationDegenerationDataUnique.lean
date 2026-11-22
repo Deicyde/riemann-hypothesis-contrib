@@ -105,7 +105,7 @@ end GlobalTheory.UnifUniq
 namespace GlobalTheory
 
 
-set_option maxHeartbeats 800000 in
+
 theorem unifUniq : GlobalFnsSt → SecBaseChangeSt → AmpleSt → UnifUniqSt := by
   intro hG hS hA R _ _ _ I hR D D' A A' G _ _ hsa U U' wL hwg hwm
   let gv {X : Scheme.{0}} {L' L : LB X} (w : LB.Iso L' L) {Y : Scheme.{0}} (f : Y ⟶ X) (y : Y) (j : L.ι) (k : L'.ι) : (Y.presheaf.stalk y)ˣ :=

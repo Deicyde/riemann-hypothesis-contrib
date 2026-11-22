@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.SortSi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry KaehlerDifferential GlobalTheory GlobalTheory.PD GlobalTheory.CechDR GlobalTheory.HodgeCoh ReciprocityTheory.ChartRestriction.G.Geo.Tor
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cover_restriction_base_change : ∀ {X Y : Scheme.{0}} (g : Y ⟶ X) (ι κ : Type) [LinearOrder ι] [Finite ι] [LinearOrder κ] [Finite κ]
     (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)] (S : Type) [CommRing S] [Algebra S Γ(Y, ⊤)] (σ : R →+* S)
     (hσ : ∀ r, g.appTop (algebraMap R Γ(X, ⊤) r) = algebraMap S Γ(Y, ⊤) (σ r))

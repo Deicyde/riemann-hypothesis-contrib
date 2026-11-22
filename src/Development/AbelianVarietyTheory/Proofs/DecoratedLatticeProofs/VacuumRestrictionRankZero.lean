@@ -11,8 +11,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 namespace GlobalTheory.RankZeroVac
 

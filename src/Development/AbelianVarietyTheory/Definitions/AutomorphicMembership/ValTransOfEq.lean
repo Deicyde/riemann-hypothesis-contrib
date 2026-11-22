@@ -76,7 +76,7 @@ def rowIds (I : RowIds X (toChainReal R F tupT hm hTop) l) : RowIds (rowSide c X
     ((I.prt))
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem rowSideReal_tr {I : RowIds X (toChainReal R F tupT hm hTop) l} {n : ℕ} {bs : OrthonormalBasis (Fin n) ℂ EE}
     {ty : Fin n → a.D.what₂.FT} (H : RowSideReal X (toChainReal R F tupT hm hTop) l I bs ty) :
     RowSideReal (rowSide c X) (chainB c.to F tupT hm hTop) l (rowIds c I) bs ((ty)) := by

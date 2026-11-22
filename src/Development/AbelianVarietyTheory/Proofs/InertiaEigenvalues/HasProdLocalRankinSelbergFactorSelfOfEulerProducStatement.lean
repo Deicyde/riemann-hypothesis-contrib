@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SchurDi
 
 open NumberField IsDedekindDomain GlobalTheory.JSW
 open scoped ENNReal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hasProd_localRankinSelbergFactor_self_of_eulerProduct : ∀ (I : Type) (q : I → ℕ) (n : ℕ) (α : I → Fin n → ℂˣ), (∀ w, 2 ≤ q w) →
     (∀ x : ℝ, 1 < x → GlobalTheory.RSPole.eulD q (fun w i => ((α w i : ℂˣ) : ℂ)) x ≠ ⊤) →
     (∀ x : ℝ, 1 < x →

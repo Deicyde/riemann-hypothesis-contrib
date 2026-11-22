@@ -63,9 +63,9 @@ theorem exists_cyclic_field {K : Type} [Field K] {r : ℕ} (g : Matrix (Fin r) (
   have hqv : aeval g q *ᵥ v = 0 := by
     rw [← hw]
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [q, krylov, map_sum, aeval_monomial, Matrix.sum_mulVec, Algebra.algebraMap_eq_smul_one,
-      Matrix.smul_mulVec, Matrix.mulVec.eq_def (Matrix.of _), dotProduct, mul_comm]
+
+    simp [q, krylov, map_sum, aeval_monomial, Matrix.sum_mulVec, Algebra.algebraMap_eq_smul_one,
+    Matrix.smul_mulVec, Matrix.mulVec.eq_def (Matrix.of _), dotProduct, mul_comm]
   have hmem : q ∈ Module.annihilator K[X] (Module.AEval' (Matrix.toLin' g)) := by
     rw [← hx, LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
     apply (Module.AEval'.of (Matrix.toLin' g)).symm.injective

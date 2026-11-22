@@ -227,8 +227,8 @@ theorem GLab.norms [ArithBase o Ω] (hM : ReciprocityTheory.ChartRestriction.G.G
       congr 1
       field_simp
     refine (congrArg₂ (· * ·) e₁ hδd.symm).trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← norm_mul, ← e₂, map_sum]
+
+    rw [← norm_mul, ← e₂, map_sum]
     simp only [map_mul]
   have hm0 : (m : ℝ) ≠ 0 := by
     have := S.N_ge

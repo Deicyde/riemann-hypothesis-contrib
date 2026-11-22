@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SameBlockAppe
 @[expose] public section
 
 open Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_blockAntidiagonal_scaled_pairing_matrix : ∀ {K : Type} [Field K] {j r : ℕ} (hj : j ≤ r) (w : Formalism.MainNotions.S.Loc.Pt K j),
     ∃ β : Fin r → ℕ, Monotone β ∧ (∀ a b : Fin r, j ≤ b.val → (β a = β b ↔ j ≤ a.val)) ∧
       ∀ (σ : K →+* ℂ) (sgn : Fin j → ℤˣ) (ρ : ℝ), 0 < ρ →

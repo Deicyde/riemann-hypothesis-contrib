@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCoords
 @[expose] public section
 
 universe u
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_coords_range_idempotent_of_retract : ∀ {C : Type} [CommRing C] [IsLocalRing C] (I : Ideal C), I ≠ ⊤ →
   ∀ {W : Type u} [AddCommGroup W] [Module C W] (m : ℕ) (s : W →ₗ[C] (Fin m → C ⧸ I))
   (r : (Fin m → C ⧸ I) →ₗ[C] W), r ∘ₗ s = LinearMap.id →

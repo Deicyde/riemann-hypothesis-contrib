@@ -49,15 +49,15 @@ theorem descend {k K : Type} [Field k] [Field K] [Algebra k K] {g : ℕ} {N : �
   obtain ⟨w, hw⟩ := H (fun p => algebraMap k K (v p)) (by
     funext p
     have := congrArg (algebraMap k K) (congrFun hv p)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Pi.zero_apply, map_zero] at this ⊢
+
+    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Pi.zero_apply, map_zero] at this ⊢
     simpa only [kosD_apply_map] using this)
   refine ⟨fun q => lam (w q), fun p hp => ?_⟩
   have := congrArg lam (hw p hp)
   rw [hl] at this
   rw [this]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, kosD_apply_map]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, kosD_apply_map]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [← Algebra.smul_def, map_smul, smul_eq_mul]
 

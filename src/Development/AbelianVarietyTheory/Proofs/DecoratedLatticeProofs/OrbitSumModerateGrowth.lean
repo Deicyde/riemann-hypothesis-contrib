@@ -22,7 +22,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ENNReal NNReal
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.Unf
 

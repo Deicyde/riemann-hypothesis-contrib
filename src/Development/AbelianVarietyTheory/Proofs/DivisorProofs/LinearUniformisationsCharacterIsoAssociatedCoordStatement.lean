@@ -15,7 +15,7 @@ open GlobalTheory.UPoinc Formalism.L2.Pj
 open GlobalTheory
 open Classical
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.linear_uniformisations_character_iso_associated_coords : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (W : Type) [CommRing W] [IsDomain W]
     [IsLocalRing W], GlobalTheory.Mum.Base W → ∀ (t : SAB H (Sp W)) (P P' : PELUnif (maximalIdeal W) t),
       ∃ e : P.D.toPre.X ≃ₗ[𝓞 E] P'.D.toPre.X, ∀ y r r', PsiCoord P.D.toPre y r → PsiCoord P'.D.toPre (e y) r' →

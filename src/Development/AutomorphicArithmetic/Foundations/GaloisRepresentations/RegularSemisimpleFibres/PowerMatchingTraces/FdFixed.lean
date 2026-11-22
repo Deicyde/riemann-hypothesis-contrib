@@ -94,7 +94,7 @@ private theorem updLoc {F E : Type} [Field F] [NumberField F] [Field E] [NumberF
   · have h : y ≠ v := fun h => hy (h ▸ hv)
     simp only [Function.update_of_ne h]; exact L.off y hy hyq
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.Gal.InertialTypesAlt.G.core :
     UpperTheory.Gal.InertialTypesAlt.G.Core := by
   intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn μE _ π P V hC hP hW v w hv iF bF iE bE mF mE hmF hmE τ τ' hτ hτ' s₀ I₀ hs₀ hI₀

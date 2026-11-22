@@ -20,7 +20,7 @@ public import GroundTheory.AutomorphicForms.MultiplicityOne.Injective
 
 open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep Formalism.L2.Host Formalism.UG GlobalTheory.LFun
 open scoped ENNReal ComplexConjugate nonZeroDivisors
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rankinSelbergLocalTerm_eq_sphericalWhittaker_product : ∀ (q : ℕ), 0 < q → ∀ (n : ℕ) (α β : Fin n → ℂ) (x : ℝ) (v : Fin n → ℤ), (∀ i, 0 ≤ v i) → Antitone v →
     (((q : ℝ) ^ GlobalTheory.CellDec.wtS n v : ℝ) : ℂ) *
       (GlobalTheory.JSW.sphW q α (fun i => (v i).toNat) * conj (GlobalTheory.JSW.sphW q β (fun i => (v i).toNat))) *

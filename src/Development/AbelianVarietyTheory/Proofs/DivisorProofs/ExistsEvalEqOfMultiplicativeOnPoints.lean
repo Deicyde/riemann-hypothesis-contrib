@@ -100,8 +100,8 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
   have hevC : ∀ (z : C ⊗[O] A →ₐ[C] C) (a : Module.Free.ChooseBasisIndex O A → C),
       z (∑ i, a i • eC i) = ∑ i, a i * res z (e i) := by
     intro z a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [eC, res, map_sum, Algebra.TensorProduct.basis_apply]
+
+    simp [eC, res, map_sum, Algebra.TensorProduct.basis_apply]
   have hcoord : ∀ a : Module.Free.ChooseBasisIndex O A → C,
       (∀ x : A →ₐ[O] C, ∑ i, a i * x (e i) = 0) → a = 0 := by
     intro a ha
@@ -120,8 +120,8 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
   have hval : ∀ x, κ x = ∑ i, c i * x (e i) := by
     intro x
     have h1 : ext x b' = κ x := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [b', map_sum, map_smul, smul_eq_mul]
+
+      simp only [b', map_sum, map_smul, smul_eq_mul]
       rw [Finset.sum_eq_single (ext x)]
       · rw [hw1, mul_one, hres]
       · intro z _ hz
@@ -137,10 +137,10 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
         ∑ i, ∑ j, algebraMap O C (m k i j) * (x (e i) * y (e j)) := by
     intro x y k
     conv_lhs => rw [← (e.tensorProduct e).sum_repr (Δ (e k))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Module.Basis.tensorProduct_apply,
-      Algebra.smul_def, Fintype.sum_prod_type, map_mul, AlgHom.commutes,
-      Algebra.TensorProduct.lift_tmul, m]
+
+    simp only [map_sum, map_smul, Module.Basis.tensorProduct_apply,
+    Algebra.smul_def, Fintype.sum_prod_type, map_mul, AlgHom.commutes,
+    Algebra.TensorProduct.lift_tmul, m]
   have key : ∀ x y : A →ₐ[O] C, ∑ j, (∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) *
       x (e i)) * y (e j) = 0 := by
     intro x y
@@ -181,8 +181,8 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
     IsIntegrallyClosed.isIntegral_iff.mp (IsIntegral.of_mem_of_fg S hfg _ (hcM i))
   choose o ho using hint
   refine ⟨∑ i, o i • e i, fun x => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hval, map_sum]
+
+  rw [hval, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, Algebra.smul_def, ho]
 

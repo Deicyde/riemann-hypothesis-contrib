@@ -28,7 +28,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped ComplexConjugate TensorProduct
 open Matrix
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weilMatrixCoeff_eq_zero_of_distinct_eigencharacters : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
     (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)), IsWeilDatumO ψ S T χS χT om →
     ∀ (m : Measure (WO S T)) (X : Set (WO S T)), IsCovolOne (ratL T S) m X → ∀ F : WO S T → ℂ, IsThetaFunO ψ S T F →

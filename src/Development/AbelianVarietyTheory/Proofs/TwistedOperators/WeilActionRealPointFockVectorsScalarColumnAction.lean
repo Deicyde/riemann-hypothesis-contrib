@@ -74,8 +74,8 @@ theorem pureTensor_compAt {D : D7} {S T : HSp D} (C : Ctx S T) (h : GA D S) {B :
   next p q hp hq =>
     rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
   next p v hp =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_comm p, (Lc p).2.1 v, hp, key _ (L1 (ColChange.sub C h p)).1 v, map_mul, hX, Finset.sum_mul, map_sum]
+
+    rw [mul_comm p, (Lc p).2.1 v, hp, key _ (L1 (ColChange.sub C h p)).1 v, map_mul, hX, Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [smul_mul_assoc, map_smul, (L1 (ColChange.sub C h p)).2.1]
 

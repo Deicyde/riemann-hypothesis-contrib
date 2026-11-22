@@ -61,7 +61,7 @@ variable {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
   (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_real_data (v : {v : InfinitePlace K.1 // v.IsReal}) (x : galUnramifiedOutside K.1 ℚ̄ S)
     (hreal : (infPlaceOfEmbedding (gsRealEmbedding S ιr v x) L : InfinitePlace L.1).IsReal) :
     ∃ (ιw : ℚ̄ →ₐ[L.1] AlgebraicClosure
@@ -331,7 +331,7 @@ theorem exists_real_data_of_eq (p : MackeyTopIndex (gsRealFamily S ιr) (gsOpenS
 variable (h2S : ∀ v : HeightOneSpectrum (𝓞 K.1), ((2 : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
 
-set_option maxHeartbeats 1000000 in
+
 include h2S in
 theorem gsMackeyTop_gsOpenSubgroup (j : ℕ) :
     (4 ≤ j → GsMackeyTopInjective S ιr (gsOpenSubgroup S hL) j) ∧

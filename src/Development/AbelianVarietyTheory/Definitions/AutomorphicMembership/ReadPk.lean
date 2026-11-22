@@ -75,7 +75,7 @@ structure MuW (Wt : Set B.places.Pl) (W : RowsRest B w.C) : Prop where
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 2000000 in
+
 structure RowPk {Z₀ : w.Lt} {hX : B.fields.Ok} {Wt : Set B.places.Pl} (z : Dat (w.st Z₀) w.I hX T Wt) : Type 1 where
   y : Hd z.R.toRealDat
   tup : ∀ t, y.tup t = ixOf w.I (usedOf w.I T Wt) t
@@ -162,7 +162,7 @@ structure Side0 (o : q.Over) : Type 1 where
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure Moved (o : q.Over) : Type 1 where
   z : Dat (w.st o.Z) w.I hX T Wt
   intersectionNumber_baseChange : Holds z.R z.F
@@ -181,7 +181,7 @@ structure Moved (o : q.Over) : Type 1 where
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure ReadPk {o : q.Over} (m : Moved o) (s : Side0 o) : Type 1 where
   Y : Read m.z.R.toRealDat m.z.F.lv2 s.p0
   Z : RationalReadingWithoutCongruence m.z.R m.z.F s.p0 Y

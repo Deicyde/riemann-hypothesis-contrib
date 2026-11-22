@@ -19,9 +19,9 @@ def ctau (S : HSpace E) (τ : E →+* ℂ) (x : S.V) : Fin S.rank → ℂ := fun
 theorem hT_coord (S : HSpace E) (x y : S.V) :
     S.hT x y = ∑ i, ∑ j, star (S.frame.repr x i) * (S.gram i j * S.frame.repr y j) := by
   conv_lhs => rw [← S.frame.sum_repr x, ← S.frame.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-    Finset.mul_sum, starRingEnd_apply]
+
+  simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+  Finset.mul_sum, starRingEnd_apply]
   conv_lhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [HSpace.gram, RingHom.id_apply]
@@ -30,9 +30,9 @@ theorem hT_coord (S : HSpace E) (x y : S.V) :
 theorem tau_hT (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a)) (x y : S.V) :
     τ (S.hT x y) = star (ctau S τ x) ⬝ᵥ ((S.gram.map τ) *ᵥ ctau S τ y) := by
   rw [hT_coord]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, mulVec, ctau, map_sum, map_mul, hτ, Pi.star_apply, Matrix.map_apply,
-    Finset.mul_sum, Complex.star_def]
+
+  simp only [dotProduct, mulVec, ctau, map_sum, map_mul, hτ, Pi.star_apply, Matrix.map_apply,
+  Finset.mul_sum, Complex.star_def]
 
 theorem card_le_of_nonpos (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
     (hsig : Formalism.UG.HasSignature (S.gram.map τ) (S.sig τ).1 (S.sig τ).2)

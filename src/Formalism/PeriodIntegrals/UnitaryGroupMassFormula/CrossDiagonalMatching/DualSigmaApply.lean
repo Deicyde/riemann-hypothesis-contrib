@@ -27,7 +27,7 @@ theorem dualSigma_apply {K V W : Type} [CommRing K] [AddCommGroup V] [Module K V
 variable {D : D7} {u : D.what₂.Word}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem dni_lk (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat g (clsCrd D u 0 (Nat.zero_le _) c) = clsCrd D u 0 (Nat.zero_le _) c')
@@ -43,7 +43,7 @@ theorem dni_mem_of {E : Type} [Field E] [NumberField E] {n : ℕ} (g : Matrix (F
   rw [← h]
   exact Submodule.mem_map_of_mem hz
 
-set_option maxHeartbeats 2000000 in
+
 theorem dni_mem (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat g (clsCrd D u 0 (Nat.zero_le _) c) = clsCrd D u 0 (Nat.zero_le _) c')
@@ -52,7 +52,7 @@ theorem dni_mem (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     g *ᵥ z ∈ Lk T.atT 0 (Nat.zero_le _) v c' :=
   dni_mem_of g (dni_lk T v c c' g hL hLd) hz
 
-set_option maxHeartbeats 2000000 in
+
 theorem dni_mem_ker (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat g (clsCrd D u 0 (Nat.zero_le _) c) = clsCrd D u 0 (Nat.zero_le _) c')
@@ -74,7 +74,7 @@ def dniFun (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
   T.lv0.prk v c' ⟨g *ᵥ (Function.surjInv (T.lv0.prk_surj v c) w).1,
     dni_mem T v c c' g hL hLd (Function.surjInv (T.lv0.prk_surj v c) w).2⟩
 
-set_option maxHeartbeats 2000000 in
+
 theorem dniFun_prk (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat g (clsCrd D u 0 (Nat.zero_le _) c) = clsCrd D u 0 (Nat.zero_le _) c')
@@ -91,7 +91,7 @@ theorem dniFun_prk (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls
   simpa [Matrix.mulVec_sub] using hg
 
 
-set_option maxHeartbeats 2000000 in
+
 def dniLin (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0)
     (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat g (clsCrd D u 0 (Nat.zero_le _) c) = clsCrd D u 0 (Nat.zero_le _) c')
@@ -137,7 +137,7 @@ theorem dni_inv_eq {E : Type} [Field E] [NumberField E] {n : ℕ} (g : GL (Fin n
   rw [← Submodule.map_comp, hid, Submodule.map_id]
 
 
-set_option maxHeartbeats 2000000 in
+
 def dniEquiv (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0) (g : GL (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E) (clsCrd D u 0 (Nat.zero_le _) c) =
       clsCrd D u 0 (Nat.zero_le _) c')
@@ -173,7 +173,7 @@ theorem dniEquiv_prk (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.c
   dniLin_prk T v c c' _ hL hLd z
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem dniEquiv_te (T : Forms0 D u) (v : (D.mem u).A.vT) (c c' : (D.mem u).C.cls 0) (g : GL (Fin (D.R.N 0)) D.host.E)
     (hL : mulLat (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E) (clsCrd D u 0 (Nat.zero_le _) c) =
       clsCrd D u 0 (Nat.zero_le _) c')

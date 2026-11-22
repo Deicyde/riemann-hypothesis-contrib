@@ -12,7 +12,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTh
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.L2.Ker
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.beforeLastStep_datum_transport_badPrime : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X) (hI : I.Ok) (l : I.Laws) (u : B.Word) (a : I.ι) (i : ℕ) (hm : i + 2 = B.R.m) (al : (I.idx a).β i) (P : Formalism.L2.Col.rowSG (B.primes X) I.sel (I.tup a))
     (p q : PtAt B.R I.sel (I.tup a) (I.cst a) u (i)) (p' q' : PtAt B.R I.sel (I.tup a) (I.cst a) u (i + 1))
     (k y : TC.GA B (B.R.N (i))) (k' y' : TC.GA B (B.R.N (i + 1))),

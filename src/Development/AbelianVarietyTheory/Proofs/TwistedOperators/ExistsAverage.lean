@@ -67,8 +67,8 @@ theorem _root_.GlobalTheory.WordGrowth.exists_average
     · intro v _
       rfl
   · intro f hf
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum, smul_eq_mul]
+
+    rw [map_smul, map_sum, smul_eq_mul]
     rw [Finset.sum_congr rfl (g := fun _ => f u) ?_]
     · rw [Finset.sum_const, nsmul_eq_mul]
       field_simp

@@ -8,8 +8,8 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.InfPartOfSplit
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 
@@ -32,8 +32,8 @@ theorem sum_rank_one {R : Type} [CommRing R] (σ : R →+* R) (hσ : ∀ x, σ (
     intro k
     ext a
     generalize Gi * (M.map σ)ᵀ * Gt = A
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Pi.smul_apply, smul_eq_mul, map_mul, mulVec, vecMul, dotProduct, map_sum, transpose_apply, map_apply]
+
+    simp only [Pi.smul_apply, smul_eq_mul, map_mul, mulVec, vecMul, dotProduct, map_sum, transpose_apply, map_apply]
     congr 1
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
   have h2 : ∀ k, w • vecMulVec (g k) (vecMul (fun a => σ ((z • ((Gi * (M.map σ)ᵀ * Gt) *ᵥ s k)) a)) Gs) =
@@ -218,7 +218,7 @@ theorem halfDifferent_ne_bot : D.host.𝔟 ≠ ⊥ := by
   exact differentIdeal_ne_bot h1
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_dual_families (S : HSp D) {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)} (hS : IsSelfDualC S ΛS) :
     ∃ (N : ℕ) (g s' : Fin N → Fin S.rank → D.host.E), (∀ i, g i ∈ ΛS) ∧ (∀ i, s' i ∈ ΛS) ∧
       ∀ v : Fin S.rank → D.host.E, ∑ i, ((fun a => star (s' i a)) ⬝ᵥ (S.gram *ᵥ v)) • g i = v := by
@@ -233,8 +233,8 @@ theorem exists_dual_families (S : HSp D) {ΛS : Submodule (𝓞 D.host.E) (Fin S
     have h1 : f (σ x) = x := LinearMap.congr_fun hσ x
     have h2 : f (σ x) = ∑ i, σ x i • gg i := by
       conv_lhs => rw [pi_eq_sum_univ (σ x)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, gg]
     rw [← h2, h1]
   let A := algebraMap (𝓞 D.host.E) D.host.E
@@ -262,8 +262,8 @@ theorem exists_dual_families (S : HSp D) {ΛS : Submodule (𝓞 D.host.E) (Fin S
       rw [map_natCast, this]
       push_cast; ring
     have h3 := congrArg (fun y => A (σ y i)) hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, Pi.smul_apply, Finset.sum_apply, smul_eq_mul, map_mul, map_natCast] at h3
+
+    simp only [map_smul, map_sum, Pi.smul_apply, Finset.sum_apply, smul_eq_mul, map_mul, map_natCast] at h3
     apply mul_left_cancel₀ (mul_ne_zero hc0 hm0)
     rw [dotProduct, Finset.mul_sum]
     have e1 : ((c * m : ℕ) : D.host.E) = (c : D.host.E) * m := by push_cast; ring
@@ -335,8 +335,8 @@ theorem natCast_mem_AA (k : ℕ) : ((k * Ideal.absNorm D.host.ccK : ℕ) : D.hos
 theorem idem_div_int {P : Finset (Formalism.L2.DIV.Pl D.host.E)} {e : AE D} (he : IsIdemSum e P) {n : ℕ}
     (hn : ∀ PP ∈ P, (n : 𝓞 D.host.E) ∉ PP.asIdeal) : finPart D (e * incA D (n : D.host.E)⁻¹) ∈ intAE D := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine AddSubgroup.sum_mem _ fun PP hPP => ?_
   have h0 : (n : 𝓞 D.host.E) ≠ 0 := fun h => hn PP hPP (h ▸ zero_mem _)
   have h1 := (hes PP hPP).2 n h0
@@ -403,8 +403,8 @@ theorem mem_latO_of_adj_int : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 
       (vecMul (fun a => sR D (eToEAf D (s k a))) (T.gram.map (eToEAf D))) = 1 := by
     ext i j
     have h1 := congrArg (eToEAf D) (congrFun (hb (Pi.single j 1)) i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_apply, map_sum] at h1
+
+    rw [Finset.sum_apply, map_sum] at h1
     rw [Matrix.sum_apply]
     have h2 : eToEAf D ((Pi.single j 1 : Fin T.rank → D.host.E) i) = (1 : Matrix (Fin T.rank) (Fin T.rank) (EAf D)) i j := by
       rw [Pi.single_apply, Matrix.one_apply]
@@ -412,9 +412,9 @@ theorem mem_latO_of_adj_int : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 
     rw [← h2, ← h1]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [mulVec_single_one]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [vecMulVec_apply, vecMul, dotProduct, map_apply, sR_eTo, Pi.smul_apply, smul_eq_mul, map_mul, map_sum,
-      Matrix.col, transpose_apply]
+
+    simp only [vecMulVec_apply, vecMul, dotProduct, map_apply, sR_eTo, Pi.smul_apply, smul_eq_mul, map_mul, map_sum,
+    Matrix.col, transpose_apply]
     exact mul_comm _ _
   have hM : ((eToEAf D (n : D.host.E) * ((1 : D.host.E) ⊗ₜ[D.host.F] (1 : Af D.host.F))) * sR D (toEAf D z)) • M = M := by
     have h1 : (eToEAf D (n : D.host.E) * ((1 : D.host.E) ⊗ₜ[D.host.F] (1 : Af D.host.F))) * sR D (toEAf D z) =

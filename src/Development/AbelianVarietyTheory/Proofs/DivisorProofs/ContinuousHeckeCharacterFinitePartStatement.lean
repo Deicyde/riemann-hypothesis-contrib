@@ -15,6 +15,6 @@ open GlobalTheory.NormExact
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.continuous_heckeCharacterFinitePart : ∀ {D : D7} {N : ℕ} (c : HeckeU D N), Continuous (GlobalTheory.HeckeUChar.finChar c) := by
   first | exact @GlobalTheory.HeckeUChar.continuous_finChar | exact GlobalTheory.HeckeUChar.continuous_finChar | (intros; apply GlobalTheory.HeckeUChar.continuous_finChar <;> assumption)

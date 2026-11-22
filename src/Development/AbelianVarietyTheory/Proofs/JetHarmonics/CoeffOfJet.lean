@@ -46,8 +46,8 @@ theorem sval_secLin (hL : L.IsLB) {φ : K → (Y ⟶ X)} {ε : K → ℤ} {φ₁
     (hJ : Good L z J) : sval s₁ r z J = ∑ i, gs r z ⊤ (c i) * sval (s i) (r ≫ h) z J := by
   have e := (FieldBaseChange.secLin_iff_val hL s₁ s h c).1 H (r z) (fun ψ => J (r ≫ ψ)) fun ψ => hJ (r ≫ ψ)
   have e₁ := sval_comp s₁ r (𝟙 _) z hJ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Category.comp_id, e, map_sum] at e₁
+
+  rw [Category.comp_id, e, map_sum] at e₁
   refine e₁.trans (Finset.sum_congr rfl fun i _ => ?_)
   rw [map_mul, ← gs_stalkMap r z ⊤ trivial, Category.id_comp, ← sval_comp (s i) r h z hJ]
 
@@ -86,8 +86,8 @@ theorem coeff_of_jet {V F κ : Type} [CommRing V] [CommRing F] (g : V →+* F) [
   choose p hp using fun i => Ideal.Quotient.mk_surjective (a i)
   refine ⟨fun i => AddMonoidAlgebra.coeff (p i) e, ?_⟩
   have h1 : psJet e.degree f = Ideal.Quotient.mk _ (∑ i, MvPolynomial.C (c i) * MvPolynomial.map g (p i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h, map_sum]
+
+    rw [h, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, ← hp]
     rfl

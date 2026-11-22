@@ -29,14 +29,14 @@ theorem intCone_absorb {n s : ℕ} {β : Fin n → LinearMap.BilinForm ℤ X} (h
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hδ.strict
   refine h3 (β i) (hβ i) (hβp i) ?_
   have hx1 : (ℓ (∑ i, a i • β i) : ℝ) = N * ∑ i, (a i : ℝ) * φ.evalZ (β i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← intCone_evalZ_sum hβl, h, intCone_evalZ_sum hδ.linear, map_sum, Int.cast_sum, Finset.mul_sum]
+
+    rw [← intCone_evalZ_sum hβl, h, intCone_evalZ_sum hδ.linear, map_sum, Int.cast_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_nsmul, nsmul_eq_mul, Int.cast_mul, Int.cast_natCast, h1]
     ring
   have hx2 : (ℓ (∑ i, a i • β i) : ℝ) = ∑ i, (a i : ℝ) * ℓ (β i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_nsmul]
+
+    simp [map_sum, map_nsmul]
   have hle : ∀ j, (a j : ℝ) * (N * φ.evalZ (β j)) ≤ (a j : ℝ) * ℓ (β j) := fun j =>
     mul_le_mul_of_nonneg_left (h2 _ (hβ j) (hβp j)) (Nat.cast_nonneg _)
   have hsum : ∑ j, ((a j : ℝ) * ℓ (β j) - (a j : ℝ) * (N * φ.evalZ (β j))) = 0 := by
@@ -71,8 +71,8 @@ theorem intCone_face : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun 
     obtain ⟨k', e, hk', he'⟩ := habs i hi
     have h0 : k' • G' i = ∑ m, e m • G m := Subtype.ext (by simp [G, G', he'])
     have h1 := congrArg (f l) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum] at h1
+
+    rw [map_nsmul, map_sum] at h1
     simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true, nsmul_eq_mul,
       mul_one] at h1
     have hk'' : (0 : ℤ) < k' := by exact_mod_cast hk'
@@ -96,8 +96,8 @@ theorem intCone_face : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun 
   have hzero : ∀ l, l ≠ j → f l (G' i) = 0 := by
     intro l hl
     have h1 := congrArg (f l) hdG
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum, hfG, if_neg hl, smul_zero] at h1
+
+    rw [map_nsmul, map_sum, hfG, if_neg hl, smul_zero] at h1
     simp only [map_nsmul, nsmul_eq_mul] at h1
     have hnn : ∀ i' ∈ Finset.univ, 0 ≤ (d i' : ℤ) * f l (G' i') := fun i' _ => by
       rcases Nat.eq_zero_or_pos (d i') with h | h
@@ -110,8 +110,8 @@ theorem intCone_face : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun 
   have hem : ∀ m, (e m : ℤ) = k' * f m (G' i) := by
     intro m
     have h1 := congrArg (f m) hE
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum] at h1
+
+    rw [map_nsmul, map_sum] at h1
     simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true, nsmul_eq_mul,
       mul_one] at h1
     exact h1.symm

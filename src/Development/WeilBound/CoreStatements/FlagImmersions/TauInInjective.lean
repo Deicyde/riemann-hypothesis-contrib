@@ -26,7 +26,7 @@ theorem tauIn_injective {l : Level H} (c : Coeff l) (τ : E →+* ℂ) : Functio
     simpa [tauIn] using this
   exact RingOfIntegers.ext (τ.injective h)
 
-set_option maxHeartbeats 1600000 in
+
 theorem core (hSm : SmoothLine) (hLc : LocalCmp) (hNu : Numerics) (hF : HT.FarguesHodgeTate) {l : Level H}
     {Xo : Moduli D l} {c : Coeff l} [NumberField c.F] {Y : Model Xo c (algebraMap (𝓞 c.F) c.F)} {U : Set (Xo.XF c)}
     (Z : CptOver Y U) (φ : FrameFn Xo c) (τ : CMType H) (N : LogNorms c.F) {S : Finset ℕ} {Ω : Type} [Field Ω]

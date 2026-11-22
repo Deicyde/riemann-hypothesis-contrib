@@ -18,7 +18,7 @@ open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR levDet secRing move)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.OrbitSep
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_jacobian_section_isUnit_germ_of_localIso : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (p : Y ⟶ Sp F) (σ : X ⟶ Y) (d : ℕ)
     [SmoothOfRelativeDimension d p] [SmoothOfRelativeDimension d (σ ≫ p)] (K : CanonLB p d) (K' : CanonLB (σ ≫ p) d),
     ∃ J : H0 (σ ≫ p) (LB.div K'.bundle (K.bundle.pull σ)) ⊤, ∀ x : X, Function.Bijective (σ.stalkMap x).hom →

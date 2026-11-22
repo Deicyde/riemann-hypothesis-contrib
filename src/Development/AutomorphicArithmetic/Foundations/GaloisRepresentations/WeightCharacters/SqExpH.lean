@@ -11,7 +11,7 @@ open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 open MvPolynomial
 
-set_option maxHeartbeats 400000 in
+
 private theorem coeff_diag {a : ℕ} (t : Fin a → ℂ) (f : MvPolynomial (Fin a × Fin a) ℂ) (m : Fin a × Fin a →₀ ℕ) :
     AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := a) (Matrix.diagonal t) f) m = (∏ v : Fin a × Fin a, t v.1 ^ m v) * AddMonoidAlgebra.coeff f m := by
   have hg : (fun v : Fin a × Fin a => ∑ b, MvPolynomial.C (Matrix.diagonal t v.1 b) * MvPolynomial.X (b, v.2))

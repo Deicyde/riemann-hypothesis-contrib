@@ -54,8 +54,8 @@ theorem qm_inv_entry {R : Type} [CommRing R] (φ : R →+* K) (hφ : ∀ x, φ x
     h2, one_mul] at e1
   have e2 : ξ⁻¹ k b = -∑ c ∈ Finset.univ.erase k, ξ k c * ξ⁻¹ c b := by
     linear_combination e1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e2, map_neg, map_sum]
+
+  rw [e2, map_neg, map_sum]
   refine qm_neg q (qm_sum q _ _ fun c hc' => ?_)
   rw [map_mul]
   rcases lt_or_gt_of_ne (Finset.ne_of_mem_erase hc') with hlt | hgt
@@ -70,7 +70,7 @@ section XiPf
 variable {D : Formalism.BasicNotions.D7}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem xiTyped_of_ctx {Zd : LocDat D} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
     {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (hctx : CtxP u u' F0 what₂) : XiTyped Zd u u' F0 what₂ := by
   intro γ w hγ p g hs k b hkb

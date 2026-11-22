@@ -15,7 +15,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.AnnConjHalf
 

@@ -966,9 +966,9 @@ theorem mass_ortho (K : Type) [Field K] [NumberField K] [StarRing K] (hK : Forma
   have he : ∀ x y, stdForm K n (e x) (e y) = h x y := by
     intro x y
     conv_rhs => rw [← B.sum_repr x, ← B.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, hB, hon,
-      RingHom.id_apply, mul_ite, mul_one, mul_zero]
+
+    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, hB, hon,
+    RingHom.id_apply, mul_ite, mul_one, mul_zero]
     show ∑ i, star (e x i) * e y i = _
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [e, Module.Basis.equivFun_apply, starRingEnd_apply, mul_comm]

@@ -71,8 +71,8 @@ theorem norm_phase {m n : ℕ} (ε : Fin m → Bool) (t : ℝ) (b : Matrix (Fin 
   have hre : (Complex.I * (t : ℂ) * (b * gramX ε u).trace).re = 0 := by
     have hgram : (gramX ε u)ᴴ = gramX ε u := by
       ext i j
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
+
+      simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
     have htrace : star (b * gramX ε u).trace = (b * gramX ε u).trace := by
       rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, hgram, hb, Matrix.trace_mul_comm]
     rw [← Complex.conj_eq_iff_re.1 htrace]

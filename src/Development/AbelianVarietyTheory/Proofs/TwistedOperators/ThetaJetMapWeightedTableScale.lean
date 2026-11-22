@@ -78,10 +78,10 @@ lemma scale_subD (c : ι → ℂ) :
   intro v
   simp only [AlgHom.comp_apply, subD, aeval_X]
   split_ifs
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sum, map_mul, scaleVar, aeval_X, wDer, wCoord, Sum.elim_inl, Sum.elim_inr, map_one, one_mul]
-      refine Finset.sum_congr rfl fun β _ => ?_
-      ring
+
+  · simp only [map_sum, map_mul, scaleVar, aeval_X, wDer, wCoord, Sum.elim_inl, Sum.elim_inr, map_one, one_mul]
+    refine Finset.sum_congr rfl fun β _ => ?_
+    ring
   · simp
 
 lemma jetLin_smul_table (u : ℂ) (J : (DVar ι a b →₀ ℕ) → ℂ) (Q : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ) :

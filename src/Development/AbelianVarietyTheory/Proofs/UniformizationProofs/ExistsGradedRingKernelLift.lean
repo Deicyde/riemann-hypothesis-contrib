@@ -66,16 +66,16 @@ theorem exists_graded_ring_kernel_lift : ∀ (R : Type) [CommRing R] [IsNoetheri
       have h := congrFun hv' j
       simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Ideal.Quotient.factor_mk,
         Pi.zero_apply] at h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
+
+      rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
       simpa only [map_mul] using h
 
     have hs2 : ∀ i, ∑ j, d₁ i j * ∑ k, d₀ j k * r k ∈ I ^ (e + 1 + 1) := fun i => by
       have hrow : ∀ k, ∑ j, d₁ i j * d₀ j k ∈ I ^ (e + 1 + 1) := fun k => by
         have h := congrFun (congrFun hD i) k
         simp only [Matrix.mul_apply, Matrix.map_apply, Matrix.zero_apply] at h
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
+
+        rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
         simpa only [map_mul] using h
       have heq : ∑ j, d₁ i j * ∑ k, d₀ j k * r k = ∑ k, (∑ j, d₁ i j * d₀ j k) * r k := by
         simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
@@ -101,8 +101,8 @@ theorem exists_graded_ring_kernel_lift : ∀ (R : Type) [CommRing R] [IsNoetheri
           simpa using hs2 i
         · simp [hn]
       have := Ideal.Quotient.eq_zero_iff_mem.mpr hmem
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       simpa only [Matrix.mulVec, dotProduct, Matrix.map_apply, hg'x, Pi.zero_apply,
         map_mul] using this
 
@@ -115,8 +115,8 @@ theorem exists_graded_ring_kernel_lift : ∀ (R : Type) [CommRing R] [IsNoetheri
       have h' : Ideal.Quotient.mk (reesShiftIdeal I)
           (∑ k, algebraMap R (reesAlgebra I) (d₀ j k) * P k) =
           Ideal.Quotient.mk (reesShiftIdeal I) (m j) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simpa only [map_mul] using h
       rw [Ideal.Quotient.eq, mem_reesShiftIdeal] at h'
       have h'' := h' (e + 1)
@@ -133,8 +133,8 @@ theorem exists_graded_ring_kernel_lift : ∀ (R : Type) [CommRing R] [IsNoetheri
         rw [heq]
         exact neg_mem (hdiff j)
       have := Ideal.Quotient.eq_zero_iff_mem.mpr hmem
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       simpa only [Matrix.mulVec, dotProduct, Matrix.map_apply, Pi.zero_apply, map_mul] using this
     · intro k
       simp only [Ideal.Quotient.factor_mk]

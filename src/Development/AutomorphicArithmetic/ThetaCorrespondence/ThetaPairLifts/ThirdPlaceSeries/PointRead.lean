@@ -9,7 +9,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open CategoryTheory AlgebraicGeometry NumberField
@@ -24,7 +24,7 @@ open scoped TensorProduct
 namespace GlobalTheory.DefRead
 variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
   {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ}
-set_option maxHeartbeats 1000000 in
+
 theorem point_read_alt (p : PtAt ex Csz) (i : Fin D.R.m) (hp : _root_.GlobalTheory.CovTop.RowsTAlt p) (hg : GramAt p i)
     (hfree : ∀ k : Fin 2, ∃ (X : Type) (_ : Fintype X) (_ : DecidableEq X) (_ : MulAction (GlobalTheory.BadCount.Inh.halfH D k) X)
       (A : X → Submodule ℂ (VAt p i)),
@@ -116,8 +116,8 @@ theorem point_read_alt (p : PtAt ex Csz) (i : Fin D.R.m) (hp : _root_.GlobalTheo
     have hK : Representation.asAlgebraHom ((repAt p i).comp (MonoidHom.id (G0g D.nd))) D.ntypes.e0 =
         Representation.asAlgebraHom (twBC D.what₂.embLL (p.R.toRealDat.FW i).ρ (p.R.toRealDat.FW i).chi)
           (∑ g, MonoidAlgebra.single g (D.what₂.embLL ((Formalism.L2.DIV.idemOf p.P.A3.A.X).coeff g))) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [he0, map_sum, map_sum]
+
+      rw [he0, map_sum, map_sum]
       refine Finset.sum_congr rfl fun g _ => ?_
       rw [Representation.asAlgebraHom_single, Representation.asAlgebraHom_single]
       have hee : (p.R.eG.trans p.cG).symm (e g) = g := MulEquiv.symm_apply_apply _ _

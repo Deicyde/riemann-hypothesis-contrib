@@ -12,7 +12,7 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.dvrPlace_topForm_orders_api : ∀ {k K : Type} [Field k] [CharZero k] [Field K] (c : k →+* K) (n : ℕ) (x : Fin n → K), TrBasis c x →
   IsFreeGen K (dForm c x) ∧
   ∀ E : Place c, (∃ ω : Forms E.const n, IsFreeGen E.ring ω) ∧

@@ -31,8 +31,8 @@ variable {S : Type u} [CommRing S] {N : ℕ}
 theorem homogeneousComponent_mul_mem_span {g : Poly S N} {e : ℕ} (hg : g.IsHomogeneous e)
     (r : Poly S N) (d : ℕ) : homogeneousComponent d (r * g) ∈ Ideal.span {g} := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_homogeneousComponent r, Finset.sum_mul, map_sum]
+
+  rw [← sum_homogeneousComponent r, Finset.sum_mul, map_sum]
   refine Ideal.sum_mem _ fun m _ => ?_
   rw [homogeneousComponent_of_mem
     ((mem_homogeneousSubmodule _ _).mpr ((homogeneousComponent_isHomogeneous m r).mul hg))]
@@ -57,8 +57,8 @@ theorem hom_span {T : Set (Poly S N)} (hT : ∀ g ∈ T, ∃ e, g.IsHomogeneous 
     intro d
     classical
     change homogeneousComponent d (r * a) ∈ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← sum_homogeneousComponent a, Finset.mul_sum, map_sum]
+
+    rw [← sum_homogeneousComponent a, Finset.mul_sum, map_sum]
     refine Ideal.sum_mem _ fun m _ => ?_
     exact (Ideal.span_singleton_le_iff_mem _).mpr (ha m)
       (homogeneousComponent_mul_mem_span (homogeneousComponent_isHomogeneous m a) r d)

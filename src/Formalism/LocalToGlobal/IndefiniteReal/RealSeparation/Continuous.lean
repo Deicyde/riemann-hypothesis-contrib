@@ -12,7 +12,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 
 namespace Formalism.IndefR.Mi
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [-instance] CStarMatrix.instHMulOfFintypeOfMulOfAddCommMonoid
@@ -20,7 +20,7 @@ attribute [-instance] CStarMatrix.instHMulOfFintypeOfMulOfAddCommMonoid
 variable {D : D7} {A T : HSp D} {ι : A.V →ₗ[D.host.E] T.V} {s : GA D A →* GA D T}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem map_formula_one {R : Type*} [CommRing R] (φ : AE D →+* R) (hι : HSpace.IsIsomEmb A T ι) (h : GA D A)
     (hh : (mt A h).map φ = 1) :
     ((frameMat T A ι).map (incA D) * mt A h * (embP' A T ι).map (incA D) +

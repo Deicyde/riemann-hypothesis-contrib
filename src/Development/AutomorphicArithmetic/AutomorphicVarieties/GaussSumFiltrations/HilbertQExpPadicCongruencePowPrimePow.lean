@@ -94,8 +94,8 @@ theorem small_mul {r s : ℝ} {f g : Hn F → ℂ} (hf : Small ι r f) (hg : Sma
   obtain ⟨c, hc, hc'⟩ := hasQ_mul F f g a b ha hb
   refine ⟨c, hc, fun ξ => ?_⟩
   obtain ⟨t, ht⟩ := hc' ξ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ht, map_sum]
+
+  rw [ht, map_sum]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (mul_nonneg hr hs) fun η _ => ?_
   rw [map_mul, norm_mul]
   exact mul_le_mul (ha' η) (hb' (ξ - η)) (norm_nonneg _) hr
@@ -179,6 +179,6 @@ end GlobalTheory.QPow
 
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
 open scoped Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hilbertQExp_padicCongruence_pow_prime_pow : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime] (ι : Qbar p ≃+* ℂ) (f : Hn F → ℂ), Small ι (p : ℝ)⁻¹ (f - 1) → ∀ N m : ℕ, Small ι ((p : ℝ)⁻¹ ^ (N + 1)) (f ^ (p ^ N * m) - 1) := by
   first | exact @GlobalTheory.QPow.main | exact GlobalTheory.QPow.main | (intros; apply GlobalTheory.QPow.main <;> assumption)

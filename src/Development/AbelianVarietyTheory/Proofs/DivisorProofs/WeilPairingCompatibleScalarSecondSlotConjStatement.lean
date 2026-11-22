@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointShiftSt
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CM
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weilPairingCompatible_scalar_second_position_conj : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (K : Type) [Field K]
     [NumberField K] (σ₁ : K →+* ℂ) (A B : PAT H (Sp (𝓞 K))) (f g : A.t.G ⟶ B.t.G), IsMonHom f → IsMonHom g →
     ∀ r s : 𝓞 E,

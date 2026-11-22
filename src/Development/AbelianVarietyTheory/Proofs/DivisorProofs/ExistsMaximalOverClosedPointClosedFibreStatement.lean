@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsorsTrivi
 @[expose] public section
 
 open IsLocalRing Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_maximal_over_closedPoint_closedFibre : ∀ (T E : Type) [CommRing T] [IsLocalRing T] [CommRing E] [Algebra (Polynomial T) E]
     [Algebra.FiniteType (Polynomial T) E] (Q : Ideal E) [Q.IsPrime],
     Q.comap (algebraMap (Polynomial T) E) =

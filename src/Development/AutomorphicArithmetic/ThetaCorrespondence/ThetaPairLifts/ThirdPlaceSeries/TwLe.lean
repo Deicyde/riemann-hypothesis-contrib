@@ -14,7 +14,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
@@ -28,8 +28,8 @@ open GlobalTheory.FlatVecSum (princ)
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 namespace GlobalTheory.BigOn.Exp.TupLe
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

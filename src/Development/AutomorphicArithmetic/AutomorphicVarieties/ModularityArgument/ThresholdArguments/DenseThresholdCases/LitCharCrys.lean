@@ -5,8 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 theorem UpperTheory.Lit.hecke_ladic_char_crystalline_of_de_rham_pst_wd_llc (h1 : GlobalTheory.Published.HeckeLAdicCharacterDeRham) (h2 : GlobalTheory.Published.DeRhamPotSemistable)

@@ -8,7 +8,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 namespace GlobalTheory.PlaceTop
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.L2.Pj GlobalTheory.PtTie

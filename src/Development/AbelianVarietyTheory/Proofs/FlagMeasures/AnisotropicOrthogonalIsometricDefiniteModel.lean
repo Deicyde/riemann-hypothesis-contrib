@@ -36,8 +36,8 @@ theorem fixedFrameOfWord_isotropicSpan_eq : (GlobalTheory.TypeAsm.F0 X u).X = Su
 theorem hT_span_left {v : (VS D).V} (hv : ∀ a, (VS D).hT (X.eX a) v = 0) {y : (VS D).V}
     (hy : y ∈ Submodule.span D.host.E (Set.range X.eX)) : (VS D).hT y v = 0 := by
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, hv]
+
+  simp [map_sum, hv]
 
 theorem hT_span_span {y y' : (VS D).V} (hy : y ∈ Submodule.span D.host.E (Set.range X.eX))
     (hy' : y' ∈ Submodule.span D.host.E (Set.range X.eX)) : (VS D).hT y y' = 0 := by
@@ -54,8 +54,8 @@ theorem span_eq_zero {d : (VS D).V} (hd : d ∈ Submodule.span D.host.E (Set.ran
   have hc : ∀ b, c b = 0 := by
     intro b
     have := h b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, hT_f_e] using this
+
+    simpa [map_sum, hT_f_e] using this
   simp [hc]
 
 end GlobalTheory.RowsOrb.ModelIso

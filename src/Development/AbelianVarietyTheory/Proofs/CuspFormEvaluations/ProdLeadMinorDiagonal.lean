@@ -262,9 +262,9 @@ theorem biInvariant_eval {z : Fin p × Fin p → σ} (hz : Function.Injective z)
     funext s
     by_cases hs : ∃ w, z w = s
     · obtain ⟨⟨u, v⟩, rfl⟩ := hs
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
-        apply_ite (eval (setBlock z x M)), map_mul, eval_C, map_zero, rowAdd, of_apply]
+
+      simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
+      apply_ite (eval (setBlock z x M)), map_mul, eval_C, map_zero, rowAdd, of_apply]
       by_cases hu : u = b <;> simp [hu]
     · have : ∀ w, s ≠ z w := fun w h => hs ⟨w, h.symm⟩
       simp [setBlock_of_not _ _ hs, this]
@@ -275,10 +275,10 @@ theorem biInvariant_eval {z : Fin p × Fin p → σ} (hz : Function.Injective z)
     funext s
     by_cases hs : ∃ w, z w = s
     · obtain ⟨⟨u, v⟩, rfl⟩ := hs
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
-        apply_ite (eval (setBlock z x Mᵀ)), map_mul, eval_C, map_zero, rowAdd, of_apply,
-        transpose_apply]
+
+      simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
+      apply_ite (eval (setBlock z x Mᵀ)), map_mul, eval_C, map_zero, rowAdd, of_apply,
+      transpose_apply]
       by_cases hu : v = b <;> simp [hu]
     · have : ∀ w, s ≠ z w := fun w h => hs ⟨w, h.symm⟩
       simp [setBlock_of_not _ _ hs, this]

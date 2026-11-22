@@ -7,6 +7,6 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 @[expose] public section
 
 open GlobalTheory.PRep PositivityTheory.SphericalProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.jacquet_lemma_holds : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G], PositivityTheory.SphericalProduct.A4 G := by
   first | exact @GlobalTheory.CompanionTheory.Cass.sphericalProduct_A4 | exact GlobalTheory.CompanionTheory.Cass.sphericalProduct_A4 | (intros; apply GlobalTheory.CompanionTheory.Cass.sphericalProduct_A4 <;> assumption)

@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
@@ -47,8 +47,8 @@ private theorem continuous_linear_closed {G κ : Type} [TopologicalSpace G] [Fie
   have h : (fun g => f (a g)) = fun g => ∑ i, ∑ j, a g i j * f (Matrix.single i j 1) := by
     funext g
     conv_lhs => rw [Matrix.matrix_eq_sum_single (a g)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     rw [← smul_eq_mul, ← map_smul]
     simp

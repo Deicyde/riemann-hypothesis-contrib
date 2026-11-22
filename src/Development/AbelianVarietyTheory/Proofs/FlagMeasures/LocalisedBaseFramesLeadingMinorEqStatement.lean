@@ -12,7 +12,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.localised_base_frames_leading_minor_eq : ∀ (D : D7) (Z : LocDat D) (p : PlF D) {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
     (F' : LFlag (D.sp.Y 0) D.R.rS T') (Tn T'n : ℕ) (P : Formalism.MainNotions.S.LocNG.FPair (locH Z p) D.R.rS),
     AtBase Z p F F' Tn T'n P → ∀ l : ℕ, P.Dm l =

@@ -124,8 +124,8 @@ theorem ioBlock_eq_sum (K : Type) [Field K] (b : SegBlock (segS X.TT j) X.m) (t 
       (aeval (fun v => (MvPolynomial.X (symVar C0 CE1 CE2 X j v) :
         MvPolynomial ((X.TT × Bool) × Fin (X.m + 1)) K) ^ symLev X.p C0 CE1 CE2 X j v)).toLinearMap
   have hf : ∀ t, ioBlock K X.p C0 CE1 CE2 X j b t = f t := fun _ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [hf, ← t.support_sum_monomial_coeff, map_sum]
+
+  conv_lhs => rw [hf, ← t.support_sum_monomial_coeff, map_sum]
   exact Finset.sum_congr rfl fun μ _ => by rw [← hf, ioBlock_monomial]
 
 end

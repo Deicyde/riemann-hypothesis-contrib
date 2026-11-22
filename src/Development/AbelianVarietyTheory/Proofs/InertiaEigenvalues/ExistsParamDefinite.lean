@@ -71,7 +71,7 @@ theorem exists_coord_ne {V : HSp D} (c : CoefA V) {f : Bridge.Gf V → c.W} (h0 
   exact inner_self_eq_zero.1 e
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_param_definite {V : HSp D} (hs : V.SigOK) (hp : V.IsPosDef) (c : CoefA V) (hc : c.Is)
     {β : GL (Fin V.rank) (Lev.EAf D)} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (hβ : IsSDFrame V β Λ 1)
     {L : LevDat D.host.E ℂ V.rank} {S : Finset (HeightOneSpectrum (𝓞 D.host.F))}
@@ -110,8 +110,8 @@ theorem exists_param_definite {V : HSp D} (hs : V.SigOK) (hp : V.IsPosDef) (c : 
     rw [opOf, Finsupp.sum_single_index (by exact zero_smul _ _), one_smul, Finset.sum_apply, LinearMap.sum_apply,
       Finset.sum_apply] at h3
     have h5 := congrArg ℓ h4
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Pi.smul_apply, map_smul] at h5
+
+    rw [map_sum, Pi.smul_apply, map_smul] at h5
     exact h3.trans h5.symm
   obtain ⟨B, hB', -⟩ := GlobalTheory.T.exists_satake_parameters_bounded_eigenfunction D V _ _ S hsph _ hbd hℓ hlev s heig
   exact ⟨B, (GlobalTheory.LFun.isParamFunV_iff_isSysParamD_of_level hsph hℓ hlev heig B).1 hB'⟩
