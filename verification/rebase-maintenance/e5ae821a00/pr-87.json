@@ -1,0 +1,27 @@
+{
+  "number": 87,
+  "title": "Shorten checked proofs across 816 Lean modules",
+  "original_head": "8e92b2be254a03fa837ad68a96e2be73b92ef8ef",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "proof-shortening/verified-disjoint-20261122",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "b6e5ed7e799336159305e5f4bd6d3b456193b51d",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-87-e5ae821a00-45039889610-small-two",
+  "status": "rebased"
+}

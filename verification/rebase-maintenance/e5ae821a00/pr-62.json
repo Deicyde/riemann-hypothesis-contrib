@@ -1,0 +1,27 @@
+{
+  "number": 62,
+  "title": "Shorten machine-dumped terms and reuse repeated proofs in 76 modules",
+  "original_head": "31a38861da6da8f71b16d18e935ac4f6794141d9",
+  "original_repo": "marwuint/riemann-hypothesis",
+  "original_branch": "refactor/shorten-explicit-terms-wave2",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2e43e1406f4398c615e1e527eeb3334600726cc4",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "d2b16a2968a2d7541aebb8e132e642cdd2c6a552",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "76 files changed, 1354 insertions(+), 6590 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-62-e5ae821a00-45039889610-small-two",
+  "status": "rebased"
+}

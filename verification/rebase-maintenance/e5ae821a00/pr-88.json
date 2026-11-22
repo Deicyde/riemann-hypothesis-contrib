@@ -1,0 +1,10 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "ae0e6264563635d7b4cac27dcd52e2eec1919a9e",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "status": "branch-advanced",
+  "observed_head": "8dd3418093411bc76f4295f750810ec193d3b2af"
+}

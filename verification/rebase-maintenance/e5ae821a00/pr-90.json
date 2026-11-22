@@ -1,0 +1,31 @@
+{
+  "number": 90,
+  "title": "Golf proofs in si  x ThetaBesselIsometries / BesselWaveGrids files (\u2212344 lines)",
+  "original_head": "a1c037e1653e86efb7d7afeb50114a4510c9b6b9",
+  "original_repo": "josephbebel/riemann-hypothesis",
+  "original_branch": "golf/theta-bessel-proof-golf",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "stages": {
+        "1": "4313c08904bd30db69267215a3f6e8c538013beb",
+        "2": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+        "3": "23a7ca09e67d34b432ca63df05c17a5e7de50f6e"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "e73d3f2dea2c98e51768d001aa30c33825727b70",
+  "log_tail": "Auto-merging src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean\nCONFLICT (content): Merge conflict in src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean\nRebasing (1/6)\nRebasing (2/6)\nerror: could not apply e73d3f2dea... Golf BesselGapDimensionFormula: shorter quot_ae/piInv_contOn, drop maxHeartbeats override\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply e73d3f2dea... # Golf BesselGapDimensionFormula: shorter quot_ae/piInv_contOn, drop maxHeartbeats override\n",
+  "checkpoint_head": "f800a8a1096c3b890e6a4473230dc2c12b89ee94",
+  "checkpoint_branch": "maintenance/checkpoint-pr-90-e5ae821a00-45039889610-small-two"
+}

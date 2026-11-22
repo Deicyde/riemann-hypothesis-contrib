@@ -1,0 +1,9 @@
+{
+  "number": 85,
+  "title": "Pilot: Lean auto-formatter on a sample of the submission (not for merging)",
+  "original_head": "dacaca3616ad0341b1c975d8e610bcf97fcd9485",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "formatter-pilot",
+  "maintainer_can_modify": false,
+  "status": "excluded-nonmerging-formatter-pilot"
+}

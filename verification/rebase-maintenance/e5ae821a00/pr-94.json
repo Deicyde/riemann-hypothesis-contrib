@@ -1,0 +1,30 @@
+{
+  "number": 94,
+  "title": "Reuse the quadratic Hasse norm theorem for the negative-one norm equation",
+  "original_head": "ae11f0f2b01356117a3acb5a4fb888c322bc7b8e",
+  "original_repo": "hhh2210/riemann-hypothesis",
+  "original_branch": "reuse-quadratic-hasse-norm",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean",
+      "stages": {
+        "1": "92b67ed183902dc7f7964e1148abecf5438555d3",
+        "2": "3118916f1af93da2d9a1b35ff60ff9069141b542",
+        "3": "753e5f391804e1784623b57427f6236fcd47fd87"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "ae11f0f2b01356117a3acb5a4fb888c322bc7b8e",
+  "log_tail": "Auto-merging src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean\nRebasing (1/1)\nerror: could not apply ae11f0f2b0... Reuse the quadratic Hasse norm theorem for the negative-one norm equation\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply ae11f0f2b0... # Reuse the quadratic Hasse norm theorem for the negative-one norm equation\n",
+  "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+}

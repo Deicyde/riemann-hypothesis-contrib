@@ -1,0 +1,30 @@
+{
+  "number": 92,
+  "title": "Reuse the existing CovNFormula proof",
+  "original_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "covn-formula-share-proof",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+      "stages": {
+        "1": "f9e693ee30bf338a0f67e7457cfdab2ef12da831",
+        "2": "55ddf60fbc7787f81a0b960359d56ac93e6f7175",
+        "3": "a512c5e2142e67efb9bcef6728078bbf90357926"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+  "log_tail": "Auto-merging src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean\nCONFLICT (content): Merge conflict in src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean\nRebasing (1/1)\nerror: could not apply bb1ffc4383... Reuse the existing CovNFormula proof\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply bb1ffc4383... # Reuse the existing CovNFormula proof\n",
+  "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+}
