@@ -1,0 +1,55 @@
+{
+  "number": 95,
+  "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+  "status": "conflict",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "original_head": "018e327c93d07383f5542b97741ca17548db2a7e",
+  "original_repo": "Osgood001/riemann-hypothesis",
+  "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+  "rebased_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+  "prepared_branch": "maintenance/rebased-pr-95-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "26 files changed, 590 insertions(+), 1370 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+  "restack_commit_count": 1,
+  "automatic_resolutions": [],
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "stages": {
+        "1": "0372db0b13ca99a97c5555a75936471f6d18e624",
+        "2": "43c115082034e9d342d7d46016b5e8bc84835321",
+        "3": "2cd7c590bad4e9ac5d641f8b47c5beb97f376ed9"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+  "checkpoint_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "checkpoint_branch": "maintenance/checkpoint-pr-95-8f1c3281c1-45052873081-proofs-b"
+}

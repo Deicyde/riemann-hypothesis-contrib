@@ -1,0 +1,34 @@
+{
+  "number": 87,
+  "title": "Shorten checked proofs across 816 Lean modules",
+  "original_head": "dbbf5d8bdf07025202ee4954437d41481ae69847",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "proof-shortening/verified-disjoint-20261122",
+  "maintainer_can_modify": true,
+  "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "automatic_resolution_count": 0,
+  "rebased_head": "df33ee94514f4a3bc7d5f46d923ea5787740bc7c",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-87-8f1c3281c1-45052873081-proofs-b",
+  "status": "rebased",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "previous_prepared_head": "94335668ef0b4ae125cba291a5505a450456776b",
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 1,
+  "automatic_resolutions": [],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 1
+}

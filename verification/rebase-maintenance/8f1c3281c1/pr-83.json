@@ -1,0 +1,35 @@
+{
+  "number": 83,
+  "title": "Zero-free region: replace the 34-file assembly with a self-contained 2,368-token proof (-89.1% normalized tokens)",
+  "status": "rebased",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "original_head": "92e1668af9185779557a28ce4983f28e5d12b41f",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-single-file",
+  "rebased_head": "9f484eb72fa87162d42936ce52d4120c9b37002a",
+  "prepared_branch": "maintenance/rebased-pr-83-8f1c3281c1-45052873081-proofs-b",
+  "ready_to_publish": true,
+  "changes": "2 files changed, 197 insertions(+), 3 deletions(-)",
+  "imports": {
+    "modules": 149398,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "f31ae7c2ecbce37f43894b183ed4ccf7f0e197f2",
+  "restack_commit_count": 5,
+  "automatic_resolutions": [],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 5
+}

@@ -1,0 +1,305 @@
+{
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "run": "45052873081-proofs-b",
+  "results": [
+    {
+      "number": 82,
+      "title": "Share stabilizer filtration and Hensel counts (414 fewer Lean lines)",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+      "original_repo": "YinkaiYu/riemann-hypothesis",
+      "original_branch": "refactor/share-stabilizer-counts",
+      "rebased_head": "48d53ef136473013409529cfb7ecfb275f66da9f",
+      "prepared_branch": "maintenance/rebased-pr-82-8f1c3281c1-45052873081-proofs-b",
+      "ready_to_publish": true,
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "64690b5603ce340460f6ed061057d9143f9ed886",
+      "restack_commit_count": 2,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 2
+    },
+    {
+      "number": 83,
+      "title": "Zero-free region: replace the 34-file assembly with a self-contained 2,368-token proof (-89.1% normalized tokens)",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "92e1668af9185779557a28ce4983f28e5d12b41f",
+      "original_repo": "YinkaiYu/riemann-hypothesis",
+      "original_branch": "refactor/zero-free-region-single-file",
+      "rebased_head": "9f484eb72fa87162d42936ce52d4120c9b37002a",
+      "prepared_branch": "maintenance/rebased-pr-83-8f1c3281c1-45052873081-proofs-b",
+      "ready_to_publish": true,
+      "changes": "2 files changed, 197 insertions(+), 3 deletions(-)",
+      "imports": {
+        "modules": 149398,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "f31ae7c2ecbce37f43894b183ed4ccf7f0e197f2",
+      "restack_commit_count": 5,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 5
+    },
+    {
+      "number": 86,
+      "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+      "original_head": "9422ada52f367cf8b1da05ce8df9ca0b7ff727a0",
+      "original_repo": "leanprover-community/riemann-hypothesis",
+      "original_branch": "ci/job-start-map-count-preflight",
+      "maintainer_can_modify": false,
+      "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+      "automatic_resolution_count": 0,
+      "rebased_head": "1a6ca690c10f78fd96ec5c3b1d0190bb656b321e",
+      "diff_check": true,
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "5 files changed, 192 insertions(+), 8 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-86-8f1c3281c1-45052873081-proofs-b",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "previous_prepared_head": "0103a1ad8cb8a4a7d4bbf85e23d45539c2352fce",
+      "author_and_message_metadata_unchanged": true,
+      "restack_commit_count": 4,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 4
+    },
+    {
+      "number": 87,
+      "title": "Shorten checked proofs across 816 Lean modules",
+      "original_head": "dbbf5d8bdf07025202ee4954437d41481ae69847",
+      "original_repo": "graohene10-spec/riemann-hypothesis",
+      "original_branch": "proof-shortening/verified-disjoint-20261122",
+      "maintainer_can_modify": true,
+      "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+      "automatic_resolution_count": 0,
+      "rebased_head": "df33ee94514f4a3bc7d5f46d923ea5787740bc7c",
+      "diff_check": true,
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-87-8f1c3281c1-45052873081-proofs-b",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "previous_prepared_head": "94335668ef0b4ae125cba291a5505a450456776b",
+      "author_and_message_metadata_unchanged": true,
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1
+    },
+    {
+      "number": 90,
+      "title": "Golf proofs in si  x ThetaBesselIsometries / BesselWaveGrids files (\u2212344 lines)",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "a1c037e1653e86efb7d7afeb50114a4510c9b6b9",
+      "original_repo": "josephbebel/riemann-hypothesis",
+      "original_branch": "golf/theta-bessel-proof-golf",
+      "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "prepared_branch": "maintenance/rebased-pr-90-8f1c3281c1-45052873081-proofs-b",
+      "ready_to_publish": true,
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "42c8a505e5757ac3b7d22a8c6742ea363f01d936",
+      "restack_commit_count": 6,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 0
+    },
+    {
+      "number": 92,
+      "title": "Reuse the existing CovNFormula proof",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+      "original_repo": "graohene10-spec/riemann-hypothesis",
+      "original_branch": "covn-formula-share-proof",
+      "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "prepared_branch": "maintenance/rebased-pr-92-8f1c3281c1-45052873081-proofs-b",
+      "ready_to_publish": true,
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "319babb9678d5c0cb59ad3c3b8f9356e92759ef9",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 0
+    },
+    {
+      "number": 94,
+      "title": "Reuse the quadratic Hasse norm theorem for the negative-one norm equation",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "ae11f0f2b01356117a3acb5a4fb888c322bc7b8e",
+      "original_repo": "hhh2210/riemann-hypothesis",
+      "original_branch": "reuse-quadratic-hasse-norm",
+      "rebased_head": "dafb4b1bbd717f9ea6912d722b5ce771bf8d89e5",
+      "prepared_branch": "maintenance/rebased-pr-94-8f1c3281c1-45052873081-proofs-b",
+      "ready_to_publish": true,
+      "changes": "1 file changed, 34 insertions(+), 1703 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "451b491b3180551d46024a478f281f2c363b5767",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1
+    },
+    {
+      "number": 95,
+      "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+      "status": "conflict",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "018e327c93d07383f5542b97741ca17548db2a7e",
+      "original_repo": "Osgood001/riemann-hypothesis",
+      "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+      "rebased_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+      "prepared_branch": "maintenance/rebased-pr-95-c259b55f5b-45051429944-tree-restack",
+      "ready_to_publish": true,
+      "changes": "26 files changed, 590 insertions(+), 1370 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "restack_source_unchanged": {
+        "src": true,
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "lakefile.toml": true
+      },
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "stages": {
+            "1": "0372db0b13ca99a97c5555a75936471f6d18e624",
+            "2": "43c115082034e9d342d7d46016b5e8bc84835321",
+            "3": "2cd7c590bad4e9ac5d641f8b47c5beb97f376ed9"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+      "checkpoint_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "checkpoint_branch": "maintenance/checkpoint-pr-95-8f1c3281c1-45052873081-proofs-b"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
