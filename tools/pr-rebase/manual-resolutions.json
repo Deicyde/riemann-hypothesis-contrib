@@ -1,0 +1,28 @@
+{
+  "prs": {
+    "54": [
+      {
+        "commit": "4feab85e07e2c312013048dec7b264d74f35f079",
+        "files": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+            "ours": "5527ddf26c002dce6ad79e44bdc0a498488da2ab",
+            "resolution": "resolutions/54-current-claimstrip.lean"
+          }
+        ]
+      }
+    ],
+    "95": [
+      {
+        "commit": "562d5d59e0cedb59b64b3b55db339830b358848a",
+        "files": [
+          {
+            "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+            "ours": "43c115082034e9d342d7d46016b5e8bc84835321",
+            "resolution": "resolutions/95-author-current-logderiv.lean"
+          }
+        ]
+      }
+    ]
+  }
+}

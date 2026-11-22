@@ -1,0 +1,85 @@
+{
+  "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "previous_base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "results": [
+    {
+      "number": 54,
+      "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+      "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+      "original_repo": "by-eureka/riemann-hypothesis",
+      "original_branch": "eureka/upstream-proof-refactors",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 111,
+      "rebased_head": "d4c52842a47c82b9436bbf3f294caad818d48112",
+      "diff_check": false,
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "135 files changed, 1438 insertions(+), 4775 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 1,
+        "missing": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+            "line": "4",
+            "module": "Formalism.GammaFactorNonvanishing.RhOfRight"
+          }
+        ],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/repaired-pr-54-8f32827748-45048636006",
+      "status": "rebased",
+      "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+      "note": "Retained main\u2019s local zeta reduction because RhOfRight was pruned; kept other proof shortenings.",
+      "repair_parent": "0d1cefd21d834298efd7b91c06ebfcc40674372b"
+    },
+    {
+      "number": 95,
+      "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+      "status": "rebased",
+      "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+      "original_head": "b5c830f1cd3f529d94602391dc4b5c93829fdf16",
+      "original_repo": "Osgood001/riemann-hypothesis",
+      "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+      "rebased_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+      "prepared_branch": "maintenance/rebased-pr-95-c259b55f5b-45051429944-tree-restack",
+      "ready_to_publish": true,
+      "changes": "26 files changed, 590 insertions(+), 1370 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "restack_source_unchanged": {
+        "src": true,
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "lakefile.toml": true
+      },
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 4,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "adba511564d02b8cb4cb2c4575011618abf30a35",
+      "restack_commit_count": 1
+    }
+  ],
+  "only": [
+    54,
+    95
+  ],
+  "contributor_heads": {
+    "95": "b5c830f1cd3f529d94602391dc4b5c93829fdf16"
+  }
+}
