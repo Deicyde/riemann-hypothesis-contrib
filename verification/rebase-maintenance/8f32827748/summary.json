@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-93",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CharpolyDvdPowOfAevalEqZero.lean",
+          "stages": {
+            "1": "0cd1c0026d9070b4a5f6bb5c1198888f1aba8586",
+            "2": "85e18f9ab800ea57f442214b25ed28ecd3d1d005",
+            "3": "520b648c2d21c529f6be9bb6529757b10cf935cb"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "091ff4a5ea67ae9e12e480634eecfb924618413a",
+      "checkpoint_head": "3f3e9dd524fce5d03a2a4fc7164d88f7842e69da",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-93"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
