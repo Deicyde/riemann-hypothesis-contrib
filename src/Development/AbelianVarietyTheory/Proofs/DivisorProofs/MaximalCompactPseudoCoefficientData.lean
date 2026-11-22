@@ -1,32 +1,66 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RangeShape
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceEqOfMem
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HarishChandraModulesIndefiniteUnitaryGroup
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HighestWeightKernelLowestType
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TracePairingNonzeroIntertwiner
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxCompactPolynomialBlockTimesConjDetPower
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointDetOnCompactTorus
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointDetTraceClassFunction
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CasimirScalarStableSumSpace
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CasimirValueHighestWeightCoordinates
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointDetTraceClassFunction
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvConjTransposeMem
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockCoordinatesSpanFiniteDimensional
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompactDiscreteSeriesOwnType
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqDiscreteSeriesOfLowestKTypeCasimir
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvConjTransposeMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockCoordinatesSpanFiniteDimensional
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraWeightIntegralDominant
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapConditionsOfLargeGaps
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HighestWeightKernelLowestType
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntertwinerPreservesHighestWeight
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryRepUpqMatrixFunction
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModeMatrixDetEqAdjointDet
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointDetOnCompactTorus
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IrrepAveragesFinDimSmoothOfKTypesAndPolyAverages
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxCompactPolynomialBlockTimesConjDetPower
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModeMatrixDetEqAdjointDet
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormIrreducibleCharacterUnitaryMaxCompactEqOne
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolyCoefIrrepHasDerivedAction
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolyOnKConj
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StrIdxProof2
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupertraceCarriedByDiracKernel
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolyCoefIrrepHasDerivedAction
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceEqOfMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TracePairingNonzeroIntertwiner
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryRepUpqMatrixFunction
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeylFormulaCompactTorusIdentityOfIngredients
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolyOnKConj
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapConditionsOfLargeGaps
 
 @[expose] public section
 

@@ -1,60 +1,44 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.RealisedChainTorusEq
-public import Formalism.SharpRestriction.FamCore
-public import Formalism.LocalRingCardinality.SpanPowerMembership
-public import Formalism.LocalRingCardinality.DataKerI
-public import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowF
-public import Formalism.LocalRingCardinality.SpanPowerMembership.NZTypeH
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleWeightMiddleEntries
-public import Formalism.LocalRingCardinality.SpanPowerMembership.FmZeroHLatEmpty
-public import Formalism.LocalRingCardinality.SpanPowerMembership.GPlacesExampleNatAct
-public import Formalism.CyclotomicNorms.StatementT
-public import Formalism.LocalRingCardinality.SpanPowerMembership.EntPlNonempty
-public import Formalism.LocalRingCardinality.Lemmas
-public import Formalism.LocalRingCardinality.DataTies
-public import Formalism.LocalRingCardinality.SpanPowerMembership.RankRecordRowDimensionZero
-public import Formalism.LocalRingCardinality.SpanPowerMembership.SignSplitEquivInl
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraTheta
-public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleySignature
-public import Formalism.SharpRestriction.Divisibility.InnerProductFormulaField
-public import Formalism.LocalRingCardinality.DataKerP
-public import Formalism.LocalRingCardinality.DataLatDefs
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ClassRecordRowDimensionZero
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraVal
-public import Formalism.LocalRingCardinality.DataNChTie
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ExistsHomOfBasis
-public import Formalism.LocalRingCardinality.DataExtra
-public import Formalism.LocalRingCardinality.PrincipalHermitianLattice
-public import Formalism.LocalRingCardinality.DataDIVDefs
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleClassGroupCardPos
-public import Formalism.LocalRingCardinality.DataNChoice
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraNum
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraGat
-public import Formalism.LocalRingCardinality.DataMink
-public import Formalism.LocalRingCardinality.DataIdx
-public import Formalism.LocalRingCardinality.SpanPowerMembership.DivXExample
-public import Formalism.LocalRingCardinality.DataAmbForm
-public import Formalism.LocalRingCardinality.DataKap
-public import Formalism.LocalRingCardinality.DataRows
-public import Formalism.LocalRingCardinality.DataForms
-public import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowC
-public import Formalism.LocalRingCardinality.SpanPowerMembership.NZLevD
-public import Formalism.SharpRestriction.GrowthBounds.UnramifiedQuadraticSetting
-public import Formalism.SharpRestriction.GrowthBounds.LatticeSystems
-public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.ClsLat
-public import Formalism.LocalToGlobal.GroupLattices.FockModels.OperatorsPreserveLattices
-public import Formalism.SharpRestriction.GrowthBounds.DataGChain
-public import Formalism.LocalRingCardinality.SpanPowerMembership.GatSetting
-public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.DeterminantTwistRowActionMem
-public import Formalism.LocalToGlobal.GroupLattices.PerfectRings.JOInjective
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraGatC
 public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsRealPD
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NStageTrivialCharacterCoeffEq
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLocalPrimeAinf
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DvdOfEqMulIntegral
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FiniteDimensionalMram
+import Formalism.LocalRingCardinality.SpanPowerMembership.NZTypeD
 
 @[expose] public section
 

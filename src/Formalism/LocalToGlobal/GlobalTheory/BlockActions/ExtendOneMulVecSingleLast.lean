@@ -1,8 +1,6 @@
 module
 
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Mathlib.Data.Matrix.Block
-public import Mathlib.Algebra.BigOperators.Fin
 
 @[expose] public section
 

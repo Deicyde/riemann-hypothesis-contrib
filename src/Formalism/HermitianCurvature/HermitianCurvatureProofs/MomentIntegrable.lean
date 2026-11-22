@@ -1,8 +1,10 @@
 module
 
-public import Mathlib.Analysis.Fourier.Inversion
+public import Mathlib.Analysis.Calculus.ContDiff.Defs
+public import Mathlib.Analysis.Fourier.FourierTransform
 public import Mathlib.Analysis.Fourier.FourierTransformDeriv
-public import Mathlib.Analysis.SpecialFunctions.JapaneseBracket
+public import Mathlib.Analysis.Fourier.Inversion
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

@@ -1,64 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.ZhangDimensionPushDownGrassmannianHeightBounds
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PCutoffs
-public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.ContinuousTmaxShift
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PTopNPoly
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FlagIndices
+public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.Metric
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.CoordinateIdeals.MemMCoordIdealOfAevalEqZero
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PLiftGraphPoints
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.TailBoundStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ConvergenceStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ConvergenceRateStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SignedConvergenceStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CompChartEventuallyEq
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LoglogQuotNonneg
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularFamilyC2PullbackOfSection
-public import ReciprocityTheory.AnalyticForms.LeviForms.TailBoundA
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffAtOfIsPotential
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.MoriwakiSt
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.Imports
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PtsIntegralCurveConst
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PNefOnGenericOfSemipos
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PCurvePointsFinite
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsBirationalModelExists
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PBirationalModelExists
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.ImportsBis
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.BigLineBundleMoriwaki
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PZhangLowerX
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.RingKrullDimLocalizationInt
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.SmallSectionCountMonoLattice
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsArith
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsConstantShift
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PConductor
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PSecEq
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PMetricMaxComparison
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PSectionLatticeFinite
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PRealFormsOnPoints
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PComplexFormsOnPoints
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PPrimeComplexRadical
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PComplexMinimalPrimesContract
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PIndependentModBaseChange
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PScaledFSTopPos
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PPerturbSemipos
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.ZcombIsConjInvariantH
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.SmallSectionCountLeOfInjOn
-public import GroundTheory.HeightsAndTheta.Heights.ElementarySymmetric.PSmallGenHeightsNonneg
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PThmIUnique
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.IsConjInvariantHZcomb
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PUpperNormalisation
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PMonomialShift
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.AssemblyBase
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.MoriwakiHSFull
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PRootGridLower
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PGridSeparation
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PNormalLocusRep
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PFibreNormBound
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PProjAvoidingForm
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PSegreArith
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PFibreRepresentatives
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PAvoidFormFinite
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PFibreNormMax
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeB
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsCompactRWSublevel
+public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.Weights
+public import GroundTheory.HeightsAndTheta.Heights.Regularisation.RegMaxReindex
+import GroundTheory.HeightsAndTheta.Heights.Regularisation.StRiemannSlices
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.AnalyticForms.LeviForms.IsRegFamilyInhabitStatement
+import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.LogIntSt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 

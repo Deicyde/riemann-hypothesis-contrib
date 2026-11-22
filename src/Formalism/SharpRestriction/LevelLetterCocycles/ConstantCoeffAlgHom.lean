@@ -1,9 +1,14 @@
 module
 
 public import Mathlib.RingTheory.PowerSeries.Substitution
-public import Mathlib.RingTheory.PowerSeries.Derivative
-public import Mathlib.RingTheory.PowerSeries.Binomial
-public import Mathlib.NumberTheory.Padics.MahlerBasis
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Data.EReal.Inv
+import Mathlib.Geometry.Convex.ConvexSpace.Defs
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
