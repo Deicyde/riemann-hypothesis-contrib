@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-56",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/ExistsEmbeddingIdempotentTensor.lean",
+          "stages": {
+            "1": "186e4f9dc90976459210591fafa6183112546f0c",
+            "2": "b740232984362044a1aa6a7a5a0a4dfcb684b05b",
+            "3": "63f3deca90b4088b9a50403a43066b7c754c04f8"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "66262e36ab37f2316ff8c4f0b130a0dd67f4b271",
+      "checkpoint_head": "3f98ed13d5081cb257420dd7fd6d34d5631440bd"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
