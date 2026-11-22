@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-89",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DerInner.lean",
+          "stages": {
+            "1": "e18b60d94491df88ba671aed32e94e337a41453b",
+            "2": "59e02ea6e86dafab869dfb03da04f80130cb6aed",
+            "3": "30b05828d9d342cb143722d594bb89c327a39bc4"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "1d95a2d5d6ed8fa459a4406e0ce4afbc6785e4bd",
+      "checkpoint_head": "f68d4669314680b699ca020603ea671881249a9d"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
