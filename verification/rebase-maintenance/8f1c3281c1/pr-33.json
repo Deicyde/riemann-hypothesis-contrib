@@ -1,0 +1,35 @@
+{
+  "number": 33,
+  "title": "replace deprecated proof lemmas",
+  "status": "rebased",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "original_head": "ede9888a861a06898e0d6c8632a396a763e496db",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/deprecated-proof-lemmas",
+  "rebased_head": "128cda691f5bc81f74411ff3a4116c613162ecec",
+  "prepared_branch": "maintenance/rebased-pr-33-8f1c3281c1-45052873081-proofs-a",
+  "ready_to_publish": true,
+  "changes": "75 files changed, 113 insertions(+), 113 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "a11557483d00764fb821efb5907b9de5c86d2a10",
+  "restack_commit_count": 1,
+  "automatic_resolutions": [],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 1
+}
