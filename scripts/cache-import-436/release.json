@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "release": "https://github.com/Vilin97/rh-lc/releases/tag/lean-4.36-build-5a1fb95adc",
+  "revision": "9b1ee6011d0433c4c38a90508a14d39e33d608b6",
+  "source_tree": "0ba0b4d44fa26b97a376ec10889be6b553237103",
+  "toolchain": "leanprover/lean4:v4.36.0",
+  "toolchain_commit": "611c117bfaf7b7ae1cfcf246ce6fba31e8f509e9",
+  "blobs": {
+    "lean-toolchain": "00f848359b1cdaf7c12cd6b7acc5b4364752e154",
+    "lakefile.toml": "1c1cfbca08944aa3785dc710c98baffc9f3abb07",
+    "lake-manifest.json": "0a7d3ab521aaec65b39bf5ae96cabe5a7b4bb5c9"
+  },
+  "archive_sha256": "c652456b1f0e35e98b9a0b809f807e729db6cfaad76c986c20fa618f1781d1fb",
+  "files": 1195160,
+  "modules": 149395,
+  "assets": [
+    {
+      "name": "MANIFEST.sha256.zst",
+      "size": 46568250,
+      "sha256": "2cb79f7dfa8f80abc6fd8e39f8e4becd342d5e5361a40025faf327677d1b5f38",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/MANIFEST.sha256.zst"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-000",
+      "size": 1992294400,
+      "sha256": "4834c72550d487b950e63b83421677f04265ea28328c4972323f515daaec3727",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-000"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-001",
+      "size": 1992294400,
+      "sha256": "937e1b3e29d0f845a8ad418c52b53b0832893f387be5d17545c65c71dd096080",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-001"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-002",
+      "size": 1992294400,
+      "sha256": "f223d98c6e5dce85aa0719b7c0ff8a5da881b197ec5048348b0193cfe328234b",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-002"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-003",
+      "size": 1992294400,
+      "sha256": "fbcede1b116c1bd503152121eb732d2e559010391165b2646c07fe3c33a83d11",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-003"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-004",
+      "size": 1992294400,
+      "sha256": "6b559498a842ecd1b6adc56107cedd245b369f2dd7a7c4c66bb346a063967633",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-004"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-005",
+      "size": 1992294400,
+      "sha256": "cd6da4c236adc64e61560a7bf18b8057be6f9d6fa815539adf6b3de715ebf246",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-005"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-006",
+      "size": 1992294400,
+      "sha256": "4f863e215142f7197cf435cec8eb4bdbbac4d74a9e772b09ffa81e07e24c49e4",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-006"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-007",
+      "size": 1992294400,
+      "sha256": "772f6c1226c42809aac435b1c2626b807dcc5a0eb39a0c87821cb61ec1807231",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-007"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-008",
+      "size": 1992294400,
+      "sha256": "973dded2965786f89083ca19adc4bd68664795024b8e476672b378a996430d0e",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-008"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-009",
+      "size": 1992294400,
+      "sha256": "9df234ecadfb7535b1b596a6ea3abec0fdaa1d0f71f62f089d8c8856edcf8683",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-009"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-010",
+      "size": 1992294400,
+      "sha256": "e7a558ef7f00939b7e5bb0640da5726c5b78049ad5d76c0df0dc58dd7c86274f",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-010"
+    },
+    {
+      "name": "rh-lean-4.36-build-5a1fb95adc.tar.zst.part-011",
+      "size": 1930662548,
+      "sha256": "470c078b8a6e3d476092e1fe9723bd2d2c8eee13ed3d63f014ae1a0e961e7cc9",
+      "url": "https://github.com/Vilin97/rh-lc/releases/download/lean-4.36-build-5a1fb95adc/rh-lean-4.36-build-5a1fb95adc.tar.zst.part-011"
+    }
+  ]
+}
