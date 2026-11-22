@@ -131,6 +131,38 @@ def resolve_module_conflicts(number):
     return resolved
 
 
+def resolve_reviewed_ports(number):
+    config = HERE / 'reviewed-ports.json'
+    if not config.exists():
+        return []
+    reviewed = json.loads(config.read_text())
+    paths = reviewed['prs'].get(str(number), [])
+    if not paths:
+        return []
+    applying = git('rev-parse', 'REBASE_HEAD', check=False).stdout.strip()
+    if number == 82 and applying != 'd4fa3841d45d222ce2c4a7f7c73d96a78cf04c55':
+        return []
+    unmerged = set(git('diff', '--name-only', '--diff-filter=U').stdout.splitlines())
+    resolved = []
+    for path in paths:
+        if path not in unmerged and number not in (74, 82):
+            continue
+        # These full-file ports are valid only while main still has the reviewed release versions.
+        main = git('rev-parse', BASE + ':' + path, check=False)
+        release = git('rev-parse', '2e43e1406f4398c615e1e527eeb3334600726cc4:' + path, check=False)
+        if main.returncode != release.returncode or (not main.returncode and main.stdout != release.stdout):
+            continue
+        source = git('show', reviewed['reference'] + ':' + path, check=False)
+        if source.returncode:
+            continue
+        target = REPO / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(source.stdout)
+        git('add', '--', path)
+        resolved.append({'path': path, 'reason': 'reuse-reviewed-Lean-4.36-port-from-PR91'})
+    return resolved
+
+
 def import_check():
     names = value('ls-tree', '-r', '--name-only', 'HEAD', '--', 'src').splitlines()
     modules = {p[4:-5].replace('/', '.') for p in names if p.endswith('.lean')}
@@ -211,6 +243,7 @@ def main():
         'pruning': [55,58,61,67],
         'structural': [44,63],
         'performance': [79,98,104],
+        'reviewed': [71,74,82,90,92],
     }
     selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
     prs = sorted([p for p in SNAPSHOT['prs'] if p['n'] in selected], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
@@ -218,6 +251,10 @@ def main():
     specs = ['refs/pull/' + str(p['n']) + '/head:refs/remotes/pr/' + str(p['n']) for p in prs]
     print('FETCH selected PR histories', flush=True)
     git('fetch', '--no-tags', UPSTREAM, *specs, timeout=1800)
+    reviewed_config = HERE / 'reviewed-ports.json'
+    if reviewed_config.exists():
+        reviewed = json.loads(reviewed_config.read_text())
+        git('fetch', '--no-tags', OWN, reviewed['reference'] + ':refs/remotes/reviewed/reference')
     print('FETCH complete', flush=True)
     results = []
     for pr in prs:
@@ -246,7 +283,8 @@ def main():
                     for _ in range(500):
                         if not replay.returncode:
                             break
-                        changes = resolve_module_conflicts(number)
+                        changes = resolve_reviewed_ports(number)
+                        changes += resolve_module_conflicts(number)
                         resolutions.extend(changes)
                         if not changes or git('ls-files', '-u').stdout:
                             break
