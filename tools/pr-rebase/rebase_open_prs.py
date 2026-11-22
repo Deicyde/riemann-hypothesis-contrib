@@ -104,6 +104,67 @@ def replay_line_deletions(base, ours, theirs):
     return ''.join(line for i,line in enumerate(b) if not mask[i]), ''.join(out)
 
 
+def replay_generated_cleanup(number, base, ours, theirs):
+    """Replay restricted cleanup operations without restoring pre-port proof bodies."""
+    b, t = base.splitlines(True), theirs.splitlines(True)
+    edits = [(b[a:z],t[c:d]) for kind,a,z,c,d in
+             difflib.SequenceMatcher(None,b,t,autojunk=False).get_opcodes() if kind!='equal']
+    if number in (4,9):
+        old_imports, new_imports, removed_options = set(), [], set()
+        for old,new in edits:
+            for lines,is_old in ((old,True),(new,False)):
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    m = re.fullmatch(r'import\s+([\w.]+)\s*\n?',line)
+                    if m:
+                        if is_old: old_imports.add(m[1])
+                        else: new_imports.append(m[1])
+                    elif number==9 and is_old and re.fullmatch(r'set_option (?:synthInstance\.)?maxHeartbeats \d+(?: in)?\s*\n?',line):
+                        removed_options.add(line.strip())
+                    else:
+                        return None
+        if number==9 and new_imports:
+            return None
+        retained=set(new_imports)
+        lines=[]
+        for line in ours.splitlines(True):
+            m=re.fullmatch(r'import\s+([\w.]+)\s*\n?',line)
+            if m and m[1] in old_imports-retained:
+                continue
+            if line.strip() in removed_options:
+                continue
+            lines.append(line)
+        existing={m[1] for line in lines if (m:=re.fullmatch(r'import\s+([\w.]+)\s*\n?',line))}
+        additions=list(dict.fromkeys(m for m in new_imports if m not in existing))
+        if any(not (REPO/'src'/Path(*m.split('.'))).with_suffix('.lean').exists()
+               for m in additions if m!='Mathlib' and not m.startswith('Mathlib.')):
+            return None
+        last=max((i for i,line in enumerate(lines) if line.startswith('import ')),default=-1)
+        if last<0: return None
+        lines[last+1:last+1]=['import '+m+'\n' for m in additions]
+        return ''.join(lines)
+    if number==10:
+        out=ours
+        for old,new in edits:
+            if len(old)!=1 or len(new)!=1:
+                return None
+            pattern=r'(\s*)first \| exact @([\w.\'₀-₉]+) \| exact \2 \| \(intros; apply \2 <;> assumption\)\s*'
+            m=re.fullmatch(pattern,old[0])
+            if m and new[0].strip()=='exact @'+m[2]:
+                out=out.replace(old[0],new[0])
+            else:
+                def simp_names(line):
+                    m=re.fullmatch(r'\s*simp(?: \[([\w.\', ]+)\])?\s*',line)
+                    return None if not m else [s.strip() for s in (m[1] or '').split(',') if s.strip()]
+                before,after=simp_names(old[0]),simp_names(new[0])
+                if before is None or after is None or not set(after)<set(before):
+                    return None
+                out=out.replace(old[0],new[0])
+        return out
+    return None
+
+
 def resolve_module_conflicts(number):
     """Replay edits through the known module-header conversion, preserving proof edits."""
     entries = collections.defaultdict(dict)
@@ -160,6 +221,16 @@ def resolve_module_conflicts(number):
             temporary.mkdir(exist_ok=True)
             paths = []
             normalized = {stage: normalize(blobs[stage]) for stage in ['2','1','3']}
+            cleanup = replay_generated_cleanup(number, normalized['1'],normalized['2'],normalized['3'])
+            if cleanup is not None:
+                lines=cleanup.splitlines(True)
+                imports=[i for i,line in enumerate(lines) if line.startswith('import ')]
+                if imports:
+                    for i in imports: lines[i]='public '+lines[i]
+                    lines.insert(imports[-1]+1,'\n@[expose] public section\n')
+                    (REPO/path).write_text(('module\n\n'+''.join(lines)).rstrip()+'\n')
+                    resolved.append({'path':path,'reason':'replay-restricted-cleanup-preserving-main-proof-repairs'})
+                    continue
             deletion_replay = replay_line_deletions(normalized['1'], normalized['2'], normalized['3']) if pruning else None
             if deletion_replay:
                 normalized['1'], normalized['2'] = deletion_replay
@@ -315,6 +386,7 @@ def import_check():
     modules = {p[4:-5].replace('/', '.') for p in names if p.endswith('.lean')}
     roots = {p.split('.')[0] for p in modules} | {'BuildAid', 'CompanionTheory', 'Development', 'Formalism', 'GroundTheory', 'Lemmata', 'PositivityTheory', 'ReciprocityTheory', 'Supplements'}
     missing = []
+    edges = {m:set() for m in modules}
     proc = subprocess.Popen(['git', '-C', str(REPO), 'grep', '-n', '-E',
                              '^([[:space:]]*(public|meta))*[[:space:]]*import[[:space:]]',
                              'HEAD', '--', 'src'], stdout=subprocess.PIPE,
@@ -329,10 +401,31 @@ def import_check():
             for name in match[1].split('--')[0].split():
                 if name.split('.')[0] in roots and name not in modules:
                     missing.append({'path': path, 'line': number, 'module': name})
+                if name in modules:
+                    module = path[4:-5].replace('/', '.')
+                    if module in edges: edges[module].add(name)
     proc.wait()
     if proc.returncode not in (0, 1):
         raise RuntimeError('Import scan failed')
-    return {'modules': len(modules), 'missing_count': len(missing), 'missing': missing[:100]}
+    reverse = collections.defaultdict(list)
+    counts = {m:len(deps) for m,deps in edges.items()}
+    for module,deps in edges.items():
+        for dependency in deps: reverse[dependency].append(module)
+    queue=collections.deque(m for m,n in counts.items() if not n)
+    while queue:
+        for dependent in reverse[queue.popleft()]:
+            counts[dependent]-=1
+            if not counts[dependent]: queue.append(dependent)
+    remaining={m for m,n in counts.items() if n}
+    cycle=[]
+    if remaining:
+        current=next(iter(remaining)); seen={}; chain=[]
+        while current not in seen:
+            seen[current]=len(chain);chain.append(current)
+            current=next(d for d in edges[current] if d in remaining)
+        cycle=chain[seen[current]:]+[current]
+    return {'modules': len(modules), 'missing_count': len(missing), 'missing': missing[:100],
+            'acyclic': not remaining, 'cycle_sample': cycle[:30]}
 
 
 def finish_report(results, run_tag):
@@ -390,6 +483,9 @@ def main():
         'small-one': [33,54,69,71,75,76,78,82,83],
         'small-two': [62,84,85,86,87,88,90,92,94,95],
         'imports': [4,9,10],
+        'imports-4': [4],
+        'imports-9': [9],
+        'imports-10': [10],
         'pruning': [55,58,61,67],
         'structural': [44,63],
         'performance': [79,98,104],
