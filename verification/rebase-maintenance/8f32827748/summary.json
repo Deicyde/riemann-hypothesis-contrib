@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-77",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KummerResidueMemAdjoinUnit.lean",
+          "stages": {
+            "1": "f1f858d194bd4bbf7863a3a1a8685afb176981ea",
+            "2": "dc252b388f1b30717b094c1946c9f5d12ee1d32d",
+            "3": "c26956b7551bda67ab29408f1aef518c50693d88"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "6b0bec050cb8bafebf9c51b13e24f420f88ffb26",
+      "checkpoint_head": "5fe37f951ae757e9e58c70dbb21a09152c8f6b22",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-77"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
