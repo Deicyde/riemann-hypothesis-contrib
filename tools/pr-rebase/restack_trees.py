@@ -26,6 +26,11 @@ def replay_commit(sha,new_parent):
     worker.ENV.update(GIT_AUTHOR_NAME=match[1],GIT_AUTHOR_EMAIL=match[2],
                       GIT_AUTHOR_DATE='@'+match[3]+' '+match[4])
     new=worker.git('commit-tree',tree,'-p',new_parent,input=message).stdout.strip()
+    # commit-tree adds a final newline; GitHub's commit API also creates valid
+    # commit messages without one. Preserve those original bytes as well.
+    if raw_commit(new)==(author,message+'\n') and not message.endswith('\n'):
+        headers=worker.git('cat-file','commit',new).stdout.split('\n\n',1)[0]
+        new=worker.git('hash-object','-t','commit','-w','--stdin',input=headers+'\n\n'+message).stdout.strip()
     if raw_commit(new)!=(author,message):
         raise RuntimeError('Author or complete commit message changed')
     return new
