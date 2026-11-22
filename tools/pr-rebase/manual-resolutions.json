@@ -10,6 +10,16 @@
             "resolution": "resolutions/78-readme-current.md"
           }
         ]
+      },
+      {
+        "commit": "e55b962df465cf5d543497fae0e997733e388c00",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "0ca27adb5416505f9d0b000587c9d2596fa5fca7",
+            "resolution": "resolutions/78-readme-bibliography.md"
+          }
+        ]
       }
     ]
   }
