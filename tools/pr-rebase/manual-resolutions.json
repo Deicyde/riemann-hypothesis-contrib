@@ -430,6 +430,17 @@
             "resolution": "resolutions/54-hermitian-growth.lean"
           }
         ]
+      },
+      {
+        "commit": "e495e5db1e9e12202b72399859bf36f083e06aae",
+        "files": [
+          {
+            "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/PosNear.lean",
+            "ours": "600a115fe46bf0a1546006d1599c3909506a81be",
+            "resolution": "resolutions/54-pruned-orbit-test.lean"
+          }
+        ],
+        "note": "The orbit-volume test and its finite projection helper were already pruned from main. Retain the pruning and current imports/API repairs."
       }
     ]
   }
