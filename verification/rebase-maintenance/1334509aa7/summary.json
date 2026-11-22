@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-47",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/Unimod.lean",
+          "stages": {
+            "1": "1dd3549a6f54379596c43c7a4ad064854e0fe346",
+            "2": "71c15dda908b9163e2554952c0175acc73ff9483",
+            "3": "0ab23f0fb0ec88c582ba20a123ae712aa2299f3d"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "e7ba4e6fd32fb9f9404d42d137d414c8bdb0ee47",
+      "checkpoint_head": "d4f15b1654ed42806e67a03dbd4f0966eff2b187"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
