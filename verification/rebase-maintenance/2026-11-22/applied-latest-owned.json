@@ -1,0 +1,38 @@
+[
+  {
+    "n": 91,
+    "old": "2a1994e748aece10924ecc0d933b9ee8fd34f88a",
+    "new": "3dbbac15c31dca8edfa0f00039979b59d3ce05ca",
+    "backup": "maintenance/before-latest-rebase-pr-91-2a1994e748ae",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Action completed."
+        }
+      ],
+      "structuredContent": {
+        "success": true
+      },
+      "isError": false
+    }
+  },
+  {
+    "n": 97,
+    "old": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+    "new": "885e54de662d0df57587901f55fded759f717fc9",
+    "backup": "maintenance/before-latest-rebase-pr-97-c97a0fa101f9",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Action completed."
+        }
+      ],
+      "structuredContent": {
+        "success": true
+      },
+      "isError": false
+    }
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "main": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "pr88": {
+    "head": "fdf6baa027671ba5a51c0776043573156dabbafa",
+    "original": "24e73b1ff2c9c965e39c68c32e50bdaf13a7db7a",
+    "metadata": {
+      "retained": 10,
+      "matched": 10,
+      "unmatched": 0
+    },
+    "feature_files_identical_to_contributor": [
+      ".github/workflows/challenge-files.yml",
+      ".github/workflows/checks.yml",
+      "comparator/Challenge.lean",
+      "comparator/FormalConjecturesBridge.lean",
+      "comparator/FormalConjecturesChallenge.lean",
+      "comparator/FormalConjecturesSolution.lean",
+      "comparator/FormalConjecturesStatement.lean",
+      "comparator/formal-conjectures-export-targets.txt",
+      "comparator/formal-conjectures.json",
+      "comparator/main-export-targets.txt",
+      "comparator/main.json",
+      "lakefile.toml",
+      "verification/NOTES.md"
+    ],
+    "readme_matches_reviewed_integration": true,
+    "challenge_relocated_byte_for_byte": true
+  },
+  "pr95": {
+    "author_head": "b5c830f1cd3f529d94602391dc4b5c93829fdf16",
+    "identical_source_tree": "5edefbfde13d6107ae25c1ad00c4d5f8a9380e49"
+  },
+  "pr91": {
+    "concurrent_head": "2a1994e748aece10924ecc0d933b9ee8fd34f88a",
+    "non_readme_root_entries_identical_before_final_rebase": true
+  },
+  "publishing": {
+    "number": 9,
+    "head": "82759a791c4686556ed698c9900556ff3df3a923",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "GithubGraphQLAPIError: [{'type': 'FORBIDDEN', 'path': ['updateRefs'], 'extensions': {'saml_failure': False, 'ip_allow_list_failure': False}, 'locations': [{'line': 3, 'column': 5}], 'message': 'Resource not accessible by integration'}]"
+        }
+      ],
+      "structuredContent": {
+        "error": "GithubGraphQLAPIError: [{'type': 'FORBIDDEN', 'path': ['updateRefs'], 'extensions': {'saml_failure': False, 'ip_allow_list_failure': False}, 'locations': [{'line': 3, 'column': 5}], 'message': 'Resource not accessible by integration'}]",
+        "error_code": "UNKNOWN"
+      },
+      "isError": true
+    }
+  },
+  "lean_builds_run": false
+}
