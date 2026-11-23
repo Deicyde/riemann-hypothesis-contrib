@@ -147,7 +147,7 @@ theorem base_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) :
   have hmη : (D.R.m : ℝ) * L.etaSz ≤ L.sc.w'' D.R.n := by
     refine le_trans ?_ h2
     have : 0 ≤ (D.R.m : ℝ) * L.etaSz * D.R.t := by positivity
-    nlinarith
+    linarith
   have hW0 : 0 ≤ L.sc.w'' D.R.n := le_trans (by positivity) hmη
   refine ⟨?_, ?_, ?_, ?_, ?_, hη, hb'⟩
   · calc (D.R.N D.R.m : ℝ) * (D.R.m : ℝ) ^ 12 = (D.R.m : ℝ) * ((D.R.N D.R.m : ℝ) * (D.R.m : ℝ) ^ 10 * D.R.m) := by ring
@@ -158,7 +158,7 @@ theorem base_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) :
     have hS := L.Sc_pos
     nlinarith
   · refine le_trans ?_ h2
-    have : (D.R.m : ℝ) * D.R.t ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by nlinarith
+    have : (D.R.m : ℝ) * D.R.t ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by linarith
     have h3 : 0 ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by positivity
     nlinarith
   · unfold Scale.w''
@@ -302,13 +302,13 @@ theorem sub_aux (R : Ranks) (j : ℕ) :
   have ht : (0 : ℝ) ≤ (R.t : ℝ) + 1 := by positivity
   have h2 : (0 : ℝ) ≤ 2 * ((j : ℝ) + 1) - 1 := by linarith
   constructor
-  · nlinarith [mul_nonneg h2 ht]
+  · linarith [mul_nonneg h2 ht]
   · intro hj
     have hjm : (j : ℝ) + 1 ≤ R.m := by exact_mod_cast hj
     have hA : (0 : ℝ) ≤ 2 * (R.m : ℝ) - (2 * ((j : ℝ) + 1) - 1) := by linarith
     rw [Ranks.N]
     push_cast
-    nlinarith [mul_nonneg hA ht]
+    linarith [mul_nonneg hA ht]
 
 theorem wts_lam {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (Cn : ℝ) (hCn : 3 ≤ Cn) (u : D.what₂.Word)
     (τ : D.what₂.Tau) :
@@ -377,7 +377,7 @@ theorem wts_w {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (hx : 4 �
     have g2 := (D.hc τ).gap_eb ⟨j, by omega⟩ hj
     push_cast
     simp only at g2
-    nlinarith
+    linarith
   · intro hTh j hj
     rw [wJ_real D u τ j hj]
     have := (sub_aux D.R j).1
@@ -430,7 +430,7 @@ theorem wts_last {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (hX : L
   have h2 := (l2 D.R.m (by omega) (le_refl _)).2
   have hprod : 1 ≤ ((D.R.m : ℝ) - 1) * ((D.R.t : ℝ) + 1) := by nlinarith
   push_cast
-  nlinarith
+  linarith
 
 theorem wts_of_params {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (Cn : ℝ) (hCn : 3 ≤ Cn)
     (hx : 4 ≤ L.sc.x) (hX : L.sc.x ≤ L.sc.X') (u : D.what₂.Word) :
@@ -454,30 +454,30 @@ theorem nums_alg (N m l b' cL Cc Cn T G : ℝ) (hN : 1 ≤ N) (hm : 1 ≤ m) (hl
   have hml : 0 ≤ m * l := mul_nonneg hm0 hl0
   have hmm : 0 ≤ m * m := mul_nonneg hm0 hm0
   have hA1 : cL * l ≤ cL * m * l := by
-    nlinarith [mul_nonneg (mul_nonneg hcL0 hl0) (sub_nonneg.mpr hm)]
+    linarith [mul_nonneg (mul_nonneg hcL0 hl0) (sub_nonneg.mpr hm)]
   have hA2 : (cL + Cc) * (m * l) ≤ m * (m * l) := mul_le_mul_of_nonneg_right hcLm hml
   have hA3 : m * m * l ≤ m * m * m := mul_le_mul_of_nonneg_left hlm hmm
-  have hA : cL * l + Cc * m * l ≤ m ^ 3 := by nlinarith
-  have hm34 : m ^ 3 ≤ m ^ 4 := by nlinarith [mul_nonneg (pow_nonneg hm0 3) (sub_nonneg.mpr hm)]
-  have hNm3 : N * m ^ 3 ≤ b' := by nlinarith [mul_le_mul_of_nonneg_left hm34 hN0]
+  have hA : cL * l + Cc * m * l ≤ m ^ 3 := by linarith
+  have hm34 : m ^ 3 ≤ m ^ 4 := by linarith [mul_nonneg (pow_nonneg hm0 3) (sub_nonneg.mpr hm)]
+  have hNm3 : N * m ^ 3 ≤ b' := by linarith [mul_le_mul_of_nonneg_left hm34 hN0]
   have hX : N * (cL * l + T) ≤ b' := by
-    nlinarith [mul_le_mul_of_nonneg_left (show cL * l + T ≤ m ^ 3 by linarith) hN0]
+    linarith [mul_le_mul_of_nonneg_left (show cL * l + T ≤ m ^ 3 by linarith) hN0]
   have ga : N ^ 2 * (cL * l + T) ≤ N * b' := by
-    nlinarith [mul_le_mul_of_nonneg_left hX hN0]
+    linarith [mul_le_mul_of_nonneg_left hX hN0]
   have hCml : 0 ≤ Cc * m * l := mul_nonneg (mul_nonneg hCc hm0) hl0
   have gb : N * (cL * l) + T ≤ b' := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hN) hCml, mul_le_mul_of_nonneg_left hA hN0]
+    linarith [mul_nonneg (sub_nonneg.mpr hN) hCml, mul_le_mul_of_nonneg_left hA hN0]
   have hB2 : Cc * m ≤ m * m := mul_le_mul_of_nonneg_right hCcm hm0
   have hB : cL + Cc * m + 2 * Cn ≤ m ^ 2 * cL := by
-    nlinarith [hB2, mul_nonneg hm0 (sub_nonneg.mpr hm), mul_nonneg (sub_nonneg.mpr hcL) hmm]
+    linarith [hB2, mul_nonneg hm0 (sub_nonneg.mpr hm), mul_nonneg (sub_nonneg.mpr hcL) hmm]
   have hY : cL * l + T + G ≤ m ^ 2 * (cL * l) := by
-    nlinarith [mul_le_mul_of_nonneg_left hB hl0]
+    linarith [mul_le_mul_of_nonneg_left hB hl0]
   have hmN : 0 ≤ m ^ 2 * N ^ 2 := by positivity
   have hNcl : 0 ≤ N * (cL * l) := mul_nonneg hN0 (mul_nonneg hcL0 hl0)
   have gc : m ^ 2 * N ^ 2 * (cL * l + T + G) ≤ N * b' * (cL * l) := by
-    nlinarith [mul_le_mul_of_nonneg_left hY hmN, mul_le_mul_of_nonneg_right hb hNcl]
+    linarith [mul_le_mul_of_nonneg_left hY hmN, mul_le_mul_of_nonneg_right hb hNcl]
   have gd : (1 + 2 * (2 * Cn + 4)) * m ^ 3 * N ≤ b' := by
-    nlinarith [mul_nonneg (show (0 : ℝ) ≤ m - (1 + 2 * (2 * Cn + 4)) by linarith)
+    linarith [mul_nonneg (show (0 : ℝ) ≤ m - (1 + 2 * (2 * Cn + 4)) by linarith)
       (mul_nonneg (pow_nonneg hm0 3) hN0)]
   exact ⟨ga, gb, gc, gd⟩
 
@@ -487,7 +487,7 @@ theorem two_le_rdE {R : Ranks} (H : Host R) : 2 ≤ H.rdE := by
   have hd' : (7 : ℝ) ≤ H.d := by exact_mod_cast hd
   have h1 : (2 : ℝ) ≤ Real.sqrt (H.d : ℝ) := by
     apply Real.le_sqrt_of_sq_le
-    nlinarith
+    linarith
   have h2 : (1 : ℝ) ≤ (2 : ℝ) ^ ((R.e : ℝ) + 1 - (2 : ℝ) ^ (-(R.e : ℝ))) := by
     apply Real.one_le_rpow (by norm_num)
     have : (2 : ℝ) ^ (-(R.e : ℝ)) ≤ 1 :=
@@ -510,7 +510,7 @@ theorem log_g_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (i : Fi
   have h6 : Real.log 2 ≤ 1 := by
     have := Real.log_le_sub_one_of_pos (by norm_num : (0 : ℝ) < 2)
     linarith
-  nlinarith
+  linarith
 
 theorem log_xbv_le {D : D7} (L : SizeData₂ D)
     (hlx : 7 * Real.log L.sc.x ≤ L.sc.L)

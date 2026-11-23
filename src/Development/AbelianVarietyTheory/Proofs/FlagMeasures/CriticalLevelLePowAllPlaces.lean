@@ -58,12 +58,12 @@ theorem root_le (ka rd g Q b Cg m k : ℝ) (hb1 : 1 < b) (hm : 2 ≤ m) (hmk : 4
     (ka ^ (-((m - 1) * k + m * (m - 1) / 2)) * rd ^ (-((m - 1) / 2)) * g ^ (k * m + m * (m - 1) / 2) * Q) ^
       ((1 : ℝ) / k) ≤ b ^ ((4 * Cg + 12) * m) := by
   have hb0 : 0 < b := by linarith
-  have hk0 : 0 < k := by nlinarith
+  have hk0 : 0 < k := by linarith [pow_le_pow_left₀ (by norm_num) hm 2]
   have hkm : 0 ≤ k * m := by positivity
-  have hE1a : 0 ≤ (m - 1) * k + m * (m - 1) / 2 := by nlinarith
-  have hE1b : (m - 1) * k + m * (m - 1) / 2 ≤ 3 / 2 * (k * m) := by nlinarith
-  have hE3a : 0 ≤ k * m + m * (m - 1) / 2 := by nlinarith
-  have hE3b : k * m + m * (m - 1) / 2 ≤ 3 / 2 * (k * m) := by nlinarith
+  have hE1a : 0 ≤ (m - 1) * k + m * (m - 1) / 2 := add_nonneg (mul_nonneg (by linarith) hk0.le) (div_nonneg (mul_nonneg (by linarith) (by linarith)) (by norm_num))
+  have hE1b : (m - 1) * k + m * (m - 1) / 2 ≤ 3 / 2 * (k * m) := by linarith [hkm, sq_nonneg m]
+  have hE3a : 0 ≤ k * m + m * (m - 1) / 2 := add_nonneg hkm (div_nonneg (mul_nonneg (by linarith) (by linarith)) (by norm_num))
+  have hE3b : k * m + m * (m - 1) / 2 ≤ 3 / 2 * (k * m) := by linarith [sq_nonneg m, le_mul_of_one_le_right hk0.le (show 1 ≤ m by linarith)]
   have hP1 : ka ^ (-((m - 1) * k + m * (m - 1) / 2)) ≤ b ^ (3 / 2 * (k * m)) := by
     rw [Real.rpow_neg hka0.le, ← Real.inv_rpow hka0.le]
     calc ka⁻¹ ^ ((m - 1) * k + m * (m - 1) / 2) ≤ b ^ ((m - 1) * k + m * (m - 1) / 2) :=
@@ -79,7 +79,7 @@ theorem root_le (ka rd g Q b Cg m k : ℝ) (hb1 : 1 < b) (hm : 2 ≤ m) (hmk : 4
       _ = b ^ (2 * Cg * (k * m + m * (m - 1) / 2)) := (Real.rpow_mul hb0.le _ _).symm
       _ ≤ b ^ (3 * Cg * (k * m)) := by
         apply Real.rpow_le_rpow_of_exponent_le hb1.le
-        nlinarith
+        linarith [mul_le_mul_of_nonneg_left hE3b hCg]
   have hP30 : 0 ≤ g ^ (k * m + m * (m - 1) / 2) := Real.rpow_nonneg hg0 _
   have hX0 : 0 ≤ ka ^ (-((m - 1) * k + m * (m - 1) / 2)) * rd ^ (-((m - 1) / 2)) *
       g ^ (k * m + m * (m - 1) / 2) * Q := by positivity
@@ -92,7 +92,7 @@ theorem root_le (ka rd g Q b Cg m k : ℝ) (hb1 : 1 < b) (hm : 2 ≤ m) (hmk : 4
           rw [Real.rpow_add hb0, Real.rpow_add hb0]; ring
       _ ≤ b ^ (k * ((4 * Cg + 12) * m)) := by
           apply Real.rpow_le_rpow_of_exponent_le hb1.le
-          nlinarith
+          linarith [hP10, hP20, hP30, hQ0, mul_nonneg hCg hkm]
   calc _ ≤ (b ^ (k * ((4 * Cg + 12) * m))) ^ ((1 : ℝ) / k) :=
         Real.rpow_le_rpow hX0 hXb (by positivity)
     _ = b ^ ((4 * Cg + 12) * m) := by
@@ -116,9 +116,9 @@ theorem tcrit_le_pow : Formalism.L2.SG.Pf.SzHypFD.DsigHC → ∀ (D : D7) (large
     have h2 : 40 * ((D.R.m : ℝ) ^ 2 * large₂.sc.L) ≤ Cl * ((D.R.m : ℝ) ^ 2 * large₂.sc.L) :=
       mul_le_mul_of_nonneg_right h40 (by positivity)
     linarith
-  have hk1 : (1 : ℝ) ≤ (D.R.k : ℝ) := by nlinarith
+  have hk1 : (1 : ℝ) ≤ (D.R.k : ℝ) := by linarith [pow_le_pow_left₀ (by norm_num) hm 2]
 
-  have hCL : 1 ≤ Cl * large₂.sc.L := by nlinarith
+  have hCL : 1 ≤ Cl * large₂.sc.L := one_le_mul_of_one_le_of_one_le (by linarith) hL
   have hVV := Formalism.L2.SG.Pf.SzHypFD.vv_eq_vand hT h.1 hCL τ
   have hlam0 : 0 < vand (lamSH D.R (D.hc τ)) :=
     Finset.prod_pos fun _ _ => Finset.prod_pos fun _ hb =>
@@ -143,7 +143,7 @@ theorem tcrit_le_pow : Formalism.L2.SG.Pf.SzHypFD.DsigHC → ∀ (D : D7) (large
     have hCl0 : 0 < Cl := by linarith
     have h1 : Real.log D.host.rdE ≤ large₂.sc.L := by
       refine hlogrd.trans ?_
-      rw [div_le_iff₀ hCl0]; nlinarith
+      rw [div_le_iff₀ hCl0]; exact le_mul_of_one_le_right (by linarith) (by linarith)
     calc D.host.rdE = Real.exp (Real.log D.host.rdE) := (Real.exp_log hrd0).symm
       _ ≤ Real.exp large₂.sc.L := Real.exp_le_exp.mpr h1
       _ = large₂.sc.b := hbexp.symm
@@ -154,7 +154,7 @@ theorem tcrit_le_pow : Formalism.L2.SG.Pf.SzHypFD.DsigHC → ∀ (D : D7) (large
   have hka0 : 0 < D.host.ka := by rw [hka]; positivity
   have hki : D.host.ka⁻¹ ≤ large₂.sc.b := by
     rw [hka, inv_div, div_le_iff₀ (by positivity)]
-    nlinarith [Real.pi_gt_three]
+    linarith [hrdb, mul_nonneg hb0.le (sub_nonneg.mpr Real.pi_gt_three.le)]
 
   have hg1ge : 1 ≤ (D.host.g 0 : ℝ) :=
     le_trans (one_le_pow₀ (one_le_mul_of_one_le_of_one_le hk1 hb1.le)) hkg1

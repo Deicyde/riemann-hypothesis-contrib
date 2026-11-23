@@ -87,7 +87,7 @@ lemma arsinh_le (x : ℝ) (hx : 0 ≤ x) : Real.arsinh x ≤ Real.log (1 + 2 * x
     rw [Real.sqrt_le_iff]
     constructor
     · linarith
-    · nlinarith
+    · linarith [sq_nonneg x, show (1 + x) ^ 2 = 1 + 2 * x + x ^ 2 by ring]
   unfold Real.arsinh
   exact Real.log_le_log (by linarith) (by linarith)
 
@@ -136,7 +136,7 @@ lemma rpow_cLine_le {u : ℝ} (hu : 2 ≤ u) : u ^ cLine u ≤ 3 * u := by
   unfold cLine
   rw [Real.rpow_add hu0, Real.rpow_one, Real.rpow_def_of_pos hu0, mul_one_div_cancel hl.ne']
   have := Real.exp_one_lt_d9
-  nlinarith
+  linarith [mul_le_mul_of_nonneg_left (show Real.exp 1 ≤ 3 by linarith) hu0.le]
 
 lemma log_le_two_mul {X Y : ℝ} (hX : 0 < X) (hXY : X ≤ Y ^ 2) : Real.log X ≤ 2 * Real.log Y := by
   calc Real.log X ≤ Real.log (Y ^ 2) := Real.log_le_log hX hXY
@@ -152,28 +152,41 @@ lemma log_facts {N : ℕ} {u T T' : ℝ} (hN : (1 : ℝ) ≤ N) (hT : 2 ≤ T) (
   have hu2 : 2 ≤ u := le_trans hT hTu
   have hN0 : 0 < (N : ℝ) := by linarith
   have hT'2 : 2 ≤ T' := le_trans hT hTT'
-  have hNu : 2 ≤ (N : ℝ) * u := by nlinarith
-  have hNuT : 4 ≤ (N : ℝ) * u * T := by nlinarith
+  have hNu : 2 ≤ (N : ℝ) * u := by
+    calc (2 : ℝ) = 1 * 2 := by norm_num
+      _ ≤ N * u := mul_le_mul hN hu2 (by norm_num) hN0.le
+  have hNuT : 4 ≤ (N : ℝ) * u * T := by
+    calc (4 : ℝ) = 2 * 2 := by norm_num
+      _ ≤ (N * u) * T := mul_le_mul hNu hT (by norm_num) (by linarith)
   have hY2 : (N : ℝ) * (4 * T ^ 2) ≤ ((N : ℝ) * u * T) ^ 2 := by
-    have h1 : (N : ℝ) ≤ (N : ℝ) ^ 2 := by nlinarith
+    have h1 : (N : ℝ) ≤ (N : ℝ) ^ 2 := by
+      calc (N : ℝ) = 1 * N := (one_mul _).symm
+        _ ≤ N * N := mul_le_mul_of_nonneg_right hN hN0.le
+        _ = N ^ 2 := (sq _).symm
     have h2 : 4 * T ^ 2 ≤ u ^ 2 * T ^ 2 := by
-      have hu4 : 4 ≤ u ^ 2 := by nlinarith
+      have hu4 : 4 ≤ u ^ 2 := by have h := pow_le_pow_left₀ (by norm_num) hu2 2; norm_num at h; exact h
       exact mul_le_mul_of_nonneg_right hu4 (sq_nonneg T)
     calc (N : ℝ) * (4 * T ^ 2) ≤ (N : ℝ) ^ 2 * (u ^ 2 * T ^ 2) :=
           mul_le_mul h1 h2 (by positivity) (by positivity)
       _ = ((N : ℝ) * u * T) ^ 2 := by ring
-  have hNT' : 1 ≤ (N : ℝ) * T' := by nlinarith
-  have hNT'2 : 1 ≤ (N : ℝ) * (T' + 2) := by nlinarith
-  refine ⟨Real.log_nonneg (by linarith), Real.log_le_log (by nlinarith) ?_, Real.log_nonneg hNT', ?_, ?_,
+  have hNT' : 1 ≤ (N : ℝ) * T' := one_le_mul_of_one_le_of_one_le hN (by linarith)
+  have hNT'2 : 1 ≤ (N : ℝ) * (T' + 2) := one_le_mul_of_one_le_of_one_le hN (by linarith)
+  have hT2sq : 2 * T ≤ T ^ 2 := by
+    calc 2 * T ≤ T * T := mul_le_mul_of_nonneg_right hT hT0.le
+      _ = T ^ 2 := (sq T).symm
+  refine ⟨Real.log_nonneg (by linarith), Real.log_le_log (by positivity) ?_, Real.log_nonneg hNT', ?_, ?_,
     Real.log_nonneg hNT'2, Real.log_nonneg (by linarith)⟩
-  · have h : T' ≤ u * T := by nlinarith
+  · have h : T' ≤ u * T := by
+      calc T' ≤ 2 * T := by linarith
+        _ ≤ u * T := mul_le_mul_of_nonneg_right hu2 hT0.le
     calc (N : ℝ) * T' ≤ N * (u * T) := mul_le_mul_of_nonneg_left h hN0.le
       _ = N * u * T := by ring
-  · apply log_le_two_mul (by nlinarith)
-    calc (N : ℝ) * (T' + 2) ≤ N * (4 * T ^ 2) := mul_le_mul_of_nonneg_left (by nlinarith) hN0.le
+  · apply log_le_two_mul (by positivity)
+    calc (N : ℝ) * (T' + 2) ≤ N * (4 * T ^ 2) := mul_le_mul_of_nonneg_left (by linarith) hN0.le
       _ ≤ _ := hY2
-  · apply log_le_two_mul (by nlinarith)
-    calc 1 + 2 * (2 * T') ≤ (N : ℝ) * (4 * T ^ 2) := by nlinarith
+  · apply log_le_two_mul (by positivity)
+    calc 1 + 2 * (2 * T') ≤ 1 * (4 * T ^ 2) := by linarith
+      _ ≤ (N : ℝ) * (4 * T ^ 2) := mul_le_mul_of_nonneg_right hN (by positivity)
       _ ≤ _ := hY2
 
 lemma hor_side (G : ℂ → ℂ) (u c T' A h : ℝ) (hu : 1 ≤ u) (hc : -1 / 2 ≤ c) (hT'0 : 0 < T')
@@ -226,8 +239,8 @@ lemma sides_arith {C1 C2 u T T' c l1 l2 as large₂ lNu uc : ℝ} (hC1 : 0 ≤ C
   have hT'0 : 0 < T' := by linarith
   have hq : uc / T' ≤ 3 * u / T := by
     rw [div_le_div_iff₀ hT'0 hT0]
-    nlinarith
-  have hl1sq : l1 ^ 2 ≤ large₂ ^ 2 := by nlinarith
+    exact mul_le_mul huc hTT' hT0.le (by linarith)
+  have hl1sq : l1 ^ 2 ≤ large₂ ^ 2 := pow_le_pow_left₀ hl1' hl1 2
   have hcc : c - -1 / 2 ≤ 7 / 2 := by linarith
   have hcc0 : 0 ≤ c - -1 / 2 := by linarith
   have hq0 : 0 ≤ uc / T' := div_nonneg huc0 hT'0.le
@@ -244,7 +257,8 @@ lemma sides_arith {C1 C2 u T T' c l1 l2 as large₂ lNu uc : ℝ} (hC1 : 0 ≤ C
   have e2 : C2 * (2 * large₂) * (2 * (2 * large₂)) = 8 * (C2 * large₂ ^ 2) := by ring
   have h3 : large₂ ^ 2 ≤ u * large₂ ^ 2 / T := by
     rw [le_div_iff₀ hT0]
-    nlinarith [sq_nonneg large₂]
+    calc large₂ ^ 2 * T = T * large₂ ^ 2 := mul_comm _ _
+      _ ≤ u * large₂ ^ 2 := mul_le_mul_of_nonneg_right hTu (sq_nonneg large₂)
   have h4 : C2 * large₂ ^ 2 ≤ C2 * (u * large₂ ^ 2 / T) := mul_le_mul_of_nonneg_left h3 hC2
   have h5 : 0 ≤ (21 * C1 + 8 * C2) * lNu := mul_nonneg (by linarith) hlNu
   have e3 : (21 * C1 + 8 * C2) * (u * large₂ ^ 2 / T + lNu) =

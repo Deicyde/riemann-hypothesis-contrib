@@ -287,9 +287,9 @@ theorem tcritWords_of (hVW : VandWords) : TcritWords := by
     have u2 := mul_le_mul_of_nonneg_right hL1 ht0.le
     constructor
     · apply Real.exp_le_exp.mpr
-      nlinarith
+      linarith
     · apply Real.exp_le_exp.mpr
-      nlinarith
+      linarith
 
 lemma E_le : Real.exp (1/4) ≤ 1.3 := by
   have h1 : Real.exp (1/4) ^ 4 = Real.exp 1 := by
@@ -298,11 +298,11 @@ lemma E_le : Real.exp (1/4) ≤ 1.3 := by
     | (rw [← Real.exp_nat_mul]; congr 1; norm_num)
     | (rw [← Real.exp_nat_mul]; congr 1; push_cast; ring)
   have h2 := Real.exp_one_lt_d9
-  have h3 : 0 < Real.exp (1/4) := Real.exp_pos _
   by_contra hc
   push_neg at hc
-  have ht2 : (1.69:ℝ) < Real.exp (1/4) ^ 2 := by nlinarith
-  have ht4 : (2.8561:ℝ) < Real.exp (1/4) ^ 4 := by nlinarith
+  have ht4 : (2.8561:ℝ) < Real.exp (1/4) ^ 4 :=
+    calc (2.8561:ℝ) = (1.3:ℝ) ^ 4 := by norm_num
+      _ < Real.exp (1/4) ^ 4 := pow_lt_pow_left₀ hc (by norm_num) (by norm_num)
   linarith
 
 lemma E_pos : 0 < Real.exp (1/4) := Real.exp_pos _
@@ -356,7 +356,7 @@ lemma fac_bound (n : ℕ) (hn : 2 ≤ n) :
       have e2 : (4:ℝ) ^ (k + 1) = 4 ^ k * 4 := pow_succ 4 k
       have h4 : (0:ℝ) < 4 ^ k := pow_pos (by norm_num) k
       rw [e1, e2]
-      nlinarith
+      linarith
   have hQ := key n hn
   have hA : 0 ≤ 2 * (0.38:ℝ) ^ (n + 2) := by positivity
   have hZ : 0 ≤ Real.exp (1/4) ^ (n + 1) := by positivity
@@ -401,11 +401,10 @@ lemma non_top_final_inequality (k : ℕ) (hk : 1 ≤ k) (e B α Vv Vu : ℝ) (h�
   have hbase : 0 ≤ 0.38 * e / (1 + 0) * B / α := by positivity
   have key3 : ∀ x y z w : ℝ, 0 ≤ x → x ≤ 1 → 0 ≤ y → y ≤ 1 → 0 ≤ z → z ≤ 1 → 0 ≤ w →
       x * y * z * w ≤ w := by
-    intro x y z w hx hx1 hy hy1 hz hz1 hw
-    have h1 : x * y ≤ 1 := by nlinarith
-    have h1' : 0 ≤ x * y := mul_nonneg hx hy
-    have h2 : x * y * z ≤ 1 := by nlinarith
-    nlinarith
+    intro x y z w _ hx1 hy hy1 hz hz1 hw
+    have h1 : x * y ≤ 1 := (mul_le_of_le_one_left hy hx1).trans hy1
+    have h2 : x * y * z ≤ 1 := (mul_le_of_le_one_left hz h1).trans hz1
+    exact mul_le_of_le_one_left hw h2
   have hE1 : 2 * 0.38 * Real.exp (1/4) ≤ 1 := by linarith [E_le]
   have hE0 : 0 ≤ 2 * 0.38 * Real.exp (1/4) := by positivity
   have hA1 : (2 * 0.38 * Real.exp (1/4)) ^ (n + 1) ≤ 1 := by
@@ -446,11 +445,10 @@ lemma top_final_inequality (k : ℕ) (hk : 4 ≤ k) (e B a b Del θ W Vu : ℝ) 
   have hbase : 0 ≤ 0.38 * e / θ * B / (a * b / (((n:ℝ) + 2) * Del)) := by positivity
   have key3 : ∀ x y z w : ℝ, 0 ≤ x → x ≤ 1 → 0 ≤ y → y ≤ 1 → 0 ≤ z → z ≤ 1 → 0 ≤ w →
       x * y * z * w ≤ w := by
-    intro x y z w hx hx1 hy hy1 hz hz1 hw
-    have h1 : x * y ≤ 1 := by nlinarith
-    have h1' : 0 ≤ x * y := mul_nonneg hx hy
-    have h2 : x * y * z ≤ 1 := by nlinarith
-    nlinarith
+    intro x y z w _ hx1 hy hy1 hz hz1 hw
+    have h1 : x * y ≤ 1 := (mul_le_of_le_one_left hy hx1).trans hy1
+    have h2 : x * y * z ≤ 1 := (mul_le_of_le_one_left hz h1).trans hz1
+    exact mul_le_of_le_one_left hw h2
   have hX2 : (((n:ℝ) + 2) * Del) ^ 2 * (a + b) / (a ^ 2 * b ^ 2) ≤ 1 := by
     have hd : 0 < a ^ 2 * b ^ 2 := by positivity
     first
@@ -461,11 +459,8 @@ lemma top_final_inequality (k : ℕ) (hk : 4 ≤ k) (e B a b Del θ W Vu : ℝ) 
   have hX2' : 0 ≤ (((n:ℝ) + 2) * Del) ^ 2 * (a + b) / (a ^ 2 * b ^ 2) := by positivity
   have hX3 : 1 / θ ^ 2 ≤ 1 := by
     have hd : 0 < θ ^ 2 := by positivity
-    first
-    | (rw [div_le_one hd]; nlinarith)
-    | (rw [div_le_one₀ hd]; nlinarith)
-    | (rw [div_le_iff₀ hd]; nlinarith)
-    | (rw [div_le_iff hd]; nlinarith)
+    rw [div_le_one hd]
+    exact one_le_pow₀ hθ
   have hX3' : 0 ≤ 1 / θ ^ 2 := by positivity
   have hX1' : 0 ≤ e ^ (n + 2) * B := by positivity
   have hfb := fac_bound n hn
@@ -529,8 +524,12 @@ lemma u_mid_bounds (c : Cfg) (h : c.Ok) (de : ℕ → ℝ) (hw : IsWord c.k de) 
   have hj1 : (1:ℝ) ≤ (j:ℝ) := by exact_mod_cast h1
   have hD := h.hDel
   have hv0 := h.hv0
+  have hlo : c.Del ≤ c.Del * ((c.k:ℝ) - 1 - (j:ℝ)) :=
+    le_mul_of_one_le_right (by linarith) (by linarith)
+  have hhi : c.Del * ((c.k:ℝ) - 1 - (j:ℝ)) ≤ c.Del * ((c.k:ℝ) - 1 - 1) :=
+    mul_le_mul_of_nonneg_left (by linarith) (by linarith)
   rcases hw.1 j with hd | hd <;> rw [hd] <;> simp only [Cfg.v, Nat.cast_one] <;>
-    constructor <;> nlinarith
+    constructor <;> linarith
 
 lemma mu_bound (c : Cfg) (h : c.Ok) (bb : ℝ) (hs : c.Small bb) :
     Real.exp (-(2 * c.m * Real.log bb / c.k)) ^ c.k * c.prodb ≤ 1 := by
@@ -581,8 +580,10 @@ lemma key_nontop (hNT : VandNonTop) (hEF : EdgeFactors) (c : Cfg) (bb : ℝ) (de
   have hkR : (4:ℝ) ≤ (c.k:ℝ) := by exact_mod_cast hk4
   have hα : 1 ≤ c.a - c.v 1 := by
     have h1 := h.ha
-    have h2 := h.hDel
-    nlinarith
+    have h2 : (4:ℝ) ≤ (c.k:ℝ) * c.Del := by
+      have := mul_le_mul hkR h.hDel zero_le_one (by linarith)
+      linarith
+    linarith
   have hcOne : cOne c bb * c.prodb / c.aeff =
       0.38 * Real.exp (-(2 * c.m * Real.log bb / c.k)) / (1 + 0) * c.prodb / (c.a - c.v 1) := by
     rw [haeff]
@@ -666,10 +667,13 @@ lemma key_top (hTp : VandTop) (c : Cfg) (bb : ℝ) (de : ℕ → ℝ) (h : c.Ok)
     | (rw [div_le_iff hb1pos] at hvth; linarith)
   have hm2 : (2:ℝ) ≤ (c.m:ℝ) := by exact_mod_cast h.hm
   have hK1 : (c.k:ℝ) * c.Del ≤ c.bp / 40 := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hm2) hK0.le]
+    have h2K : 2 * ((c.k:ℝ) * c.Del) ≤ (c.m:ℝ) * ((c.k:ℝ) * c.Del) :=
+      mul_le_mul_of_nonneg_right hm2 hK0.le
+    linarith
   have hK2 : (c.k:ℝ) * c.Del ≤ c.a / 4 := by linarith
   have hK4 : (4:ℝ) ≤ (c.k:ℝ) * c.Del := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hkR) (sub_nonneg.mpr hD)]
+    have := mul_le_mul hkR hD zero_le_one (by linarith)
+    linarith
   have hq : ((c.k:ℝ) * c.Del) ^ 2 * (c.a + c.bp) ≤ c.a ^ 2 * c.bp ^ 2 := by
     have s1 := mul_le_mul_of_nonneg_right (mul_self_le_mul_self hK0.le hK1) ha0.le
     have s3 := mul_le_mul_of_nonneg_right (mul_self_le_mul_self hK0.le hK2)
@@ -680,7 +684,7 @@ lemma key_top (hTp : VandTop) (c : Cfg) (bb : ℝ) (de : ℕ → ℝ) (h : c.Ok)
     have s4 : 0 ≤ c.a ^ 2 * c.bp * (c.bp / 2 - 1 / 16) := by
       apply mul_nonneg (mul_nonneg (sq_nonneg _) (by linarith))
       linarith
-    nlinarith
+    linarith
   have hsplit : Vand c.k (c.u de) =
       (∏ i ∈ Icc 2 c.k, (c.a - c.u de i)) * Vand (c.k - 1) (fun i => c.u de (i + 1)) := by
     have hk1 : c.k = (c.k - 1) + 1 := by omega
@@ -829,8 +833,10 @@ theorem tcritLower_of (hBr : BracketBound) (hNT : VandNonTop) (hTp : VandTop) (h
   rw [hT]
   have fin : ∀ A om Y cP : ℝ, 0 < A → 1 ≤ om → 0 ≤ cP → cP ≤ Y → A * cP ≤ A * om * Y := by
     intro A om Y cP hA' hom hc hY
-    have h1 : cP ≤ om * Y := by nlinarith
-    calc A * cP ≤ A * (om * Y) := mul_le_mul_of_nonneg_left h1 hA'.le
+    have hY0 : 0 ≤ Y := le_trans hc hY
+    have h1 : cP ≤ om * Y := le_trans hY (le_mul_of_one_le_left hY0 hom)
+    calc
+      A * cP ≤ A * (om * Y) := mul_le_mul_of_nonneg_left h1 hA'.le
       _ = A * om * Y := by ring
   rw [show cOne c bb * g ^ c.m * (ka ^ (c.m - 1))⁻¹ * c.prodb / c.aeff =
       ((ka ^ (c.m - 1))⁻¹ * g ^ c.m) * (cOne c bb * c.prodb / c.aeff) by ring]

@@ -51,58 +51,79 @@ namespace GlobalTheory
 
 theorem covol_numerical_collect : ∀ (CG CB f r Lb S N0 sz c₁ q ℓ lb dd : ℝ), 0 ≤ CG → 0 ≤ CB → 1 ≤ f → 1 ≤ r → 1 ≤ Lb → 0 ≤ S → 0 ≤ q → q ≤ r → 0 ≤ ℓ → ℓ ≤ 3 * Lb → |c₁| ≤ 9 * r * Lb → 0 ≤ N0 → N0 ≤ S + f * (4 * (f * r + 1) + 1) → 0 ≤ sz → sz ≤ (1 + r) * S + r * f * (4 * (f * r + 1) + 1) → lb ≤ CB * (f * r * Lb) ^ 2 → dd ≤ 391 / 2 * (f * r * Lb) ^ 2 → (f * r + 1) * (2 * (f * r) * Real.log (2 * Real.pi)) + ((|c₁| + q * ℓ) * N0 + lb + dd + 1) + CG * (f * r * Lb) ^ 2 * sz ≤ (11 * CG + CB + 500) * ((f * r * Lb) ^ 3 * S + (f * r * Lb) ^ 5) := by
   intro CG CB f r Lb S N0 sz c₁ q ℓ lb dd hCG hCB hf hr hLb hS hq hqr hℓ hℓL hc hN0 hN0u hsz hszu hlb hdd
-  have hfr : 1 ≤ f * r := by nlinarith
-  have hfrF : f * r ≤ f * r * Lb := by nlinarith
-  have hrLbF : r * Lb ≤ f * r * Lb := by nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ r) (by linarith : (0:ℝ) ≤ Lb)]
-  have hrF : r ≤ f * r * Lb := by nlinarith
+  have hf0 : 0 ≤ f := zero_le_one.trans hf
+  have hr0 : 0 ≤ r := zero_le_one.trans hr
+  have hLb0 : 0 ≤ Lb := zero_le_one.trans hLb
+  have hfr : 1 ≤ f * r := one_le_mul_of_one_le_of_one_le hf hr
+  have hfr0 : 0 ≤ f * r := zero_le_one.trans hfr
+  have hfrF : f * r ≤ f * r * Lb := le_mul_of_one_le_right hfr0 hLb
+  have hrLbF : r * Lb ≤ f * r * Lb := by
+    rw [mul_assoc]
+    exact le_mul_of_one_le_left (mul_nonneg hr0 hLb0) hf
+  have hrF : r ≤ f * r * Lb := (le_mul_of_one_le_right hr0 hLb).trans hrLbF
   obtain ⟨F, hFd⟩ : ∃ F, F = f * r * Lb := ⟨_, rfl⟩
   rw [← hFd] at hlb hdd hfrF hrLbF hrF ⊢
-  have hF : 1 ≤ F := by linarith
+  have hF : 1 ≤ F := hfr.trans hfrF
+  have hF0 : 0 ≤ F := zero_le_one.trans hF
+  have hFle2 : F ≤ F ^ 2 := le_self_pow₀ hF (by decide)
   have hF2 : F ^ 2 ≤ F ^ 5 := pow_le_pow_right₀ hF (by norm_num)
   have hF3 : F ^ 3 ≤ F ^ 5 := pow_le_pow_right₀ hF (by norm_num)
   have hF4 : F ^ 4 ≤ F ^ 5 := pow_le_pow_right₀ hF (by norm_num)
   have hF1 : F ≤ F ^ 3 := by simpa using pow_le_pow_right₀ hF (by norm_num : 1 ≤ 3)
+  have hY : 1 ≤ F ^ 5 := one_le_pow₀ hF
   have hX : 0 ≤ F ^ 3 * S := mul_nonneg (by positivity) hS
 
   have hlog : Real.log (2 * π) ≤ 7 := by
     have := Real.log_le_sub_one_of_pos (by positivity : (0:ℝ) < 2 * π)
     have := Real.pi_le_four
     linarith
-  have hfrsq : (f * r) ^ 2 ≤ F ^ 2 := by
-    nlinarith [mul_nonneg (sub_nonneg.2 hfrF) (by linarith : (0:ℝ) ≤ F + f * r)]
+  have hfrsq : (f * r) ^ 2 ≤ F ^ 2 := pow_le_pow_left₀ hfr0 hfrF 2
   have hT1a : (f * r + 1) * (2 * (f * r) * Real.log (2 * π)) ≤ (f * r + 1) * (2 * (f * r) * 7) :=
-    mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hlog (by linarith)) (by linarith)
+    mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hlog (by positivity)) (by positivity)
+  have hT1 : (f * r + 1) * (2 * (f * r) * Real.log (2 * π)) ≤ 28 * F ^ 5 := by
+    linarith only [hT1a, hfrsq.trans hF2, hfrF.trans (hFle2.trans hF2)]
 
-  have hql : q * ℓ ≤ r * (3 * Lb) := mul_le_mul hqr hℓL hℓ (by linarith)
-  have hA : |c₁| + q * ℓ ≤ 12 * (r * Lb) := by linarith
-  have hffr : f ≤ f * (f * r) := by nlinarith
+  have hql : q * ℓ ≤ r * (3 * Lb) := mul_le_mul hqr hℓL hℓ hr0
+  have hA : |c₁| + q * ℓ ≤ 12 * (r * Lb) := by linarith only [hc, hql]
+  have hffr : f ≤ f * (f * r) := le_mul_of_one_le_right hf0 hfr
   have hB : N0 ≤ S + 9 * (f * (f * r)) := by
     have e : f * (4 * (f * r + 1) + 1) = 4 * (f * (f * r)) + 5 * f := by ring
-    linarith
+    linarith only [e, hN0u, hffr]
   have hAB : (|c₁| + q * ℓ) * N0 ≤ 12 * (r * Lb) * (S + 9 * (f * (f * r))) :=
     mul_le_mul hA hB hN0 (by positivity)
-  have hrLbS : r * Lb * S ≤ F ^ 3 * S := mul_le_mul_of_nonneg_right (by linarith) hS
+  have hrLbS : r * Lb * S ≤ F ^ 3 * S :=
+    mul_le_mul_of_nonneg_right (hrLbF.trans hF1) hS
   have hFfr : r * Lb * (f * (f * r)) ≤ F ^ 5 := by
     have e : r * Lb * (f * (f * r)) = F * (f * r) := by rw [hFd]; ring
     rw [e]
-    have : F * (f * r) ≤ F * F := mul_le_mul_of_nonneg_left hfrF (by linarith)
-    nlinarith
+    calc
+      F * (f * r) ≤ F * F := mul_le_mul_of_nonneg_left hfrF hF0
+      _ ≤ F ^ 5 := by simpa only [pow_two] using hF2
+  have hT2 : (|c₁| + q * ℓ) * N0 ≤ 12 * (F ^ 3 * S) + 108 * F ^ 5 := by
+    have e : 12 * (r * Lb) * (S + 9 * (f * (f * r))) = 12 * (r * Lb * S) + 108 * (r * Lb * (f * (f * r))) := by ring
+    linarith only [e, hAB, hrLbS, hFfr]
 
-  have hsz1 : (1 + r) * S ≤ 2 * F * S := mul_le_mul_of_nonneg_right (by linarith) hS
+  have hsz1 : (1 + r) * S ≤ 2 * F * S :=
+    mul_le_mul_of_nonneg_right (by linarith only [hF, hrF]) hS
   have hsz2 : r * f * (4 * (f * r + 1) + 1) ≤ 9 * F ^ 2 := by
     have e : r * f * (4 * (f * r + 1) + 1) = 4 * (f * r) ^ 2 + 5 * (f * r) := by ring
-    rw [e]; nlinarith
-  have hsz' : sz ≤ 2 * F * S + 9 * F ^ 2 := by linarith
+    rw [e]
+    linarith only [hfrsq, hfrF.trans hFle2]
+  have hsz' : sz ≤ 2 * F * S + 9 * F ^ 2 := by linarith only [hszu, hsz1, hsz2]
   have hT6a : CG * F ^ 2 * sz ≤ CG * F ^ 2 * (2 * F * S + 9 * F ^ 2) :=
     mul_le_mul_of_nonneg_left hsz' (by positivity)
   have hT6b : CG * F ^ 4 ≤ CG * F ^ 5 := mul_le_mul_of_nonneg_left hF4 hCG
+  have hT6 : CG * F ^ 2 * sz ≤ 2 * (CG * (F ^ 3 * S)) + 9 * (CG * F ^ 5) := by
+    have e : CG * F ^ 2 * (2 * F * S + 9 * F ^ 2) = 2 * (CG * (F ^ 3 * S)) + 9 * (CG * F ^ 4) := by ring
+    linarith only [e, hT6a, hT6b]
   have hlb' : lb ≤ CB * F ^ 5 := le_trans hlb (mul_le_mul_of_nonneg_left hF2 hCB)
+  have hdd' : dd ≤ 196 * F ^ 5 := by linarith only [hdd, hF2, hY]
   have p1 : 0 ≤ CG * (F ^ 3 * S) := mul_nonneg hCG hX
   have p2 : 0 ≤ CB * (F ^ 3 * S) := mul_nonneg hCB hX
   have p3 : 0 ≤ CG * F ^ 5 := mul_nonneg hCG (by positivity)
   have e : (11 * CG + CB + 500) * (F ^ 3 * S + F ^ 5)
       = 11 * (CG * (F ^ 3 * S)) + CB * (F ^ 3 * S) + 500 * (F ^ 3 * S) + 11 * (CG * F ^ 5) + CB * F ^ 5 + 500 * F ^ 5 := by ring
   rw [e]
-  linarith
+  linarith only [hT1, hT2, hT6, hlb', hdd', p1, p2, p3, hX, hY]
 
 end GlobalTheory

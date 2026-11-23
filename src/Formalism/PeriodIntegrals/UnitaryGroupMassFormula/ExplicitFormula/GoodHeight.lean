@@ -251,7 +251,7 @@ theorem exists_good_height {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) {N
     have htri := abs_sub_le (|ρ.im|) x (T + 1 / 2)
     have h3 : 1 / (2 * (2 * C * Real.log (N * (T + 3)) + 1)) ≤ 1 / 2 := by
       rw [div_le_div_iff₀ (by positivity) (by norm_num)]
-      nlinarith
+      linarith
     linarith
 
 theorem trunc_change {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) {N : ℕ} [NeZero N]
@@ -312,8 +312,9 @@ theorem trunc_change {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) {N : ℕ
         mul_le_mul_of_nonneg_right hsumm (div_nonneg hu0.le hT.le)
 
 theorem four_mul_le_cube {x : ℝ} (hx : 2 ≤ x) : 4 * x ≤ x ^ 3 := by
-  have h4 : 4 ≤ x ^ 2 := by nlinarith
-  nlinarith
+  have h4 : 4 ≤ x ^ 2 := by linarith [pow_le_pow_left₀ (by norm_num) hx 2]
+  calc 4 * x ≤ x ^ 2 * x := mul_le_mul_of_nonneg_right h4 (by linarith)
+    _ = x ^ 3 := by ring
 
 theorem goodHeightExists_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) :
     GoodHeightExists (12 * C + 4) := by
@@ -322,7 +323,9 @@ theorem goodHeightExists_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) :
   refine ⟨T', hT'.1, hT'.2, fun ρ h0 h1 hL => le_trans ?_ (hgood ρ h0 h1 hL)⟩
   have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.2 (NeZero.ne N)
   have hT2 : 2 ≤ T' := le_trans hT hT'.1
-  have hNT : 2 ≤ (N : ℝ) * T' := by nlinarith
+  have hNT : 2 ≤ (N : ℝ) * T' := by
+    calc (2 : ℝ) = 1 * 2 := by norm_num
+      _ ≤ N * T' := mul_le_mul hN1 hT2 (by norm_num) (by linarith)
   have hL' : 1 / 2 ≤ Real.log (N * T') := by
     have := Real.log_le_log (by norm_num) hNT
     linarith [Real.log_two_gt_d9]
@@ -338,12 +341,12 @@ theorem goodHeightExists_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) :
         _ = (N * T') ^ 3 := by ring
     calc Real.log (N * (T + 3)) ≤ Real.log ((N * T') ^ 3) := Real.log_le_log hpos3 hle
       _ = 3 * Real.log (N * T') := by rw [Real.log_pow]; norm_num
-  have hlogpos : 0 ≤ Real.log (N * (T + 3)) := Real.log_nonneg (by nlinarith)
+  have hlogpos : 0 ≤ Real.log (N * (T + 3)) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hN1 (by linarith))
   have hCL := mul_nonneg hC0 hlogpos
   have h1 : C * Real.log (N * (T + 3)) ≤ C * (3 * Real.log (N * T')) :=
     mul_le_mul_of_nonneg_left hL hC0
-  apply one_div_le_one_div_of_le (by nlinarith)
-  nlinarith
+  apply one_div_le_one_div_of_le (by positivity)
+  linarith
 
 theorem truncChange_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) : TruncChange (4 * C) := by
   intro N _ χ hχ u T T' hT hTu hTT' hT'
@@ -354,7 +357,9 @@ theorem truncChange_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) : Trun
   unfold Err
   have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.2 (NeZero.ne N)
   have hT0 : 0 < T := by linarith
-  have huT4 : (4 : ℝ) ≤ u * T := by nlinarith
+  have huT4 : (4 : ℝ) ≤ u * T := by
+    calc (4 : ℝ) = 2 * 2 := by norm_num
+      _ ≤ u * T := mul_le_mul (hT.trans hTu) hT (by norm_num) (by linarith)
   have hNuT : 4 ≤ (N : ℝ) * u * T := by
     have h := mul_le_mul_of_nonneg_right hN1 (by linarith : (0 : ℝ) ≤ u * T)
     have e : (N : ℝ) * u * T = N * (u * T) := by ring
@@ -364,10 +369,13 @@ theorem truncChange_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) : Trun
     rw [Real.le_log_iff_exp_le (by linarith)]
     linarith [Real.exp_one_lt_d9]
   have hLle : Real.log (N * (T + 3)) ≤ 2 * Real.log (N * u * T) := by
-    have hT2 : 4 ≤ T ^ 2 := by nlinarith
-    have hA : T + 3 ≤ T ^ 2 * T ^ 2 := by nlinarith
-    have hB : T ^ 2 ≤ u ^ 2 := by nlinarith
-    have hC' : (N : ℝ) ≤ N ^ 2 := by nlinarith
+    have hT2 : 4 ≤ T ^ 2 := by linarith [pow_le_pow_left₀ (by norm_num) hT 2]
+    have hA : T + 3 ≤ T ^ 2 * T ^ 2 := by
+      have h2T : 2 * T ≤ T ^ 2 := by simpa [sq] using mul_le_mul_of_nonneg_right hT hT0.le
+      have : T + 3 ≤ 4 * T ^ 2 := by linarith
+      exact this.trans (mul_le_mul_of_nonneg_right hT2 (sq_nonneg T))
+    have hB : T ^ 2 ≤ u ^ 2 := pow_le_pow_left₀ hT0.le hTu 2
+    have hC' : (N : ℝ) ≤ N ^ 2 := le_self_pow₀ hN1 (by norm_num)
     have hle : (N : ℝ) * (T + 3) ≤ (N * u * T) ^ 2 := by
       calc (N : ℝ) * (T + 3) ≤ N * (T ^ 2 * T ^ 2) := mul_le_mul_of_nonneg_left hA (by linarith)
         _ ≤ N ^ 2 * (u ^ 2 * T ^ 2) :=
@@ -377,15 +385,17 @@ theorem truncChange_of {C : ℝ} (hC0 : 0 ≤ C) (hC : ZerosWindowWith C) : Trun
     calc Real.log (N * (T + 3)) ≤ Real.log ((N * u * T) ^ 2) :=
           Real.log_le_log (mul_pos (by linarith) (by linarith)) hle
       _ = 2 * Real.log (N * u * T) := by rw [Real.log_pow]; norm_num
-  have hlogNu : 0 ≤ Real.log (N * u) := Real.log_nonneg (by nlinarith)
+  have hlogNu : 0 ≤ Real.log (N * u) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hN1 (by linarith))
   have huT : 0 ≤ u / T := div_nonneg (by linarith) hT0.le
-  have h1 : Real.log (N * (T + 3)) ≤ 2 * Real.log (N * u * T) ^ 2 := by nlinarith
+  have h1 : Real.log (N * (T + 3)) ≤ 2 * Real.log (N * u * T) ^ 2 := by
+    have := le_self_pow₀ hL2 (by norm_num : 2 ≠ 0)
+    linarith
   have h2 : 2 * C * Real.log (N * (T + 3)) * (u / T) ≤
       4 * C * (u * Real.log (N * u * T) ^ 2 / T) := by
     have e : u * Real.log (N * u * T) ^ 2 / T = Real.log (N * u * T) ^ 2 * (u / T) := by ring
     rw [e]
     have := mul_le_mul_of_nonneg_left h1 (mul_nonneg (mul_nonneg (by norm_num : (0:ℝ) ≤ 2) hC0) huT)
-    nlinarith
+    linarith
   have h3 : 4 * C * (u * Real.log (N * u * T) ^ 2 / T) ≤
       4 * C * (u * Real.log (N * u * T) ^ 2 / T + Real.log (N * u)) :=
     mul_le_mul_of_nonneg_left (le_add_of_nonneg_right hlogNu) (by linarith)

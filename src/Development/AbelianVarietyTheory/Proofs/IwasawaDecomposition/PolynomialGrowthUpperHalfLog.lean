@@ -61,7 +61,7 @@ theorem norm_le_qf {w : ℂ} (hw : 0 < w.im) : ‖w‖ ≤ qf w := by
   unfold qf
   rw [le_div_iff₀ hw]
   have h1 := mul_le_mul_of_nonneg_left (Complex.im_le_norm w) (norm_nonneg w)
-  nlinarith [norm_nonneg w, sq_nonneg (‖w‖ - 1)]
+  linarith [h1, sq_nonneg (‖w‖ - 1)]
 
 theorem norm_sub_conj_le (u v : ℂ) (hv : 0 < v.im) : ‖u - conj v‖ ≤ ‖u - v‖ + 2 * v.im := by
   have e : u - conj v = (u - v) + (v - conj v) := by ring
@@ -85,30 +85,31 @@ theorem qf_le {u v : ℂ} {r : ℝ} (hu : 0 < u.im) (hv : 0 < v.im) (hr0 : 0 ≤
     rwa [norm_sub_rev v u, ← hd] at h'
   have hdv : d ≤ (K - 1) * v.im := by
     rw [hK1, div_mul_eq_mul_div, le_div_iff₀ h1r]
-    nlinarith [mul_le_mul_of_nonneg_left e1 hr0]
+    linarith [mul_le_mul_of_nonneg_left e1 hr0, mul_le_mul_of_nonneg_right (show 2 * r ≤ 1 + r by linarith) hv.le]
   have hdu : d ≤ (K - 1) * u.im := by
     rw [hK1, div_mul_eq_mul_div, le_div_iff₀ h1r]
-    nlinarith [mul_le_mul_of_nonneg_left e2 hr0]
+    linarith [mul_le_mul_of_nonneg_left e2 hr0, mul_le_mul_of_nonneg_right (show 2 * r ≤ 1 + r by linarith) hu.le]
   have him : v.im ≤ K * u.im := by
     have : v.im - u.im ≤ d := by
       have := Complex.im_le_norm (v - u)
       rw [norm_sub_rev] at this
       simpa using this
-    nlinarith
+    linarith
   have hn : ‖u‖ ≤ K * ‖v‖ := by
     have h1 : ‖u‖ ≤ ‖v‖ + d := by
       have := norm_add_le v (u - v)
       simpa using this
     have h2 := mul_le_mul_of_nonneg_left (Complex.im_le_norm v) (by linarith : 0 ≤ K - 1)
-    nlinarith
+    linarith
   have hsq : 1 + ‖u‖ ^ 2 ≤ K ^ 2 * (1 + ‖v‖ ^ 2) := by
     have : ‖u‖ ^ 2 ≤ (K * ‖v‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hn 2
-    nlinarith [sq_nonneg K, sq_nonneg ‖v‖]
+    have hK2 : 1 ≤ K ^ 2 := one_le_pow₀ hKge
+    linarith
   have hprod : (1 + ‖u‖ ^ 2) * v.im ≤ (K ^ 2 * (1 + ‖v‖ ^ 2)) * (K * u.im) :=
     mul_le_mul hsq him hv.le (by positivity)
   unfold qf
   rw [div_le_iff₀ hu, ← mul_div_assoc, div_mul_eq_mul_div, le_div_iff₀ hv]
-  nlinarith
+  linarith
 
 end GlobalTheory.UpperGrowth
 
@@ -135,7 +136,7 @@ theorem qf_ball {f : ℂ → ℂ} (hd : DifferentiableOn ℂ f (Metric.ball 0 1)
     refine (pow_le_pow_iff_left₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).mp ?_
     rw [Complex.sq_norm, Complex.sq_norm, Complex.normSq_apply, Complex.normSq_apply]
     simp
-    nlinarith [mul_pos hz' hc]
+    linarith [mul_pos hz' hc]
   set g : ℂ → ℂ := fun z => (f z - c) / (f z - conj c) with hg
   have hdg : DifferentiableOn ℂ g (Metric.ball 0 1) :=
     (hd.sub_const c).div (hd.sub_const _) hne
@@ -169,13 +170,13 @@ theorem cay_re {ζ : ℂ} (hζ : ζ ∈ Metric.ball (0 : ℂ) 1) : (cay ζ).re <
   have hn : 0 < Complex.normSq (ζ + 1) := Complex.normSq_pos.mpr h1
   have hζ' : ζ.re ^ 2 + ζ.im ^ 2 < 1 := by
     have h2 : ‖ζ‖ < 1 := by simpa using hζ
-    have h3 : ‖ζ‖ ^ 2 < 1 := by nlinarith [norm_nonneg ζ]
+    have h3 : ‖ζ‖ ^ 2 < 1 := pow_lt_one₀ (norm_nonneg ζ) h2 two_ne_zero
     rw [Complex.sq_norm, Complex.normSq_apply] at h3
-    nlinarith
+    linarith
   unfold cay
   rw [Complex.div_re, ← add_div, div_lt_iff₀ hn, Complex.normSq_apply]
   simp
-  nlinarith
+  linarith
 
 theorem cay_diff : DifferentiableOn ℂ cay (Metric.ball 0 1) :=
   DifferentiableOn.div (by fun_prop) (by fun_prop) fun _ h => cay_ne h
@@ -204,8 +205,8 @@ theorem cay_bound {z : ℂ} (hz : z.re ≤ -1 / 2) :
     push_neg at hc
     have h0 : B = 0 := le_antisymm hc (norm_nonneg _)
     rw [h0] at hAB
-    nlinarith
-  have hlt : A < B := by nlinarith
+    linarith [sq_nonneg A]
+  have hlt : A < B := lt_of_pow_lt_pow_left₀ 2 hB0.le (by linarith)
   have hBz : B ≤ 1 + ‖z‖ := by
     rw [hB]; exact (norm_sub_le _ _).trans (by simp)
   have hq : ‖(1 + z) / (1 - z)‖ = A / B := by rw [norm_div]
@@ -214,9 +215,13 @@ theorem cay_bound {z : ℂ} (hz : z.re ≤ -1 / 2) :
   refine ⟨hlt1, ?_⟩
   have e : 1 - A / B = (B - A) / B := by field_simp
   rw [e, div_div_eq_mul_div, div_le_iff₀ (by linarith)]
-  have h1 : 1 ≤ 2 * B * (B - A) := by nlinarith
+  have h1 : 1 ≤ 2 * B * (B - A) := by
+    have := mul_le_mul_of_nonneg_right (show B + A ≤ 2 * B by linarith) (show 0 ≤ B - A by linarith)
+    linarith
   have h2 : B ^ 2 ≤ (1 + ‖z‖) ^ 2 := pow_le_pow_left₀ hB0.le hBz 2
-  nlinarith [mul_le_mul_of_nonneg_right h2 (by linarith : (0:ℝ) ≤ B - A)]
+  have h1B := mul_le_mul_of_nonneg_left h1 hB0.le
+  have h2B := mul_le_mul_of_nonneg_right h2 (show (0 : ℝ) ≤ B - A by linarith)
+  linarith
 
 theorem re_le_of_exp {z : ℂ} (h : ‖Complex.exp z‖ ≤ 1 / 2) : z.re ≤ -1 / 2 := by
   rw [Complex.norm_exp] at h
@@ -330,7 +335,8 @@ theorem upper_half_growth : ∀ (n a : ℕ) (F : (Fin n → ℂ) → ℂ), Diffe
         have hMb : 2 / (1 - ‖s i‖) ≤ M := by
           rw [div_le_iff₀ (by linarith)]
           have : 1 ≤ (1 + ‖s‖) ^ 2 := one_le_pow₀ (by linarith [norm_nonneg s])
-          nlinarith
+          have hM4 : 4 ≤ M := by rw [hMdef]; linarith
+          exact (by norm_num : (2 : ℝ) ≤ 4 * (1 / 2)).trans (mul_le_mul hM4 (by linarith) (by norm_num) (by linarith))
         have key := qf_ball_le hdf hposf hζ hMb
         have e0 : s₀ i = 0 := by simp [hs₀, hai]
         rw [← e0, hPj, ← hPi] at key
@@ -342,7 +348,7 @@ theorem upper_half_growth : ∀ (n a : ℕ) (F : (Fin n → ℂ) → ℂ), Diffe
       rw [e]
       have h0 := qf_nonneg (hpos _ (hPmem j))
       have : 1 ≤ M ^ 3 := one_le_pow₀ hM1
-      nlinarith
+      exact le_mul_of_one_le_left h0 this
   have hind : ∀ j, qf (F (P j)) ≤ (M ^ 3) ^ j * qf (F s₀) := by
     intro j
     induction j with

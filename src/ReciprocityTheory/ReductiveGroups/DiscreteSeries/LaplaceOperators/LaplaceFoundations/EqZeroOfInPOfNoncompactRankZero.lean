@@ -95,9 +95,9 @@ theorem phi_le (x : ℝ) :
     rw [e2] at h2
     have h3 : Real.exp y * (Real.exp (-y) * Real.exp (-y)) = Real.exp (-y) := by
       rw [← mul_assoc, e3, one_mul]
-    have hu : Real.exp y - Real.exp (-y) ≤ 2 * y * Real.exp y := by nlinarith
+    have hu : Real.exp y - Real.exp (-y) ≤ 2 * y * Real.exp y := by linarith [hy]
     calc Real.exp (2 * y) + Real.exp (-(2 * y)) - 2 = (Real.exp y - Real.exp (-y)) ^ 2 := by
-          rw [e1, e2]; nlinarith [e3]
+          rw [e1, e2]; linarith [e3]
       _ ≤ (2 * y * Real.exp y) ^ 2 := pow_le_pow_left₀ hu0 hu 2
       _ = 4 * y ^ 2 * Real.exp (2 * y) := by rw [e1]; ring
   rcases le_total 0 x with hx | hx
@@ -115,7 +115,7 @@ theorem exp_two_lt : Real.exp 2 < 7.5 := by
   have h : Real.exp 2 = Real.exp 1 * Real.exp 1 := by rw [← Real.exp_add]; norm_num
   have h1 := Real.exp_one_lt_d9
   have h2 := Real.exp_pos 1
-  rw [h]; nlinarith
+  rw [h]; linarith [mul_lt_mul'' h1 h1 h2.le h2.le]
 
 theorem log_bound (D : ℝ) (m : ℕ) : ∃ A : ℝ, 0 ≤ A ∧ ∀ s a y : ℝ, 0 ≤ s → 0 ≤ a → 0 ≤ y →
     a ≤ 4 * s * Real.exp (2 * Real.sqrt s) → y ≤ D ^ 2 * a * (1 + Real.sqrt a) ^ (2 * m) →
@@ -138,10 +138,10 @@ theorem log_bound (D : ℝ) (m : ℕ) : ∃ A : ℝ, 0 ≤ A ∧ ∀ s a y : ℝ
   rcases le_total s 1 with h1 | h1
   · have hσ1 : Real.sqrt s ≤ 1 := by
       rw [show (1 : ℝ) = Real.sqrt 1 from Real.sqrt_one.symm]; exact Real.sqrt_le_sqrt h1
-    have hmin : min s (Real.sqrt s) = s := min_eq_left (by nlinarith)
+    have hmin : min s (Real.sqrt s) = s := min_eq_left (by linarith [mul_le_of_le_one_left hσ0 hσ1])
     have he : Real.exp (2 * Real.sqrt s) ≤ 7.5 :=
       (Real.exp_le_exp.mpr (by linarith)).trans exp_two_lt.le
-    have ha30 : a ≤ 30 * s := by nlinarith
+    have ha30 : a ≤ 30 * s := by linarith [mul_le_mul_of_nonneg_left he hs]
     have ha36 : a ≤ 36 := by linarith
     have hsq6 : Real.sqrt a ≤ 6 := by
       have := Real.sqrt_le_sqrt ha36
@@ -160,36 +160,36 @@ theorem log_bound (D : ℝ) (m : ℕ) : ∃ A : ℝ, 0 ≤ A ∧ ∀ s a y : ℝ
       _ ≤ max A1 A2 * s := mul_le_mul_of_nonneg_right (le_max_left _ _) hs
   · have hσ1 : 1 ≤ Real.sqrt s := by
       rw [show (1 : ℝ) = Real.sqrt 1 from Real.sqrt_one.symm]; exact Real.sqrt_le_sqrt h1
-    have hmin : min s (Real.sqrt s) = Real.sqrt s := min_eq_right (by nlinarith)
+    have hmin : min s (Real.sqrt s) = Real.sqrt s := min_eq_right (by linarith [le_self_pow₀ hσ1 two_ne_zero])
     set σ := Real.sqrt s with hσ
     set E := Real.exp σ with hE
     have hE1 : 1 ≤ E := Real.one_le_exp hσ0
     have hσE : σ ≤ E := by have := Real.add_one_le_exp σ; linarith
     have he2 : Real.exp (2 * σ) = E * E := by rw [hE, ← Real.exp_add]; ring_nf
     have hsa1 : Real.sqrt a ≤ 2 * σ * E := by
-      have h2 : a ≤ (2 * σ * E) ^ 2 := by rw [← hσs] at haS; rw [he2] at haS; nlinarith
+      have h2 : a ≤ (2 * σ * E) ^ 2 := by rw [← hσs] at haS; rw [he2] at haS; linarith
       have := Real.sqrt_le_sqrt h2
       rwa [Real.sqrt_sq (by positivity)] at this
-    have hsa2 : 1 + Real.sqrt a ≤ 3 * E ^ 2 := by nlinarith
+    have hsa2 : 1 + Real.sqrt a ≤ 3 * E ^ 2 := by linarith [one_le_pow₀ (n := 2) hE1, mul_le_mul_of_nonneg_right hσE (show 0 ≤ E by linarith)]
     have hy2 : y ≤ B * Real.exp (4 * ((m : ℝ) + 1) * σ) := by
       have hexp : Real.exp (4 * ((m : ℝ) + 1) * σ) = E ^ (4 * (m + 1)) := by
         rw [hE, ← Real.exp_nat_mul]; push_cast; ring_nf
       calc y ≤ D ^ 2 * a * (1 + Real.sqrt a) ^ (2 * m) := hyA
         _ ≤ D ^ 2 * (1 + Real.sqrt a) ^ 2 * (1 + Real.sqrt a) ^ (2 * m) := by
-            gcongr; nlinarith
+            gcongr; linarith [hsa0, hsa]
         _ = D ^ 2 * (1 + Real.sqrt a) ^ (2 * (m + 1)) := by ring
         _ ≤ D ^ 2 * (3 * E ^ 2) ^ (2 * (m + 1)) := by gcongr
         _ = B * Real.exp (4 * ((m : ℝ) + 1) * σ) := by
             rw [hexp, hBd, mul_pow, ← pow_mul, pow_mul 3 2 (m + 1)]; ring_nf
     have hX1 : 1 ≤ Real.exp (4 * ((m : ℝ) + 1) * σ) := Real.one_le_exp (by positivity)
-    have h3 : 1 + y ≤ (1 + B) * Real.exp (4 * ((m : ℝ) + 1) * σ) := by nlinarith
+    have h3 : 1 + y ≤ (1 + B) * Real.exp (4 * ((m : ℝ) + 1) * σ) := by linarith [hB]
     have h4 : Real.log (1 + y) ≤ Real.log (1 + B) + 4 * ((m : ℝ) + 1) * σ := by
       calc Real.log (1 + y) ≤ Real.log ((1 + B) * Real.exp (4 * ((m : ℝ) + 1) * σ)) :=
             Real.log_le_log (by linarith) h3
         _ = _ := by rw [Real.log_mul (by linarith) (Real.exp_pos _).ne', Real.log_exp]
     rw [hmin]
     calc Real.log (1 + y) ≤ Real.log (1 + B) + 4 * ((m : ℝ) + 1) * σ := h4
-      _ ≤ A2 * σ := by rw [hA2d]; nlinarith
+      _ ≤ A2 * σ := by rw [hA2d]; linarith [hA2, hy, le_mul_of_one_le_right hlB hσ1]
       _ ≤ max A1 A2 * σ := mul_le_mul_of_nonneg_right (le_max_right _ _) hσ0
 
 theorem herm_decomp {X : Matrix (Fin n) (Fin n) ℂ} (hX : X.IsHermitian) :

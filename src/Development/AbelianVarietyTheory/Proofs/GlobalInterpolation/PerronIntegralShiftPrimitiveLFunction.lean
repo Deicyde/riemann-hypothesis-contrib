@@ -96,7 +96,8 @@ private theorem norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist {S : Set �
   have hpos : 0 < ‖s - w‖ := by linarith
   rw [norm_div, Complex.norm_natCast, div_le_iff₀ hpos]
   have : (0 : ℝ) ≤ k w := Nat.cast_nonneg _
-  nlinarith
+  have := mul_le_mul_of_nonneg_left hw' (show (0 : ℝ) ≤ 2 * (k w : ℝ) by positivity)
+  linarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
@@ -115,7 +116,7 @@ private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
     Real.log_le_log (by norm_num) (by linarith [abs_nonneg t])
   have hN : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
   have hlogN : Real.log (|t| + 2) ≤ Real.log (N * (|t| + 2)) :=
-    Real.log_le_log (by positivity) (by nlinarith [abs_nonneg t])
+    Real.log_le_log (by positivity) (le_mul_of_one_le_left (by positivity) hN)
   have hL0 : 0 ≤ Real.log (N * (|t| + 2)) := by linarith
   by_cases h1 : χ = 1
   · subst h1
@@ -153,7 +154,7 @@ private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
       exact hsum.trans (by linarith)
     rw [him] at key
     simp only [Nat.cast_one, one_mul]
-    nlinarith [mul_nonneg hC₁.le (by linarith : (0:ℝ) ≤ Real.log (|t| + 2))]
+    linarith [mul_nonneg hC₁.le (by linarith : (0:ℝ) ≤ Real.log (|t| + 2))]
   · have hLs := LFunction_ne_zero_of_re_eq_neg_half χ hχ hre
     obtain ⟨hfin, hcnt, hbd⟩ := H₁ N χ h1 s (by rw [hre]; norm_num) (by rw [hre]; norm_num) hLs
     rw [him] at hcnt hbd
@@ -168,7 +169,7 @@ private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
     rw [e]
     refine (norm_add_le _ _).trans ?_
     have := add_le_add hbd (hsum.trans (by linarith : _ ≤ 2 * (C₁ * Real.log (N * (|t| + 2)))))
-    nlinarith
+    linarith [mul_nonneg hC₂.le hL0]
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 private theorem norm_neg_mul_ofReal_cpow_div_eq (a s : ℂ) {u : ℝ} (hu : 0 < u) :
@@ -205,7 +206,7 @@ private theorem norm_integral_logDeriv_LFunction_mul_cpow_div_neg_half_le :
   obtain ⟨C₀, hC₀, H⟩ := exists_norm_logDeriv_LFunction_neg_half_le_log_conductor
   refine ⟨4 * C₀, by positivity, fun N _ χ hχ u T' hu hT' => ?_⟩
   have hN : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
-  have hL : 0 ≤ Real.log (N * (T' + 2)) := Real.log_nonneg (by nlinarith)
+  have hL : 0 ≤ Real.log (N * (T' + 2)) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hN (by linarith))
   have hg : Continuous fun t : ℝ => 2 * C₀ * Real.log (N * (T' + 2)) * (1 / (|t| + 1 / 2)) :=
     continuous_const.mul
       (continuous_const.div (continuous_abs.add continuous_const) (fun t => by change (|t| + 1 / 2 : ℝ) ≠ 0; positivity))
@@ -220,7 +221,7 @@ private theorem norm_integral_logDeriv_LFunction_mul_cpow_div_neg_half_le :
     have hp0 : 0 ≤ u ^ (-(1 / 2) : ℝ) := Real.rpow_nonneg (by linarith) _
     have hA : ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ C₀ * Real.log (N * (T' + 2)) := by
       refine (H N χ hχ t).trans (mul_le_mul_of_nonneg_left (Real.log_le_log (by positivity)
-        (by nlinarith)) hC₀.le)
+        (mul_le_mul_of_nonneg_left (by linarith) (by linarith))) hC₀.le)
     have hs1 : |t| ≤ ‖s‖ := by rw [← him]; exact Complex.abs_im_le_norm s
     have hs2 : 1 / 2 ≤ ‖s‖ := by
       have := Complex.abs_re_le_norm s; rw [hre] at this; norm_num at this; linarith
@@ -245,7 +246,8 @@ private theorem rpow_one_add_inv_log_le_three_mul (u : ℝ) (hu : 1 < u) :
   rw [Real.rpow_add (by linarith), Real.rpow_one, Real.rpow_def_of_pos (by linarith),
     mul_one_div_cancel hl.ne']
   have := Real.exp_one_lt_d9
-  nlinarith
+  have hmul := mul_le_mul_of_nonneg_left (by linarith : Real.exp 1 ≤ 3) (by linarith : (0 : ℝ) ≤ u)
+  linarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 private theorem inv_two_pi_mul_sub_add_eq_of_contour_identity (H₁ H₂ V W M S E : ℂ)
@@ -304,42 +306,57 @@ theorem _root_.GlobalTheory.PerronShift.perron_shift : ∃ C : ℝ, 0 < C ∧ �
   rw [inv_two_pi_mul_sub_add_eq_of_contour_identity _ _ _ _ _ _ _ hid]
   refine (norm_neg_add_inv_two_pi_mul_add_I_mul_sub_le _ _ _ _).trans ?_
   have hN : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
-  have hP4 : 4 ≤ (N : ℝ) * u * T := by nlinarith [mul_le_mul hN hTu (by linarith) (by linarith)]
+  have hP4 : 4 ≤ (N : ℝ) * u * T := by
+    have huT : 4 ≤ u * T := by
+      have := mul_le_mul (by linarith : (2 : ℝ) ≤ u) hT (by norm_num) (by linarith)
+      linarith
+    have := le_mul_of_one_le_left (by linarith : (0 : ℝ) ≤ u * T) hN
+    linarith
   have hlogP : 0 ≤ Real.log (N * u * T) := Real.log_nonneg (by linarith)
   have hP2 : Real.log (((N : ℝ) * u * T) ^ 2) = 2 * Real.log (N * u * T) := by
     rw [Real.log_pow]; norm_num
-  have hNuT : (N : ℝ) * u * T * (N * u * T) ≥ 4 * (N * u * T) := by nlinarith
-  have hNT : (N : ℝ) * T ≤ N * u * T := by nlinarith
+  have hNuT : (N : ℝ) * u * T * (N * u * T) ≥ 4 * (N * u * T) :=
+    mul_le_mul_of_nonneg_right hP4 (by positivity)
+  have hNT : (N : ℝ) * T ≤ N * u * T := by
+    have := le_mul_of_one_le_right (by positivity : (0 : ℝ) ≤ (N : ℝ) * T) hu1.le
+    linarith
   have hNT2 : 2 * ((N : ℝ) * T) ≤ N * u * T := by
-    nlinarith [mul_nonneg (by positivity : (0 : ℝ) ≤ N * T) (by linarith : (0 : ℝ) ≤ u - 2)]
-  have hsq : 4 * ((N : ℝ) * u * T) ≤ ((N : ℝ) * u * T) ^ 2 := by nlinarith
+    linarith [mul_nonneg (by positivity : (0 : ℝ) ≤ N * T) (by linarith : (0 : ℝ) ≤ u - 2)]
+  have hsq : 4 * ((N : ℝ) * u * T) ≤ ((N : ℝ) * u * T) ^ 2 := by rw [sq]; exact hNuT
 
   have hS0 : 0 ≤ ∑ᶠ ρ ∈ {ρ : ℂ | 0 < ρ.re ∧ ρ.re < 1 ∧ |ρ.im| < 1 ∧ LFunction χ ρ = 0},
       ((analyticOrderNatAt (LFunction χ) ρ : ℕ) : ℝ) / ‖ρ‖ :=
     finsum_nonneg fun ρ => finsum_nonneg fun _ => by positivity
   have hlogNu : Real.log u ≤ Real.log (N * u) :=
-    Real.log_le_log (by linarith) (by nlinarith)
+    Real.log_le_log (by linarith) (le_mul_of_one_le_left (by linarith) hN)
   have hlog2N : Real.log (2 * N) ≤ Real.log (N * u) :=
-    Real.log_le_log (by positivity) (by nlinarith)
+    Real.log_le_log (by positivity) (by have := mul_le_mul_of_nonneg_left (by linarith : (2 : ℝ) ≤ u) (by linarith : (0 : ℝ) ≤ N); linarith)
   have hE : ‖(m : ℂ) * ((Real.log u : ℝ) : ℂ) + h 0‖ ≤ Real.log u + ‖h 0‖ := by
     refine (norm_add_le _ _).trans ?_
     rw [norm_mul, Complex.norm_natCast, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hlogu]
     have : (m : ℝ) ≤ 1 := by exact_mod_cast hm
-    nlinarith
+    have := mul_le_mul_of_nonneg_right this hlogu.le
+    linarith
 
   have hW := HV N χ hχ u T' hu1.le (by linarith)
   have hW1 : Real.log (N * (T' + 2)) ≤ 2 * Real.log (N * u * T) := by
-    rw [← hP2]; exact Real.log_le_log (by nlinarith) (by nlinarith)
+    rw [← hP2]
+    exact Real.log_le_log (mul_pos (by linarith) (by linarith)) (by
+      have := mul_le_mul_of_nonneg_left (by linarith : T' + 2 ≤ 4 * T) (by linarith : (0 : ℝ) ≤ N)
+      linarith)
   have hW2 : Real.log (2 * T' + 1) ≤ 2 * Real.log (N * u * T) := by
-    rw [← hP2]; exact Real.log_le_log (by linarith) (by nlinarith)
+    rw [← hP2]
+    exact Real.log_le_log (by linarith) (by
+      have := le_mul_of_one_le_left (by linarith : (0 : ℝ) ≤ T) hN
+      linarith)
   have hW0 : 0 ≤ Real.log (2 * T' + 1) := Real.log_nonneg (by linarith)
-  have hW10 : 0 ≤ Real.log (N * (T' + 2)) := Real.log_nonneg (by nlinarith)
+  have hW10 : 0 ≤ Real.log (N * (T' + 2)) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hN (by linarith))
   have hX : Real.log (N * u * T) ^ 2 ≤ u * Real.log (N * u * T) ^ 2 / T := by
     rw [le_div_iff₀ (by linarith)]
     have := mul_le_mul_of_nonneg_left hTu (sq_nonneg (Real.log (N * u * T)))
     linarith
 
-  have hlogNT : 0 ≤ Real.log (N * T) := Real.log_nonneg (by nlinarith)
+  have hlogNT : 0 ≤ Real.log (N * T) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hN (by linarith))
   have hlogNT' : Real.log (N * T) ≤ Real.log (N * u * T) := Real.log_le_log (by positivity) hNT
   have hH : ∀ y : ℝ, |y| = T' → ‖∫ x in -(1 / 2)..c, -(deriv (LFunction χ) (↑x + ↑y * I) /
       LFunction χ (↑x + ↑y * I)) * (u : ℂ) ^ (↑x + ↑y * I) / (↑x + ↑y * I)‖ ≤
@@ -379,8 +396,9 @@ theorem _root_.GlobalTheory.PerronShift.perron_shift : ∃ C : ℝ, 0 < C ∧ �
   have hXn : 0 ≤ u * Real.log (N * u * T) ^ 2 / T := by positivity
   have hWb : C₂ * Real.log (N * (T' + 2)) * Real.log (2 * T' + 1) ≤
       4 * C₂ * (u * Real.log (N * u * T) ^ 2 / T) := by
-    have := mul_le_mul hW1 hW2 hW0 (by linarith)
-    nlinarith
+    have h1 := mul_le_mul_of_nonneg_left (mul_le_mul hW1 hW2 hW0 (by linarith)) hC₂.le
+    have h2 := mul_le_mul_of_nonneg_left hX (show (0 : ℝ) ≤ 4 * C₂ by positivity)
+    linarith [show C₂ * (2 * Real.log (N * u * T) * (2 * Real.log (N * u * T))) = 4 * C₂ * Real.log (N * u * T) ^ 2 by ring]
   have hLg : 0 ≤ Real.log (N * u) := hlogu.le.trans hlogNu
   have key := add_le_add (add_le_add (add_le_add (hE.trans (add_le_add le_rfl hh0))
     (hW.trans hWb)) hH1) hH2

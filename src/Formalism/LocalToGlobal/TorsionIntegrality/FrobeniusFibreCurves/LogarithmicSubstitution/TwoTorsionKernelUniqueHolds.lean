@@ -119,16 +119,16 @@ lemma tb2 {b : K} (hb : ‖b‖ ≤ 1) (x : K) : ‖b * x ^ 2‖ ≤ ‖x‖ ^ 2
 
 lemma tb4 (h2 : ‖(2 : K)‖ = 2⁻¹) {b : K} (hb : ‖b‖ ≤ 1) (x : K) : ‖2 * b * x‖ ≤ ‖x‖ / 2 := by
   rw [norm_mul, norm_mul, h2]
-  nlinarith [mul_le_mul_of_nonneg_right hb (norm_nonneg x)]
+  linarith [mul_le_mul_of_nonneg_right hb (norm_nonneg x)]
 
 variable {b2 b4 b6 b8 x : K}
 
 lemma psi_le (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ ≤ 1) (hb4 : ‖b4‖ ≤ 1) (hb6 : ‖b6‖ ≤ 1)
     (hx : 4 ≤ ‖x‖) : ‖4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6‖ ≤ ‖x‖ ^ 3 / 4 := by
   have r0 : 0 ≤ ‖x‖ := norm_nonneg _
-  have e1 : ‖x‖ ^ 2 ≤ ‖x‖ ^ 3 / 4 := by nlinarith [mul_nonneg (sq_nonneg ‖x‖) (sub_nonneg.2 hx)]
-  have e2 : ‖x‖ / 2 ≤ ‖x‖ ^ 3 / 4 := by nlinarith [mul_nonneg r0 (sub_nonneg.2 hx)]
-  have e3 : 1 ≤ ‖x‖ ^ 3 / 4 := by nlinarith [pow_le_pow_left₀ (by norm_num) hx 3]
+  have e1 : ‖x‖ ^ 2 ≤ ‖x‖ ^ 3 / 4 := by linarith [mul_nonneg (sq_nonneg ‖x‖) (sub_nonneg.2 hx)]
+  have e2 : ‖x‖ / 2 ≤ ‖x‖ ^ 3 / 4 := by linarith [mul_nonneg r0 (sub_nonneg.2 hx)]
+  have e3 : 1 ≤ ‖x‖ ^ 3 / 4 := by linarith [pow_le_pow_left₀ (by norm_num) hx 3]
   exact nadd_le (nadd_le (nadd_le (t4 h2 x).le ((tb2 hb2 x).trans e1)) ((tb4 h2 hb4 x).trans e2))
     (hb6.trans e3)
 
@@ -137,25 +137,32 @@ lemma psi_zero_le (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ ≤ 1) (hb4 : �
   by_contra hlt
   push_neg at hlt
   have r0 : 0 ≤ ‖x‖ := norm_nonneg _
-  have e1 : ‖x‖ ^ 2 < ‖x‖ ^ 3 / 4 := by nlinarith [mul_pos (pow_pos (by linarith : (0:ℝ) < ‖x‖) 2) (sub_pos.2 hlt)]
-  have e2 : ‖x‖ / 2 < ‖x‖ ^ 3 / 4 := by nlinarith [mul_pos (by linarith : (0:ℝ) < ‖x‖) (sub_pos.2 hlt)]
-  have e3 : 1 < ‖x‖ ^ 3 / 4 := by nlinarith [pow_le_pow_left₀ (by norm_num) hlt.le 3]
+  have e1 : ‖x‖ ^ 2 < ‖x‖ ^ 3 / 4 := by linarith [mul_pos (pow_pos (by linarith : (0:ℝ) < ‖x‖) 2) (sub_pos.2 hlt)]
+  have e2 : ‖x‖ / 2 < ‖x‖ ^ 3 / 4 := by linarith [mul_pos (by linarith : (0:ℝ) < ‖x‖) (sub_pos.2 hlt)]
+  have e3 : 1 < ‖x‖ ^ 3 / 4 := by linarith [pow_le_pow_left₀ (by norm_num) hlt.le 3]
   have hr : ‖b2 * x ^ 2 + 2 * b4 * x + b6‖ < ‖4 * x ^ 3‖ := by
     rw [t4 h2]
     exact nadd_lt (nadd_lt ((tb2 hb2 x).trans_lt e1) ((tb4 h2 hb4 x).trans_lt e2)) (hb6.trans_lt e3)
   have key := ndom hr
   rw [show 4 * x ^ 3 + (b2 * x ^ 2 + 2 * b4 * x + b6) = 4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6 by ring,
     h0, norm_zero, t4 h2] at key
-  nlinarith [pow_pos (by linarith : (0:ℝ) < ‖x‖) 3]
+  linarith [pow_pos (by linarith : (0:ℝ) < ‖x‖) 3]
 
 lemma num_norm (h2 : ‖(2 : K)‖ = 2⁻¹) (hb4 : ‖b4‖ ≤ 1) (hb6 : ‖b6‖ ≤ 1) (hb8 : ‖b8‖ ≤ 1)
     (hx : 4 ≤ ‖x‖) : ‖x ^ 4 - b4 * x ^ 2 - 2 * b6 * x - b8‖ = ‖x‖ ^ 4 := by
   have r0 : 0 ≤ ‖x‖ := norm_nonneg _
-  have r2 : 16 ≤ ‖x‖ ^ 2 := by nlinarith
+  have r2 : 16 ≤ ‖x‖ ^ 2 := by linarith [pow_le_pow_left₀ (by norm_num) hx 2]
   have r4 : ‖x‖ ^ 4 = (‖x‖ ^ 2) ^ 2 := by ring
-  have e1 : ‖x‖ ^ 2 < ‖x‖ ^ 4 := by rw [r4]; nlinarith
-  have e2 : ‖x‖ / 2 < ‖x‖ ^ 4 := by rw [r4]; nlinarith
-  have e3 : 1 < ‖x‖ ^ 4 := by rw [r4]; nlinarith
+  have e1 : ‖x‖ ^ 2 < ‖x‖ ^ 4 := by
+    rw [r4, sq (‖x‖ ^ 2)]
+    calc ‖x‖ ^ 2 < 16 * ‖x‖ ^ 2 := by linarith
+      _ ≤ ‖x‖ ^ 2 * ‖x‖ ^ 2 := mul_le_mul_of_nonneg_right r2 (by linarith)
+  have e2 : ‖x‖ / 2 < ‖x‖ ^ 4 := by
+    calc ‖x‖ / 2 ≤ ‖x‖ * 1 := by linarith
+      _ ≤ ‖x‖ * ‖x‖ := mul_le_mul_of_nonneg_left (by linarith) r0
+      _ = ‖x‖ ^ 2 := (sq _).symm
+      _ < ‖x‖ ^ 4 := e1
+  have e3 : 1 < ‖x‖ ^ 4 := by linarith
   rw [show x ^ 4 - b4 * x ^ 2 - 2 * b6 * x - b8 = x ^ 4 + -(b4 * x ^ 2 + 2 * b6 * x + b8) by ring]
   rw [ndom, norm_pow]
   rw [norm_neg, norm_pow]
@@ -174,16 +181,23 @@ lemma dup_core (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ ≤ 1) (hb4 : ‖b4
   have hb : ‖X‖ * ‖4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6‖ ≤ 4 * (‖x‖ ^ 3 / 4) :=
     mul_le_mul hle hp (norm_nonneg _) (by norm_num)
   have r3 : 0 < ‖x‖ ^ 3 := pow_pos (by linarith) 3
-  nlinarith
+  have r34 : ‖x‖ ^ 3 < ‖x‖ ^ 4 := by
+    calc ‖x‖ ^ 3 = ‖x‖ ^ 3 * 1 := (mul_one _).symm
+      _ < ‖x‖ ^ 3 * ‖x‖ := mul_lt_mul_of_pos_left (by linarith) r3
+      _ = ‖x‖ ^ 4 := by ring
+  linarith
 
 lemma psi_zero_eq (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ = 1) (hb4 : ‖b4‖ ≤ 1) (hb6 : ‖b6‖ ≤ 1)
     (hx : 1 < ‖x‖) (h0 : 4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6 = 0) : ‖x‖ = 4 := by
   refine le_antisymm (psi_zero_le h2 hb2.le hb4 hb6 h0) ?_
   by_contra hlt
   push_neg at hlt
-  have e1 : ‖x‖ ^ 3 / 4 < ‖x‖ ^ 2 := by nlinarith [mul_pos (pow_pos (by linarith : (0:ℝ) < ‖x‖) 2) (sub_pos.2 hlt)]
-  have e2 : ‖x‖ / 2 < ‖x‖ ^ 2 := by nlinarith
-  have e3 : 1 < ‖x‖ ^ 2 := by nlinarith
+  have e1 : ‖x‖ ^ 3 / 4 < ‖x‖ ^ 2 := by linarith [mul_pos (pow_pos (by linarith : (0:ℝ) < ‖x‖) 2) (sub_pos.2 hlt)]
+  have e2 : ‖x‖ / 2 < ‖x‖ ^ 2 := by
+    calc ‖x‖ / 2 < ‖x‖ * 1 := by linarith
+      _ < ‖x‖ * ‖x‖ := mul_lt_mul_of_pos_left hx (by linarith)
+      _ = ‖x‖ ^ 2 := (sq _).symm
+  have e3 : 1 < ‖x‖ ^ 2 := one_lt_pow₀ hx (by norm_num)
   have hd : ‖b2 * x ^ 2‖ = ‖x‖ ^ 2 := by rw [norm_mul, hb2, one_mul, norm_pow]
   have hr : ‖4 * x ^ 3 + 2 * b4 * x + b6‖ < ‖b2 * x ^ 2‖ := by
     rw [hd]
@@ -191,7 +205,7 @@ lemma psi_zero_eq (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ = 1) (hb4 : ‖b
   have key := ndom hr
   rw [show b2 * x ^ 2 + (4 * x ^ 3 + 2 * b4 * x + b6) = 4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6 by ring,
     h0, norm_zero, hd] at key
-  nlinarith
+  linarith
 
 lemma four_add_le (h2 : ‖(2 : K)‖ = 2⁻¹) (hb4 : ‖b4‖ ≤ 1) (hb6 : ‖b6‖ ≤ 1)
     (hx : ‖x‖ = 4) (h0 : 4 * x ^ 3 + b2 * x ^ 2 + 2 * b4 * x + b6 = 0) :
@@ -201,7 +215,7 @@ lemma four_add_le (h2 : ‖(2 : K)‖ = 2⁻¹) (hb4 : ‖b4‖ ≤ 1) (hb6 : �
     nadd_le ((tb4 h2 hb4 x).trans (by rw [hx]; norm_num)) (hb6.trans (by norm_num))
   have hm := congrArg norm e
   rw [norm_mul, norm_pow, hx, norm_neg] at hm
-  nlinarith [norm_nonneg (4 * x + b2)]
+  linarith [norm_nonneg (4 * x + b2)]
 
 lemma psi_zero_unique (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ ≤ 1) (hb4 : ‖b4‖ ≤ 1) (hb6 : ‖b6‖ ≤ 1)
     {x' : K} (hx : ‖x‖ = 4) (hx' : ‖x'‖ = 4)
@@ -225,7 +239,7 @@ lemma psi_zero_unique (h2 : ‖(2 : K)‖ = 2⁻¹) (hb2 : ‖b2‖ ≤ 1) (hb4 
     linarith
   have a3 : ‖2 * b4‖ < 4 := by
     rw [norm_mul, h2]
-    nlinarith [norm_nonneg b4]
+    linarith [norm_nonneg b4]
   have hr : ‖x * (4 * x + b2) + x' * (4 * x' + b2) + 2 * b4‖ < ‖4 * x * x'‖ := by
     rw [hdom]
     exact nadd_lt (nadd_lt a1 a2) a3
@@ -357,7 +371,7 @@ lemma two_torsion_kernel_norm_unique (hW : IntCurve W) (h2 : ‖(2 : K)‖ = 2�
   obtain ⟨-, hb4, hb6, -⟩ := b_int W h1 h2a h3 h4 h6
   have hb2 : ‖W.b₂‖ = 1 := by
     simp only [WeierstrassCurve.b₂]
-    rw [ndom (by rw [norm_pow, ha, one_pow, norm_mul, n4 h2]; nlinarith [norm_nonneg W.a₂]),
+    rw [ndom (by rw [norm_pow, ha, one_pow, norm_mul, n4 h2]; linarith [norm_nonneg W.a₂]),
       norm_pow, ha, one_pow]
   cases P with
   | zero => exact (hP0 rfl).elim
@@ -412,7 +426,7 @@ theorem kappa_norm_holds : KapNorm := by
   have t1 : ‖3 * x ^ 2‖ = ‖x‖ ^ 2 := by rw [norm_mul, n3 h2, one_mul, norm_pow]
   have t2 : ‖2⁻¹ * W.b₂ * x‖ ≤ 2 * ‖x‖ := by
     rw [norm_mul, norm_mul, ni]
-    nlinarith [mul_le_mul_of_nonneg_right hb2 (norm_nonneg x), norm_nonneg W.b₂]
+    linarith [mul_le_mul_of_nonneg_right hb2 (norm_nonneg x), norm_nonneg W.b₂]
   have t3 : ‖2⁻¹ * W.b₄‖ ≤ 2 := by
     rw [norm_mul, ni]
     linarith
@@ -426,6 +440,7 @@ theorem kappa_norm_holds : KapNorm := by
     norm_num
   · intro hx
     have r0 := norm_nonneg x
-    exact nadd_lt (nadd_lt (by rw [t1]; nlinarith) (t2.trans_lt (by linarith))) (t3.trans_lt (by norm_num))
+    have hx2 : ‖x‖ ^ 2 < 16 := by linarith [pow_lt_pow_left₀ hx r0 (by norm_num : 2 ≠ 0)]
+    exact nadd_lt (nadd_lt (by rw [t1]; exact hx2) (t2.trans_lt (by linarith))) (t3.trans_lt (by norm_num))
 
 end Formalism.L2.Th1.B.KNorm

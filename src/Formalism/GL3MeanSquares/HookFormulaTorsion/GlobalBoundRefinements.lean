@@ -192,7 +192,7 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
         have hn := hw x hx.1 hx.2
         show 0 ≤ (1 - (θ:ℝ) * x ^ (β - 1)) / Real.log x - W * 1 / Real.log b
         rw [mul_one, sub_nonneg, div_le_div_iff₀ hlb hlx]
-        nlinarith [mul_le_mul_of_nonneg_left hlxb hW, mul_le_mul_of_nonneg_right hn hlb.le])
+        linarith [mul_le_mul_of_nonneg_left hlxb hW, mul_le_mul_of_nonneg_right hn hlb.le])
     simp only [sub_self, mul_zero, zero_div, sub_zero] at key
     linarith
 
@@ -256,11 +256,11 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
     obtain ⟨s, hs⟩ : ∃ s, s = Real.sqrt Y := ⟨_, rfl⟩
     have hs0 : 0 ≤ s := by rw [hs]; exact Real.sqrt_nonneg Y
     have hs2 : s ^ 2 = Y := by rw [hs]; exact Real.sq_sqrt (by linarith)
-    have hs36 : 36 ≤ s := by nlinarith
+    have hs36 : 36 ≤ s := (sq_le_sq₀ (by norm_num) hs0).mp (by linarith)
     obtain ⟨r, hr⟩ : ∃ r, r = Real.sqrt s := ⟨_, rfl⟩
     have hr0 : 0 ≤ r := by rw [hr]; exact Real.sqrt_nonneg s
     have hr2 : r ^ 2 = s := by rw [hr]; exact Real.sq_sqrt hs0
-    have hr6 : 6 ≤ r := by nlinarith
+    have hr6 : 6 ≤ r := (sq_le_sq₀ (by norm_num) hr0).mp (by linarith)
     have hrpos : 0 < r := by linarith
     have hlogs : Real.log s = 2 * Real.log r := by
       rw [← hr2, Real.log_pow]
@@ -275,18 +275,19 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
       norm_num at this
       linarith
     have hl2pos : 0 < Real.log 2 := by linarith
-    have h1 := gl2a4_Li_sub_le (a := s) (b := Y) (by linarith) (by nlinarith)
+    have h1 := gl2a4_Li_sub_le (a := s) (b := Y) (by linarith)
+      (by linarith [le_self_pow₀ (by linarith : 1 ≤ s) two_ne_zero])
     have h2 := gl2a4_Li_sub_le (a := 2) (b := s) (by norm_num) (by linarith)
     rw [gl2a4_Li_two] at h2
     have hkey' : 2 * (2 * Real.log r) ≤ r ^ 2 * Real.log 2 := by
-      nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ r - 6) (by linarith : (0:ℝ) ≤ r - 6),
+      linarith [mul_nonneg (by linarith : (0:ℝ) ≤ r - 6) (by linarith : (0:ℝ) ≤ r - 6),
         mul_le_mul_of_nonneg_left hl2.le (sq_nonneg r)]
     have hkey : 2 * Real.log s ≤ s * Real.log 2 := by
       rw [hlogs, ← hr2]
       exact hkey'
     have hA : (s - 2) / Real.log 2 ≤ s ^ 2 / (2 * Real.log s) := by
       rw [div_le_div_iff₀ hl2pos (by linarith)]
-      nlinarith [mul_le_mul_of_nonneg_left hkey hs0]
+      linarith [mul_le_mul_of_nonneg_left hkey hs0]
     have hB : (Y - s) / Real.log s ≤ s ^ 2 / Real.log s :=
       div_le_div_of_nonneg_right (by linarith) hLpos.le
     have hC : s ^ 2 / Real.log s + s ^ 2 / (2 * Real.log s) = 3 * s ^ 2 / (2 * Real.log s) := by
@@ -354,12 +355,12 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
           simp
         have e3 : 0 < Real.exp (-x) := Real.exp_pos _
         have e4 : Real.exp (-x) * (x + 1) ≤ 1 := by
-          nlinarith [mul_le_mul_of_nonneg_left e1 e3.le]
+          linarith [mul_le_mul_of_nonneg_left e1 e3.le]
         have e5 : 1 ≤ x * B ^ 2 := by rwa [div_le_iff₀ hB2pos] at hd'
-        have hy : x ≤ (1 - Real.exp (-x)) * (1 + x) := by nlinarith
+        have hy : x ≤ (1 - Real.exp (-x)) * (1 + x) := by linarith
         have hBx : x ≤ x * B ^ 2 := le_mul_of_one_le_right hx0 hB2
         have key : 1 * (1 + x) ≤ (1 - Real.exp (-x)) * (2 * B ^ 2) * (1 + x) := by
-          nlinarith [mul_le_mul_of_nonneg_left hy (by linarith : (0:ℝ) ≤ 2 * B ^ 2)]
+          linarith [mul_le_mul_of_nonneg_left hy (by linarith : (0:ℝ) ≤ 2 * B ^ 2)]
         have key2 := le_of_mul_le_mul_right key (by linarith : (0:ℝ) < 1 + x)
         rw [div_le_iff₀ (by linarith)]
         linarith
@@ -373,7 +374,7 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
         have g2 : (Z ^ 2) ^ (β - 1) = Z ^ (β - 1) * Z ^ (β - 1) := by
           rw [sq, Real.mul_rpow hZ0.le hZ0.le]
         rw [show ((1:ℤ):ℝ) = 1 by norm_num]
-        nlinarith [mul_self_nonneg (1 - Z ^ (β - 1))]
+        linarith [mul_self_nonneg (1 - Z ^ (β - 1))]
 
   have gl2a4_E_nonneg {θ : ℤ} (hθ : θ = -1 ∨ θ = 0 ∨ θ = 1) {β Y : ℝ} (h1 : 1 / 2 ≤ β)
       (h2 : β < 1) (hY : 4 ≤ Y) : 0 ≤ Emain θ β Y := by
@@ -403,12 +404,12 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
     have e1 : Real.exp (-c * Real.log X' / Real.log B) ≤ Real.exp (-c * Real.log X / Real.log B) := by
       apply Real.exp_le_exp.mpr
       apply div_le_div_of_nonneg_right _ hlogB.le
-      nlinarith [mul_le_mul_of_nonneg_left hlogle hc.le]
+      linarith [mul_le_mul_of_nonneg_left hlogle hc.le]
     have e2 : Real.exp (-c * Real.sqrt (Real.log X')) ≤ Real.exp (-c * Real.sqrt (Real.log X)) := by
       apply Real.exp_le_exp.mpr
       have := Real.sqrt_le_sqrt hlogle
-      nlinarith [mul_le_mul_of_nonneg_left this hc.le]
-    nlinarith [mul_le_mul_of_nonneg_left e1 hC.le, mul_le_mul_of_nonneg_left e2 hC.le]
+      linarith [mul_le_mul_of_nonneg_left this hc.le]
+    linarith [mul_le_mul_of_nonneg_left e1 hC.le, mul_le_mul_of_nonneg_left e2 hC.le]
 
   have gl2a4_root {B X : ℝ} (hB : 4 ≤ B) (hX : B ^ (60 : ℝ) ≤ X) :
       ∃ u : ℝ, 1024 ≤ u ∧ u ^ 12 = X ∧ Real.sqrt X = u ^ 6 ∧ X ^ ((1 : ℝ) / 3) = u ^ 4 ∧
@@ -492,7 +493,7 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
       have e : 1 / (2 * B ^ 2) * q / 2 = q / (4 * B ^ 2) := by ring
       rw [e]
       exact div_le_div_of_nonneg_left hq0 (by positivity)
-        (by nlinarith [mul_le_mul_of_nonneg_left hB3 (by positivity : (0:ℝ) ≤ B ^ 2), sq_nonneg B])
+        (by linarith [mul_le_mul_of_nonneg_left hB3 (by positivity : (0:ℝ) ≤ B ^ 2), sq_nonneg B])
     rw [hT]
     linarith
 
@@ -507,14 +508,20 @@ private lemma exceptional_zero_estimates {B β X : ℝ} {θ : ℤ}
     linarith [pow_one u]
   have hXbig : 1296 ≤ X := by
     have h2 : u ^ 2 ≤ u ^ 12 := pow_le_pow_right₀ (by linarith) (by norm_num)
-    nlinarith
+    have hu2 : (1024 : ℝ) ^ 2 ≤ u ^ 2 := pow_le_pow_left₀ (by norm_num) hu 2
+    norm_num at hu2; linarith
   have hX1 : 1 < X := by linarith
   have hL : 0 < Real.log X := Real.log_pos hX1
   have hh0 : 0 < h := by linarith [gl2a4_rho_pos (c := cr) (B := B) (X := X) hCr]
   set X' := X * (1 + h) with hX'
-  have hXX' : X ≤ X' := by rw [hX']; nlinarith
-  have hX'2 : X' ≤ 2 * X := by rw [hX']; nlinarith
-  have hX'sq : X' ≤ X ^ 2 := by nlinarith
+  have hXX' : X ≤ X' := by rw [hX']; exact le_mul_of_one_le_right hX0.le (by linarith)
+  have hX'2 : X' ≤ 2 * X := by
+    rw [hX']
+    calc X * (1 + h) ≤ X * (1 + 1) := mul_le_mul_of_nonneg_left (by linarith) hX0.le
+      _ = 2 * X := by ring
+  have hX'sq : X' ≤ X ^ 2 := by
+    have : 2 * X ≤ X * X := mul_le_mul_of_nonneg_right (by linarith) hX0.le
+    linarith
   have hX'0 : 0 < X' := by linarith
   obtain ⟨W, hW1, hW2, hWlo, hWhi⟩ := gl2a4_weight hθ hβ2 (B := B) (Z := X) (by linarith) (by linarith)
     (by
@@ -739,9 +746,9 @@ theorem shortIntervalImpliesProgressions_statement : ShortIntervalImpliesProgres
   have hpos : 0 < h := by
     by_contra hneg
     push_neg at hneg
-    nlinarith
+    linarith [mul_nonpos_of_nonpos_of_nonneg hneg hY13]
   have hfl1 : 1 ≤ ⌊Y⌋₊ := Nat.le_floor (by exact_mod_cast hY1)
-  have hfl2 : ⌊Y⌋₊ ≤ ⌊Y * (1 + h)⌋₊ := Nat.floor_mono (by nlinarith)
+  have hfl2 : ⌊Y⌋₊ ≤ ⌊Y * (1 + h)⌋₊ := Nat.floor_mono (le_mul_of_one_le_right hYpos.le (by linarith))
   have hunion : Icc 1 ⌊Y * (1 + h)⌋₊ = Icc 1 ⌊Y⌋₊ ∪ Ioc ⌊Y⌋₊ ⌊Y * (1 + h)⌋₊ := by
     ext x
     simp only [Finset.mem_union, Finset.mem_Icc, Finset.mem_Ioc]
@@ -1074,16 +1081,18 @@ theorem log_l_value_field_bound : LogLFunctionEulerBound := by
         by_contra h
         have h1k : k = 1 := by omega
         rw [hk, h1k, pow_one] at hN
-        have := hp.two_le
-        nlinarith
+        have hp2 := hp.two_le
+        have hmul : residueCharacteristic P * 2 ≤ residueCharacteristic P * residueCharacteristic P := Nat.mul_le_mul_left _ hp2
+        rw [← sq] at hmul
+        omega
       rw [hc]
       have : (2 : ℝ) ≤ k := by exact_mod_cast hk2
-      nlinarith
+      linarith [mul_le_mul_of_nonneg_right (show (1 : ℝ) ≤ (k : ℝ) / 2 by linarith) hg]
     · obtain ⟨h1, h2⟩ := euler_factor_split_prime_bound M hM _ hp (Ideal.absNorm P) (by rw [hk]; exact Nat.le_self_pow (by omega) _)
       refine ⟨h1, h2.trans ?_⟩
       rw [hc]
       have : (1 : ℝ) ≤ k := by exact_mod_cast hk1
-      nlinarith
+      linarith [mul_le_mul_of_nonneg_right (show (1 / 2 : ℝ) ≤ (k : ℝ) / 2 by linarith) hg]
 
   have partial_sums_log_euler_factor_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (M : ℕ) (hM : 2 ≤ M)
       (u : Finset {P : Ideal (𝓞 K) // P.IsMaximal}) :
