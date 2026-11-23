@@ -181,8 +181,7 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 theorem gram_determinant_ne_zero : DetGaNe := by
   intro D T T' Z hG
   rw [DetGa.det_Ga]
-  refine mul_ne_zero ?_ hG
-  rcases Int.units_eq_one_or (Equiv.Perm.sign (Equiv.sumComm (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)))) with h | h <;>
-    rw [h] <;> simp
+  exact mul_ne_zero (Int.cast_ne_zero.mpr (Units.ne_zero
+    (Equiv.Perm.sign (Equiv.sumComm (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)))))) hG
 
 end PI.UnitaryGroupMassFormula.CntFormula

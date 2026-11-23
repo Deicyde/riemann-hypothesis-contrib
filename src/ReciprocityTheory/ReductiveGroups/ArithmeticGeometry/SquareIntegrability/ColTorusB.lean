@@ -77,13 +77,16 @@ theorem ct_expo_num (q c : ℕ) (hq : 1 ≤ q) {U y M1 r : ℝ} (hU : 0 ≤ U) (
   have hX0 : 0 ≤ q * r ^ 2 := by positivity
   have hXa : q * r ^ 2 ≤ (r * Real.sqrt (q * (c + 1))) / 5 := by
     have h2 : (q * r ^ 2) * (c + 1) ≤ (r * Real.sqrt (q * (c + 1))) / 5 * (c + 1) := by
-      rw [hX]; nlinarith
+      rw [hX]
+      have := mul_le_mul_of_nonneg_left ha ha0
+      linarith
     exact le_of_mul_le_mul_right h2 (by positivity)
   have ht0 : 0 ≤ q * y ^ 2 := by positivity
   have hP0 : 0 ≤ r * q * y := by positivity
   have hPsq : (r * q * y) ^ 2 = (q * r ^ 2) * (q * y ^ 2) := by ring
   have hP : 2 * (r * q * y) ≤ 20 * (q * r ^ 2) + (q * y ^ 2) / 20 := by
-    nlinarith [sq_nonneg (20 * (q * r ^ 2) - (q * y ^ 2) / 20)]
+    have := mul_nonneg (Nat.cast_nonneg q : (0 : ℝ) ≤ q) (sq_nonneg (20 * r - y))
+    linarith
   have F1 : π * (q * r ^ 2) ≤ 3.15 * (q * r ^ 2) := mul_le_mul_of_nonneg_right hπ2.le hX0
   have F2 : π * (2 * (r * q * y)) ≤ π * (20 * (q * r ^ 2) + (q * y ^ 2) / 20) :=
     mul_le_mul_of_nonneg_left hP Real.pi_pos.le
@@ -92,8 +95,7 @@ theorem ct_expo_num (q c : ℕ) (hq : 1 ≤ q) {U y M1 r : ℝ} (hU : 0 ≤ U) (
   have F4 : π * (q / 2) * y ^ 2 ≤ π * (q - M1) * y ^ 2 := by
     have : (q : ℝ) / 2 ≤ q - M1 := by linarith
     have hy2 := sq_nonneg y
-    have := mul_le_mul_of_nonneg_left this Real.pi_pos.le
-    nlinarith
+    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left this Real.pi_pos.le) hy2
   linarith [F1, F2, F3, F3', F4, h1, hXa, ha, ht, hA]
 
 theorem ct_base_num (q c : ℕ) (hq : 1 ≤ q) {t0 : ℝ}
@@ -106,7 +108,7 @@ theorem ct_base_num (q c : ℕ) (hq : 1 ≤ q) {t0 : ℝ}
     exact Real.one_le_exp (by linarith)
   have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq
   have hc1 : (1 : ℝ) ≤ c := by exact_mod_cast hc
-  have hqc1 : (1 : ℝ) ≤ q * c := by nlinarith
+  have hqc1 : (1 : ℝ) ≤ q * c := one_le_mul_of_one_le_of_one_le hq1 hc1
   have hL0 : 0 ≤ Real.log (q * c) := Real.log_nonneg hqc1
   have hS : 0 < Real.sqrt (q * (c + 1)) := Real.sqrt_pos.mpr (by positivity)
   have hB : 0 < 6.5 * Real.exp 1.07 * Real.sqrt (q * (c + 1)) := by positivity
@@ -122,7 +124,8 @@ theorem ct_base_num (q c : ℕ) (hq : 1 ≤ q) {t0 : ℝ}
   have h2 := Real.log_two_lt_d9
   have hqc : Real.log (q * (c + 1)) ≤ Real.log 2 + Real.log (q * c) := by
     rw [← Real.log_mul (by norm_num) (by positivity)]
-    exact Real.log_le_log (by positivity) (by nlinarith)
+    have := mul_le_mul_of_nonneg_left hc1 (by linarith : (0 : ℝ) ≤ q)
+    exact Real.log_le_log (by positivity) (by linarith)
   have key : Real.log (6.5 * Real.exp 1.07 * Real.sqrt (q * (c + 1))) ≤
       0.56 * (7 + Real.log (q * c)) := by
     rw [hlogB]; linarith
@@ -170,10 +173,12 @@ theorem jet_product_le (q c dK gA dst : ℕ) (hq : 1 ≤ q) {n U t0 Bsq : ℝ} (
       7 * 2 ^ gA * (4.3 : ℝ) ^ dst * Real.exp (-t0) * n ^ c := by
   have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq
   have hc0 : (0 : ℝ) ≤ c := Nat.cast_nonneg c
-  have hS1 : 1 ≤ Real.sqrt (q * (c + 1)) := Real.one_le_sqrt.mpr (by nlinarith)
+  have hS1 : 1 ≤ Real.sqrt (q * (c + 1)) := Real.one_le_sqrt.mpr (one_le_mul_of_one_le_of_one_le hq1 (by linarith))
   have hn0 : 0 ≤ n := by linarith
   have hbase : 2 * π * U + 5 * Real.sqrt (q * (c + 1)) ≤ 6.5 * Real.sqrt (q * (c + 1)) * n := by
-    nlinarith
+    have h1 := mul_le_mul_of_nonneg_left hn (zero_le_one.trans hS1)
+    have h2 := mul_le_mul_of_nonneg_right hS1 hn0
+    linarith
   have hpow : (2 * π * U + 5 * Real.sqrt (q * (c + 1))) ^ c ≤
       (6.5 * Real.exp 1.07 * Real.sqrt (q * (c + 1))) ^ c * Real.exp (-(1.07 * c)) * n ^ c := by
     have e : (6.5 * Real.exp 1.07 * Real.sqrt (q * (c + 1))) ^ c * Real.exp (-(1.07 * c)) =

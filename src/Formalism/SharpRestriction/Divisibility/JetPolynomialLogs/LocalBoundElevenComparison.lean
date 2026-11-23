@@ -96,11 +96,10 @@ theorem local_bound_eleven_comparison (L : product_zeroth_first_parts.Loc) (k : 
 
 theorem corollary_split_eleven_one (hB : TieB) (hB0 : KernelFromExponentialTwist) (hF : TieFrame) (L : product_zeroth_first_parts.Loc) (hL : L.AdmB) : L.Cor2 11 1 := by
   intro a ha k w E hk hw hE hD1 hD2
-  have hlp := local_bound_eleven_comparison L k w E hk hw hE hD1 hD2
   refine kval_mono (thmA_of hB hB0 hF L hL a ha) ?_
-  have hg := Finset.sum_le_sum (s := L.TT) fun s _ => base_term_le_top_term L s
   rw [Finset.sum_sub_distrib, ← Finset.mul_sum]
-  linarith
+  linarith [local_bound_eleven_comparison L k w E hk hw hE hD1 hD2,
+    Finset.sum_le_sum (s := L.TT) fun s _ => base_term_le_top_term L s]
 
 theorem split_bound_eleven_one : product_zeroth_first_parts.SplitConstantsUniformBound 11 1 := by
   unfold product_zeroth_first_parts.SplitConstantsUniformBound

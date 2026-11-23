@@ -68,29 +68,21 @@ private theorem apply_mul_le_weight_apply {σ : Type*} (w : σ → (σ →₀ �
 
 theorem lctwo_le_weight {r n : ℕ} {l j : Fin n} (hlj : l ≠ j) (d : Fin r × Fin n →₀ ℕ) (b : Fin r) :
     d (b, l) ≤ Finsupp.weight (pairW l j) d (b, l) ∧ d (b, j) ≤ Finsupp.weight (pairW l j) d (b, l) := by
-  have hl : pairW (r := r) l j (b, l) = Finsupp.single (b, l) 1 := by
-    simp [pairW, hlj]
-  have hj : pairW (r := r) l j (b, j) = Finsupp.single (b, l) 1 := by
-    simp [pairW]
   constructor
-  · have h := apply_mul_le_weight_apply (pairW l j) d (b, l) (b, l)
-    rwa [hl, Finsupp.single_eq_same, mul_one] at h
-  · have h := apply_mul_le_weight_apply (pairW l j) d (b, j) (b, l)
-    rwa [hj, Finsupp.single_eq_same, mul_one] at h
+  · simpa [pairW, hlj, Finsupp.single_eq_same] using apply_mul_le_weight_apply (pairW l j) d (b, l) (b, l)
+  · simpa [pairW, Finsupp.single_eq_same] using apply_mul_le_weight_apply (pairW l j) d (b, j) (b, l)
 
 theorem lctwo_le_of_mem {B : Type*} [CommRing B] {r n : ℕ} {l j : Fin n} (hlj : l ≠ j)
     {ω : Fin r × Fin n →₀ ℕ} {p : MvPolynomial (Fin r × Fin n) B}
     (hp : IsWeightedHomogeneous (pairW l j) p ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ p.support) (b : Fin r) :
     m (b, l) ≤ ω (b, l) ∧ m (b, j) ≤ ω (b, l) := by
   have h := hp (MvPolynomial.mem_support_iff.mp hm)
-  rw [← h]
-  exact lctwo_le_weight hlj m b
+  simpa [← h] using lctwo_le_weight hlj m b
 
 theorem lctwo_sum_ite {r : ℕ} (a : Fin r) (e : ℕ) (f : Fin r → ℕ) (P : Fin r → Prop) [DecidablePred P] :
     (∑ b : Fin r with P b, ((if a = b then e else 0) + f b)) =
       (if P a then e else 0) + ∑ b : Fin r with P b, f b := by
-  rw [Finset.sum_add_distrib]
-  simp [Finset.sum_ite_eq]
+  simp [Finset.sum_add_distrib, Finset.sum_ite_eq]
 
 theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : PeelDegBound)
     (B : Type) [CommRing B] [IsDomain B] (r n : ℕ) (l j : Fin n) (hlj : l < j) :

@@ -105,9 +105,8 @@ theorem discr_pos : (0 : ℝ) < d := by
   exact_mod_cast (by omega : 0 < d)
 
 theorem norm_eq_sq (x : K) : (Algebra.norm ℚ x : ℝ) = ‖σ x‖ ^ 2 := by
-  obtain ⟨b, t, h0, -, hi⟩ := exists_basis_embedding h2 hD σ
-  have hd := discr_pos h2 hD
-  have hi0 : (σ (b 1)).im ≠ 0 := fun h => by rw [h] at hi; linarith
+  obtain ⟨b, -, h0, -, hi⟩ := exists_basis_embedding h2 hD σ
+  have hi0 : (σ (b 1)).im ≠ 0 := fun h => by rw [h] at hi; linarith [discr_pos h2 hD]
   let b' : Basis (Fin 2) ℚ K := b.localizationLocalization ℚ ℤ⁰ K
   have e0 : b' 0 = 1 := by simp [b', h0]
   have e1 : b' 1 = b 1 := by simp [b']
@@ -126,11 +125,7 @@ theorem absNorm_mul_sqrt (I : FractionalIdeal (𝓞 K)⁰ K)
     (absNorm I : ℝ) * (√d / 2) = |(σ (bI 1) * conj (σ (bI 0))).im| := by
   obtain ⟨b, t, h0, -, hi⟩ := exists_basis_embedding h2 hD σ
   let b' : Basis (Fin 2) ℚ K := b.localizationLocalization ℚ ℤ⁰ K
-  have e0 : b' 0 = 1 := by simp [b', h0]
-  have e1 : b' 1 = b 1 := by simp [b']
-  rw [← det_mul_im σ b' e0, ← abs_det_basis_change b I bI, abs_mul, e1, ← hi,
-    show 4 * (σ (b 1)).im ^ 2 = (2 * (σ (b 1)).im) ^ 2 by ring, Real.sqrt_sq_eq_abs, abs_mul,
-    show Subtype.val ∘ bI = ![(bI 0 : K), bI 1] by ext i; fin_cases i <;> rfl]
+  rw [← det_mul_im σ b' (by simp [b', h0]), ← abs_det_basis_change b I bI, abs_mul, show b' 1 = b 1 by simp [b'], ← hi, show 4 * (σ (b 1)).im ^ 2 = (2 * (σ (b 1)).im) ^ 2 by ring, Real.sqrt_sq_eq_abs, abs_mul, show Subtype.val ∘ bI = ![(bI 0 : K), bI 1] by ext i; fin_cases i <;> rfl]
   push_cast
   rw [abs_two]
   ring
@@ -276,7 +271,6 @@ theorem hasSum_ideal_of_image (hd : 4 < d) (𝔞 : (FractionalIdeal (𝓞 K)⁰ 
       ((2 / √d) ^ s * ∑' p : {p : ℤ × ℤ // p ≠ 0},
         τ.im ^ s / ‖(p.1.1 * τ + p.1.2 : ℂ)‖ ^ (2 * s)) := by
   have hω := ne_zero_of_image σ 𝔞.ne_zero h
-  have hd0 := discr_pos h2 hD
   have hy := τ.im_pos
   obtain ⟨b, e0, e1⟩ := exists_basis_of_image σ hω h
   refine hasSum_ideal h2 hD σ hd 𝔞 (by linarith) ?_

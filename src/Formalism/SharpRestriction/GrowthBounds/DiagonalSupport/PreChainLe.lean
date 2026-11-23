@@ -62,46 +62,19 @@ private theorem ll_mem_preimage_SLt_posU_iff (hV : Fr.Valid L₁ N₁) (hnL : �
     (j j' : ZMod J) (l : Fin (Dt.nL j')) (t : ℕ) (ht : t < Dt.nL j + r) :
     (ML.ll j' l : ML J Dt.nL r) ∈ mlPos Fr Dt.nL ⁻¹' SLt j (posU Fr (Dt.nL j) (segZ j) t) ↔
       j' = j ∧ l.val < t := by
-  simp only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq]
-  constructor
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_ll' (segZ j') (Dt.nL j') l.val l.isLt] at h
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') l.val t (by omega) ht).1 h
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_ll' (segZ j') (Dt.nL j') l.val l.isLt]
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') l.val t (by omega) ht).2 h
+  simpa only [Set.mem_preimage] using ml_ll_lt hV hnL j t ht j' l
 
 private theorem lab_mem_preimage_SLt_posU_iff (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
     (j j' : ZMod J) (m : Fin r) (t : ℕ) (ht : t < Dt.nL j + r) :
     (ML.lab j' m : ML J Dt.nL r) ∈ mlPos Fr Dt.nL ⁻¹' SLt j (posU Fr (Dt.nL j) (segZ j) t) ↔
       j' = j ∧ Dt.nL j + (r - 1 - m.val) < t := by
-  simp only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq]
-  constructor
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_fr' (segZ j') (Dt.nL j') (r - 1 - m.val)] at h
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') _ t (by omega) ht).1 h
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_fr' (segZ j') (Dt.nL j') (r - 1 - m.val)]
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') _ t (by omega) ht).2 h
+  simpa only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq] using fr_lt hV hnL j t ht j' m
 
 private theorem tp_mem_preimage_SLt_posU_iff (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
     (j j' : ZMod J) (m : Fin r) (hm : 1 ≤ m.val) (t : ℕ) (ht : t < Dt.nL j + r) :
     (ML.tp j' m hm : ML J Dt.nL r) ∈ mlPos Fr Dt.nL ⁻¹' SLt j (posU Fr (Dt.nL j) (segZ j) t) ↔
       j' = j ∧ Dt.nL j + (r - 1 - m.val) < t := by
-  simp only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq]
-  constructor
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_fr' (segZ j') (Dt.nL j') (r - 1 - m.val)] at h
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') _ t (by omega) ht).1 h
-  · rintro ⟨rfl, h⟩
-    refine ⟨rfl, ?_⟩
-    rw [← posU_fr' (segZ j') (Dt.nL j') (r - 1 - m.val)]
-    exact (posU_lt_iff' hV (segZ j') (Dt.nL j') (hnL j') _ t (by omega) ht).2 h
+  simpa only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq] using fr_lt hV hnL j t ht j' m
 
 private theorem wc_mem_preimage_SLt_posU_iff (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r)
     (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
@@ -109,12 +82,9 @@ private theorem wc_mem_preimage_SLt_posU_iff (hV : Fr.Valid L₁ N₁) (hr : 1 �
     (ML.wc j' m : ML J Dt.nL r) ∈ mlPos Fr Dt.nL ⁻¹' SLt j (posU Fr (Dt.nL j) (segZ j) t) ↔
       j' + 1 = j := by
   simp only [Set.mem_preimage, mlPos, SLt, Set.mem_setOf_eq]
-  constructor
-  · rintro ⟨h, -⟩
-    exact h
-  · rintro rfl
-    refine ⟨rfl, ?_⟩
-    exact w_lt_posU' hV hr (segZ (j' + 1)) (Dt.nL (j' + 1)) (hnL _) (r - 1 - m.val) t (by omega) ht
+  refine ⟨And.left, ?_⟩
+  rintro rfl
+  exact ⟨rfl, w_lt_posU' hV hr (segZ (j' + 1)) (Dt.nL (j' + 1)) (hnL _) (r - 1 - m.val) t (by omega) ht⟩
 
 theorem pre_chain (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
     (hch : ∀ j (i : Fin (Dt.nch j)), Dt.chain j i =
@@ -320,8 +290,7 @@ theorem tl_letters (hV : Fr.Valid L₁ N₁) (hsgn : ∀ j l, Dt.sgn j l = decid
   · simp [LSeg, tlPos, posTL, he _ _ (by omega : r - 1 - m.val < r)]
 
 theorem geZ_le {x : WithTop ℤ} {s t : ℝ} (h : s ≤ t) (hx : geZ x t) : geZ x s := by
-  intro k hk
-  exact h.trans (hx k hk)
+  exact fun k hk => h.trans (hx k hk)
 
 variable [NeZero r]
 
@@ -359,19 +328,15 @@ theorem val_of_pre (hV : Fr.Valid L₁ N₁) (hsgn : ∀ j l, Dt.sgn j l = decid
     geZ (valS (LSeg J) S (xiPl Fr O Dt.nL Go)) t := by
   rw [Formalism.MainNotions.G.Joints.StandardMonomialSpace.valS_map (algebraMap O (KK O)) (IsFractionRing.injective O (KK O))] at h
   have hsub : sDegs (LSeg J) S (lastIdx r) (xiPl Fr O Dt.nL Go) ⊆ sDegs Dt.modelLet T (lastIdx r) Go := by
-    have hs := sDegs_rename_subset_sDegs_preimage (mlPos Fr Dt.nL) (LSeg J) S (lastIdx r) Go
-    rw [hpre, ml_letters Dt hV hsgn] at hs
-    exact hs
+    rw [← ml_letters Dt hV hsgn, ← hpre]
+    exact sDegs_rename_subset_sDegs_preimage (mlPos Fr Dt.nL) (LSeg J) S (lastIdx r) Go
   have hle : valS Dt.modelLet T Go ≤ valS (LSeg J) S (xiPl Fr O Dt.nL Go) := Finset.inf_mono hsub
   intro k hk
   rw [hk] at hle
-  have hne : valS Dt.modelLet T Go ≠ ⊤ := ne_top_of_le_ne_top WithTop.coe_ne_top hle
-  obtain ⟨k', hk'⟩ := WithTop.ne_top_iff_exists.1 hne
+  obtain ⟨k', hk'⟩ := WithTop.ne_top_iff_exists.1 (ne_top_of_le_ne_top WithTop.coe_ne_top hle)
   rw [← hk'] at hle
-  have h1 := h k' hk'.symm
-  have h2 : k' ≤ k := WithTop.coe_le_coe.1 hle
-  have h3 : (k' : ℝ) ≤ k := by exact_mod_cast h2
-  linarith
+  have h2 : (k' : ℝ) ≤ k := by exact_mod_cast WithTop.coe_le_coe.1 hle
+  linarith [h k' hk'.symm]
 
 theorem lam_of_pre {K : ℕ} [NeZero K] (hV : Fr.Valid L₁ N₁)
     (hsgn : ∀ j l, Dt.sgn j l = decide (Even (llPos Fr (segZ j) l.val)))
@@ -381,9 +346,8 @@ theorem lam_of_pre {K : ℕ} [NeZero K] (hV : Fr.Valid L₁ N₁)
     lam1S (LSeg J) S (xiNo Fr O K Dt.nL No) ≤ ((M : ℤ) : WithBot ℤ) := by
   rw [Formalism.MainNotions.G.Joints.StandardMonomialSpace.lowest_degree_map_of_injective (algebraMap O (KK O)) (IsFractionRing.injective O (KK O))] at h
   have hsub : sDegs (LSeg J) S (0 : Fin K) (xiNo Fr O K Dt.nL No) ⊆ sDegs Dt.trueLet T (0 : Fin K) No := by
-    have hs := sDegs_rename_subset_sDegs_preimage (tlPos Fr Dt.nL) (LSeg J) S (0 : Fin K) No
-    rw [hpre, tl_letters Dt hV hsgn] at hs
-    exact hs
+    rw [← tl_letters Dt hV hsgn, ← hpre]
+    exact sDegs_rename_subset_sDegs_preimage (tlPos Fr Dt.nL) (LSeg J) S (0 : Fin K) No
   have hle : lam1S (LSeg J) S (xiNo Fr O K Dt.nL No) ≤ lam1S Dt.trueLet T No := Finset.sup_mono hsub
   exact hle.trans h
 

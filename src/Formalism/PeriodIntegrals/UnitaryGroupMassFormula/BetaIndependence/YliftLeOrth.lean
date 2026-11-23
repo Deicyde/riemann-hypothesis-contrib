@@ -65,8 +65,7 @@ theorem Hp_le_orth (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice 
 theorem Ylift'_le_orth (Λ : Submodule (𝓞 E) S.V) {T T' : E}
     (F : LFlag S r T) (F' : LFlag S r T') : Ylift' Λ F F' ≤ orth S (Xsp F') := by
   intro v hv
-  have hX : Xsp F' ≤ Xplus F' := (le_sup_left : F'.fl.X ≤ F'.fl.X ⊔ Submodule.span E {F'.fl.z})
-  exact orth_anti hX hv.2
+  exact orth_anti (le_sup_left : F'.fl.X ≤ F'.fl.X ⊔ Submodule.span E {F'.fl.z}) hv.2
 
 theorem mem_ThPairs (Λ : Submodule (𝓞 E) S.V) {T T' : E} (F : LFlag S r T) (F' F'' : LFlag S r T')
     (β : S.V ≃ₗ[E] S.V) (p : S.V × S.V) :

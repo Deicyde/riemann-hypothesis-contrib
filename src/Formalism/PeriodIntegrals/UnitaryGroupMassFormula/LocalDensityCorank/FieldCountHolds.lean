@@ -77,13 +77,12 @@ theorem fld_dvd_iff {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
     have hz' : z = algebraMap F E ((a : F) / ϖ) := by
       rw [div_eq_mul_inv, map_mul, he, mul_comm (algebraMap F E (ϖ : F)) z, mul_assoc, ← map_mul,
         mul_inv_cancel₀ hϖ0, map_one, mul_one]
-    have hm : (a : F) / ϖ ∈ 𝒪[F] :=
-      PI.UnitaryGroupMassFormula.CntFormula.fl_mem_int L (PI.UnitaryGroupMassFormula.CntFormula.fl_inj L) (hz' ▸ hz)
+    have hm := fl_mem_int L (fl_inj L) (hz' ▸ hz)
     refine ⟨⟨_, hm⟩, Subtype.ext ?_⟩
     show (a : F) = (ϖ : F) * ((a : F) / ϖ)
     field_simp
   · rintro ⟨c, rfl⟩
-    exact ⟨algebraMap F E (c : F), PI.UnitaryGroupMassFormula.CntFormula.fl_int_mem L c, by simp [map_mul]⟩
+    exact ⟨algebraMap F E (c : F), fl_int_mem L c, by simp [map_mul]⟩
 
 theorem fld_count_core {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
     [TopologicalSpace E] [MeasurableSpace E] (M : Loc.Model F E) (hl : IsNonarchimedeanLocalField F)

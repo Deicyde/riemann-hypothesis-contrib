@@ -45,128 +45,56 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MatrixCoefficientBound.IrreducibleOfMinimal
 
 @[expose] public section
 
-noncomputable section
-
-open Classical
+open Classical Formalism.L2.SG.GGMirabolic
 
 namespace PI.GGMatBoundW
 
-open Formalism.L2.SG.GGMirabolic
+variable {ι : Type} {Fq : ι → Type} [∀ v, Field (Fq v)] [∀ v, Fintype (Fq v)] {k : ℕ}
+  (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
+  (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
 
-variable {ι : Type} [Fintype ι] {Fq : ι → Type} [∀ v, Field (Fq v)] [∀ v, Fintype (Fq v)] {k : ℕ}
-
-theorem gamProd_conj (ψ : ∀ v, AddChar (Fq v) ℂ) (g x : ∀ v, GL (Fin k) (Fq v)) :
-    gamProd ψ (g * x * g⁻¹) = gamProd ψ x := by
-  unfold gamProd
-  refine Finset.prod_congr rfl fun v _ => ?_
-  exact PI.GGConvScalarW.gam_conj (ψ v) (g v) (x v)
-
-theorem totOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (g : ∀ v, GL (Fin k) (Fq v)) :
-    π g ∘ₗ totOp ψ π = totOp ψ π ∘ₗ π g := by
-  unfold totOp
-  show π g * (∑ x, gamProd ψ x • π x) = (∑ x, gamProd ψ x • π x) * π g
+theorem sum_conj_comm {H G : Type} [Group H] [Fintype H] [Group G] (ρ : Representation ℂ G V)
+    (φ : H →* G) (f : H → ℂ) (hf : ∀ a x, f (a * x * a⁻¹) = f x) (g : G) (a : H)
+    (hg : ∀ x, g * φ x * g⁻¹ = φ (a * x * a⁻¹)) :
+    ρ g ∘ₗ ∑ x, f x • ρ (φ x) = (∑ x, f x • ρ (φ x)) ∘ₗ ρ g := by
+  show ρ g * _ = _ * ρ g
   rw [Finset.mul_sum, Finset.sum_mul]
-  refine Fintype.sum_equiv (MulAut.conj g).toEquiv _ _ (fun x => ?_)
-  simp only [mul_smul_comm, smul_mul_assoc, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv,
-    MulAut.conj_apply]
-  rw [gamProd_conj]
-  congr 1
-  rw [← map_mul, ← map_mul]
-  congr 1
-  group
+  refine Fintype.sum_equiv (MulAut.conj a).toEquiv _ _ fun x => ?_
+  simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply, hf, ← hg,
+    mul_smul_comm, smul_mul_assoc, ← map_mul, inv_mul_cancel_right]
 
-theorem mulSingle_conj (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) (y : GL (Fin k) (Fq v)) :
-    g * Pi.mulSingle v y * g⁻¹ = Pi.mulSingle v (g v * y * (g v)⁻¹) := by
-  funext w
-  by_cases h : w = v
-  · subst h; simp
-  · simp [Pi.mulSingle_eq_of_ne h]
+theorem totOp_comm [Fintype ι] (g : ∀ v, GL (Fin k) (Fq v)) :
+    π g ∘ₗ totOp ψ π = totOp ψ π ∘ₗ π g :=
+  sum_conj_comm π (MonoidHom.id _) (gamProd ψ)
+    (fun a x => Finset.prod_congr rfl fun v _ => PI.GGConvScalarW.gam_conj (ψ v) (a v) (x v))
+    g g fun _ => rfl
 
-theorem placeOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) :
+theorem placeOp_comm (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) :
     π g ∘ₗ placeOp ψ π v = placeOp ψ π v ∘ₗ π g := by
-  unfold placeOp
-  show π g * (∑ y, gam (ψ v) y • π (Pi.mulSingle v y)) = (∑ y, gam (ψ v) y • π (Pi.mulSingle v y)) * π g
-  rw [Finset.mul_sum, Finset.sum_mul]
-  refine Fintype.sum_equiv (MulAut.conj (g v)).toEquiv _ _ (fun y => ?_)
-  simp only [mul_smul_comm, smul_mul_assoc, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv,
-    MulAut.conj_apply]
-  rw [PI.GGConvScalarW.gam_conj]
-  congr 1
-  rw [← map_mul, ← map_mul, ← mulSingle_conj]
-  congr 1
-  group
-
-theorem placeOp_mem (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (v : ι) (W : Submodule ℂ V)
-    (hW : ∀ g, ∀ x ∈ W, π g x ∈ W) (x : V) (hx : x ∈ W) : placeOp ψ π v x ∈ W := by
-  unfold placeOp
-  rw [LinearMap.sum_apply]
-  exact Submodule.sum_mem _ fun y _ => Submodule.smul_mem _ _ (hW _ x hx)
+  refine sum_conj_comm π (MonoidHom.mulSingle _ v) (gam (ψ v))
+    (PI.GGConvScalarW.gam_conj (ψ v)) g (g v) fun y => funext fun w => ?_
+  rcases eq_or_ne w v with rfl | h <;> simp [Pi.mulSingle_eq_of_ne, *]
 
 theorem joint_eigenvector_exists : JointEig := by
   intro ι _ Fq _ _ k ψ V _ _ _ π w μ hw hμ
-  let E : Submodule ℂ V := LinearMap.ker (totOp ψ π - μ • LinearMap.id)
-  have memE : ∀ x, x ∈ E ↔ totOp ψ π x = μ • x := by
-    intro x
-    show x ∈ LinearMap.ker _ ↔ _
-    rw [LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero]
-    simp
-  have Einv : ∀ g, ∀ x ∈ E, π g x ∈ E := by
-    intro g x hx
-    rw [memE] at hx ⊢
-    have h1 := congrArg (fun e : V →ₗ[ℂ] V => e x) (totOp_comm ψ π g)
-    simp only [LinearMap.comp_apply] at h1
-    rw [← h1, hx, map_smul]
-  have hex : ∃ n, ∃ W : Submodule ℂ V, W ≠ ⊥ ∧ W ≤ E ∧ (∀ g, ∀ x ∈ W, π g x ∈ W) ∧
-      Module.finrank ℂ W = n := by
-    refine ⟨_, E, ?_, le_rfl, Einv, rfl⟩
-    intro h
-    apply hw
-    have : w ∈ E := (memE w).2 hμ
-    rw [h] at this
-    exact (Submodule.mem_bot ℂ).1 this
-  obtain ⟨W, hW, hWE, hWinv, hWn⟩ := Nat.find_spec hex
-  have hmin : ∀ W' : Submodule ℂ V, W' ≠ ⊥ → W' ≤ W → (∀ g, ∀ x ∈ W', π g x ∈ W') → W' = W := by
-    intro W' hW' hle hinv
-    have h1 : Nat.find hex ≤ Module.finrank ℂ W' :=
-      Nat.find_min' hex ⟨W', hW', hle.trans hWE, hinv, rfl⟩
-    exact Submodule.eq_of_le_of_finrank_le hle (by omega)
-  refine ⟨W, hW, hWinv, fun x hx => (memE x).1 (hWE hx), fun v => ?_⟩
-  have hmaps : ∀ x ∈ W, placeOp ψ π v x ∈ W := fun x hx => placeOp_mem ψ π v W hWinv x hx
-  let A : W →ₗ[ℂ] W := (placeOp ψ π v).restrict hmaps
-  have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.2 hW
-  obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue A
-  obtain ⟨u, hu⟩ := hc.exists_hasEigenvector
-  refine ⟨c, ?_⟩
-  let W' : Submodule ℂ V := W ⊓ LinearMap.ker (placeOp ψ π v - c • LinearMap.id)
-  have memW' : ∀ x, x ∈ W' ↔ x ∈ W ∧ placeOp ψ π v x = c • x := by
-    intro x
-    simp only [W', Submodule.mem_inf, LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero,
-      LinearMap.smul_apply, LinearMap.id_apply]
-  have hu' : (u : V) ∈ W' := by
-    rw [memW']
-    refine ⟨u.2, ?_⟩
-    have h2 := congrArg Subtype.val hu.apply_eq_smul
-    exact h2
-  have hW'ne : W' ≠ ⊥ := by
-    intro h
-    rw [h] at hu'
-    exact hu.2 (Subtype.ext ((Submodule.mem_bot ℂ).1 hu'))
-  have hW'inv : ∀ g, ∀ x ∈ W', π g x ∈ W' := by
-    intro g x hx
-    rw [memW'] at hx ⊢
-    refine ⟨hWinv g x hx.1, ?_⟩
-    have h1 := congrArg (fun e : V →ₗ[ℂ] V => e x) (placeOp_comm ψ π v g)
-    simp only [LinearMap.comp_apply] at h1
-    rw [← h1, hx.2, map_smul]
-  have heq := hmin W' hW'ne inf_le_left hW'inv
-  intro x hx
-  have hx' : x ∈ W' := heq ▸ hx
-  exact ((memW' x).1 hx').2
+  obtain ⟨W, hWE, hW0, hmin⟩ := exists_minimal_le (eigenSubrep _ (totOp_comm ψ π) μ)
+    (ne_bot_of_mem (mem_eigenSubrep.2 hμ) hw)
+  have hW0' := toSubmodule_ne_bot.2 hW0
+  refine ⟨W.toSubmodule, hW0', W.apply_mem_toSubmodule, fun x hx => mem_eigenSubrep.1 (hWE hx),
+    fun v => ?_⟩
+  have hmaps : ∀ x ∈ W.toSubmodule, placeOp ψ π v x ∈ W.toSubmodule := fun x hx => by
+    rw [placeOp, LinearMap.sum_apply]
+    exact Submodule.sum_mem _ fun y _ => Submodule.smul_mem _ _ (W.apply_mem_toSubmodule _ hx)
+  have := Submodule.nontrivial_iff_ne_bot.2 hW0'
+  obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue ((placeOp ψ π v).restrict hmaps)
+  obtain ⟨u, hev⟩ := hc.exists_hasEigenvector
+  have hu : (u : V) ∈ (W ⊓ eigenSubrep _ (placeOp_comm ψ π v) c).toSubmodule :=
+    Submodule.mem_inf.2 ⟨u.2, mem_eigenSubrep.2 (congrArg Subtype.val hev.apply_eq_smul)⟩
+  have hle := hmin _ (ne_bot_of_mem hu fun h0 => hev.2 (Subtype.ext h0)) inf_le_left
+  exact ⟨c, fun x hx => mem_eigenSubrep.1 (inf_eq_left.1 hle hx)⟩
 
 end PI.GGMatBoundW

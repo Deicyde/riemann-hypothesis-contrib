@@ -116,7 +116,10 @@ private theorem log_abs_norm_sub_one_mul_totient_eq {m : ℕ} (hm : 1 < m) {L : 
       |((eval 1 (cyclotomic m ℚ) : ℚ) : ℝ)| ^ Module.finrank ℚ⟮η - 1⟯ L := by
     rw [hnormval]; push_cast; rw [abs_pow, abs_mul, abs_pow]; simp
   haveI : Module.Free ℚ ℚ⟮η - 1⟯ := Module.Free.of_divisionRing _ _
-  rw [habs, Real.log_pow, log_abs_eval_one_cyclotomic_eq_vonMangoldt hm, ← Module.finrank_mul_finrank ℚ ℚ⟮η - 1⟯ L, hdeg]
+  have instST : IsScalarTower ℚ ℚ⟮η - 1⟯ L :=
+    IsScalarTower.of_algebraMap_eq fun _ => rfl
+  rw [habs, Real.log_pow, log_abs_eval_one_cyclotomic_eq_vonMangoldt hm,
+    ← @Module.finrank_mul_finrank ℚ ℚ⟮η - 1⟯ L _ _ _ _ _ _ instST _ _ _ _, hdeg]
   push_cast; ring
 
 private theorem absNorm_map_algebraMap_eq_pow_finrank {L E : Type*} [Field L] [NumberField L] [Field E] [NumberField E]

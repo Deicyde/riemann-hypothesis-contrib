@@ -155,8 +155,7 @@ theorem swapped_highest_weight_mem (hn : n ≤ r) (ν : Fin n → ℕ) (hν : An
   swap_mem_swappedDualWeyl (hwMem ℚ_[p] r n hn ν hν)
 
 theorem swapped_highest_weight_ne_zero (hn : n ≤ r) (ν : Fin n → ℕ) : swappedHighestWeight p hn ν ≠ 0 := by
-  intro h
-  exact hwNe ℚ_[p] r n hn ν ((swp ℚ_[p] r n).injective (by rw [map_zero]; exact h))
+  exact fun h => hwNe ℚ_[p] r n hn ν ((swp ℚ_[p] r n).injective (by rw [map_zero]; exact h))
 
 theorem swapped_highest_weight_isHW (h1 : RowGlOne) (hw' : SwpWt) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν) :
     (GR p r ν).IsHW (fun a => (rowNu ν a : ℤ)) (swappedHighestWeight p hn ν) := by
@@ -205,8 +204,7 @@ theorem cor_emb_apply (y : MvPolynomial (Fin r × Fin n) ℤ_[p]) :
 
 theorem cor_emb_inj : Function.Injective (cor_emb p r n) := by
   intro x y h
-  rw [cor_emb_apply, cor_emb_apply] at h
-  exact MvPolynomial.map_injective _ (IsFractionRing.injective ℤ_[p] ℚ_[p]) ((swp ℚ_[p] r n).injective h)
+  exact MvPolynomial.map_injective _ (IsFractionRing.injective ℤ_[p] ℚ_[p]) ((swp ℚ_[p] r n).injective (by simpa [cor_emb_apply] using h))
 
 theorem cor_emb_hw (hn : n ≤ r) (ν : Fin n → ℕ) : cor_emb p r n (hw ℤ_[p] hn ν) = swappedHighestWeight p hn ν := by
   rw [cor_emb_apply, lclosedeq_hw_map, swappedHighestWeight]
@@ -249,9 +247,7 @@ theorem cor_delta_le (hk : RowGlDiv) (hI : SwpInt) (hn : n ≤ r) (ν : Fin n �
     (la : Fin r → ℤ) :
     DeltaLat p (GR p r ν) {h | (GR p r ν).IsHW la h ∧ h ∈ swappedDualWeyl p r n ν ∧
       h ∈ (IntPol p (Fin n × Fin r)).toAddSubgroup} ≤ (cor_L p hn ν).toAddSubgroup := by
-  refine sInf_le ⟨?_, zpClosed_toAddSubgroup _, cor_L_div hk hn ν⟩
-  rintro h ⟨a1, a2, a3⟩
-  exact cor_gen hk hI hn ν hν la h a1 a2 a3
+  exact sInf_le ⟨fun h ⟨a1, a2, a3⟩ => cor_gen hk hI hn ν hν la h a1 a2 a3, zpClosed_toAddSubgroup _, cor_L_div hk hn ν⟩
 
 theorem coreQp_of (h1 : RowGlOne) (hk : RowGlDiv) (hw : SwpWt) (hP : SwpPol) (hI : SwpInt) : CoreQp := by
   intro p _ r n hn ν hν l hS x hx
@@ -268,7 +264,6 @@ theorem coreQp_of (h1 : RowGlOne) (hk : RowGlDiv) (hw : SwpWt) (hP : SwpPol) (hI
     rw [map_smul, ← algebraMap_smul ℚ_[p] ((p : ℤ_[p]) ^ sExp p r l), map_pow, map_natCast, sExp,
       Nat.choose_two_right]
   rw [e] at hyx
-  rw [← cor_emb_inj hyx]
-  exact hy
+  rwa [← cor_emb_inj hyx]
 
 end Formalism.InvariantFactorPaths.INST

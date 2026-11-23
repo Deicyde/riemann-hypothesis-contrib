@@ -112,15 +112,13 @@ lemma summable_a_mxS (ha0 : a 0 = 0) (x : ℝ) : Summable (fun n => a n * mxS n 
   summable_of_ne_finset_zero (s := Finset.Icc 1 ⌊x⌋₊) (fun n hn => a_mxS_eq_zero a ha0 x n hn)
 
 lemma abs_Sa_le (ha0 : a 0 = 0) (x : ℝ) : |Sa a x| ≤ ∑' n, |a n| * mxS n x := by
-  have hm : ∀ n, 0 ≤ mxS n x := fun n => by
-    unfold mxS
-    exact le_max_right _ _
-  rw [Sa_eq_tsum a ha0 x, tsum_eq_sum (s := Finset.Icc 1 ⌊x⌋₊) (fun n hn => a_mxS_eq_zero a ha0 x n hn),
+  rw [Sa_eq_tsum a ha0 x,
+    tsum_eq_sum (s := Finset.Icc 1 ⌊x⌋₊) (fun n hn => a_mxS_eq_zero a ha0 x n hn),
     tsum_eq_sum (s := Finset.Icc 1 ⌊x⌋₊) (fun n hn => by
       have h := a_mxS_eq_zero a ha0 x n hn
       rcases mul_eq_zero.mp h with h | h <;> simp [h])]
   refine (Finset.abs_sum_le_sum_abs _ _).trans (le_of_eq (Finset.sum_congr rfl fun n _ => ?_))
-  rw [abs_mul, abs_of_nonneg (hm n)]
+  rw [abs_mul, abs_of_nonneg (mxS_nonneg n x)]
 
 lemma summable_abs_a (K : ℝ) (hK : ∀ n : ℕ, |a n| ≤ K * vonMangoldt n) {σ : ℝ} (hσ : 1 < σ) :
     Summable (fun n : ℕ => |a n| * (n : ℝ) ^ (-σ)) := by

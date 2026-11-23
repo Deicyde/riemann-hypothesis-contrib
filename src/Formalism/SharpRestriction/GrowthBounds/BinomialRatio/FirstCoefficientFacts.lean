@@ -98,11 +98,10 @@ theorem four_fac {e1 e2 x z w : ℝ} (h1 : 0 ≤ e1) (h1' : e1 ≤ 1) (h2 : 0 �
     have a : (1 - e1) * (1 - e2) ≤ 1 := by nlinarith
     have b : 0 ≤ (1 - e1) * (1 - e2) := mul_nonneg (by linarith) (by linarith)
     nlinarith
-  have hPlow : 1 - e1 - e2 - x ≤ (1 - e1) * (1 - e2) * (1 - x) := by
-    nlinarith [mul_nonneg (mul_nonneg h1 h2) (sub_nonneg.2 hx'), mul_nonneg h1 hx, mul_nonneg h2 hx]
-  have hw' : (1 - e1) * (1 - e2) * (1 - x) * (1 - z) ≤ (1 - e1) * (1 - e2) * (1 - x) * w :=
-    mul_le_mul_of_nonneg_left hw hP0
-  nlinarith [mul_nonneg (sub_nonneg.2 hP1) hz]
+  nlinarith [mul_le_mul_of_nonneg_left hw hP0,
+    mul_nonneg (mul_nonneg h1 h2) (sub_nonneg.2 hx'),
+    mul_nonneg h1 hx, mul_nonneg h2 hx,
+    mul_nonneg (sub_nonneg.2 hP1) hz]
 
 theorem symDim_toNat (m : ℕ) (A : ℤ) (hA : 0 ≤ A) : symDim (m + 1) A = sd m A.toNat := by
   unfold symDim sd

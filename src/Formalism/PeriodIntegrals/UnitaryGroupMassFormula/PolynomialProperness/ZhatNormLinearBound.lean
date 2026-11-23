@@ -84,18 +84,16 @@ theorem inv_mul {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : g⁻¹ * g =
 
 theorem inv_eq {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) :
     g⁻¹ = Hpk k r * gᴴ * Hpk k r := by
-  have h : gᴴ * Hpk k r * g = Hpk k r := hg
   have h1 : (Hpk k r * gᴴ * Hpk k r) * g = 1 := by
-    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, h, hpk_sq]
+    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, hg, hpk_sq]
   exact Matrix.inv_eq_left_inv h1
 
 theorem herm_mulVec {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) (v w : Fin (2 * r + k + 1) → ℂ) :
     herm (Hpk k r) (g *ᵥ v) (g *ᵥ w) = herm (Hpk k r) v w := by
-  have h : gᴴ * Hpk k r * g = Hpk k r := hg
   unfold herm
   rw [star_mulVec, ← dotProduct_mulVec]
   simp only [mulVec_mulVec]
-  rw [← Matrix.mul_assoc, h]
+  rw [← Matrix.mul_assoc, hg]
 
 def hs {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) : ℝ := ∑ i, ∑ j, Complex.normSq (M i j)
 
@@ -133,9 +131,8 @@ theorem gN_hpk_mul {k r : ℕ} (g : B.Mat k r) : B.gN (Hpk k r * g) = B.gN g := 
   rw [gN_eq, gN_eq, hs_hpk_mul]
 
 theorem gN_mul_hpk {k r : ℕ} (g : B.Mat k r) : B.gN (g * Hpk k r) = B.gN g := by
-  have e : g * Hpk k r = (Hpk k r * gᴴ)ᴴ := by
-    rw [conjTranspose_mul, hpk_herm, conjTranspose_conjTranspose]
-  rw [e, gN_conjTranspose, gN_hpk_mul, gN_conjTranspose]
+  rw [← gN_conjTranspose (g * Hpk k r), conjTranspose_mul, hpk_herm,
+    gN_hpk_mul, gN_conjTranspose]
 
 theorem gN_inv {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : B.gN g⁻¹ = B.gN g := by
   rw [inv_eq hg, gN_mul_hpk, gN_hpk_mul, gN_conjTranspose]
@@ -152,8 +149,7 @@ theorem gN_eq_frob {k r : ℕ} (g : B.Mat k r) : B.gN g = ‖g‖ := by
   rw [Complex.normSq_eq_norm_sq]; norm_cast
 
 theorem gN_mul_le {k r : ℕ} (a b : B.Mat k r) : B.gN (a * b) ≤ B.gN a * B.gN b := by
-  rw [gN_eq_frob, gN_eq_frob, gN_eq_frob]
-  exact Matrix.frobenius_norm_mul a b
+  simpa only [gN_eq_frob] using Matrix.frobenius_norm_mul a b
 
 theorem gN_ge_one {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : 1 ≤ B.gN g := by
   rw [gN_eq_frob]
@@ -164,16 +160,15 @@ theorem gN_ge_one {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : 1 ≤ B.gN
     exact zero_ne_one this
   have hpos : 0 < ‖Hpk k r‖ := norm_pos_iff.mpr hH
   have h1 : ‖Hpk k r‖ ≤ ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by
-    have e : gᴴ * Hpk k r * g = Hpk k r := hg
-    calc ‖Hpk k r‖ = ‖gᴴ * Hpk k r * g‖ := by rw [e]
+    calc ‖Hpk k r‖ = ‖gᴴ * Hpk k r * g‖ := by rw [hg]
       _ ≤ ‖gᴴ * Hpk k r‖ * ‖g‖ := Matrix.frobenius_norm_mul _ _
       _ ≤ ‖gᴴ‖ * ‖Hpk k r‖ * ‖g‖ :=
           mul_le_mul_of_nonneg_right (Matrix.frobenius_norm_mul _ _) (norm_nonneg _)
       _ = ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by rw [Matrix.frobenius_norm_conjTranspose]
   by_contra hlt
   rw [not_le] at hlt
-  have hg0 : 0 ≤ ‖g‖ := norm_nonneg _
-  have : ‖g‖ * ‖Hpk k r‖ * ‖g‖ < ‖Hpk k r‖ := by nlinarith [mul_nonneg hg0 hpos.le]
+  have this : ‖g‖ * ‖Hpk k r‖ * ‖g‖ < ‖Hpk k r‖ := by
+    nlinarith [mul_nonneg (norm_nonneg g) hpos.le]
   linarith
 
 end Frob
@@ -192,16 +187,14 @@ theorem normSq_le_hs {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (i j : ι)
           (fun _ _ => Finset.sum_nonneg fun _ _ => Complex.normSq_nonneg _) (Finset.mem_univ i)
 
 theorem entry_le_gN {k r : ℕ} (g : B.Mat k r) (i j : Fin (2 * r + k + 1)) : ‖g i j‖ ≤ B.gN g := by
-  rw [gN_eq, Complex.norm_def]
-  exact Real.sqrt_le_sqrt (normSq_le_hs g i j)
+  simpa only [gN_eq, Complex.norm_def] using Real.sqrt_le_sqrt (normSq_le_hs g i j)
 
 theorem mx_nonneg {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) : 0 ≤ C2.mx M := norm_nonneg _
 
 theorem entry_le_mx {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m) : ‖M i j‖ ≤ C2.mx M := by
   unfold C2.mx
-  calc ‖M i j‖ = ‖(Matrix.of.symm M) i j‖ := rfl
-    _ ≤ ‖(Matrix.of.symm M) i‖ := norm_le_pi_norm _ j
-    _ ≤ ‖Matrix.of.symm M‖ := norm_le_pi_norm _ i
+  exact (norm_le_pi_norm ((Matrix.of.symm M) i) j).trans
+    (norm_le_pi_norm (Matrix.of.symm M) i)
 
 theorem mx_le_iff {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) {c : ℝ} (hc : 0 ≤ c) :
     C2.mx M ≤ c ↔ ∀ i j, ‖M i j‖ ≤ c := by
@@ -214,11 +207,10 @@ theorem mx_le_iff {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) {c : ℝ} (hc : 0 �
 
 theorem mx_conjTranspose {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) : C2.mx Mᴴ = C2.mx M := by
   apply le_antisymm
-  · refine (mx_le_iff _ (mx_nonneg M)).2 fun i j => ?_
-    rw [conjTranspose_apply, norm_star]; exact entry_le_mx M j i
-  · refine (mx_le_iff _ (mx_nonneg Mᴴ)).2 fun i j => ?_
-    have := entry_le_mx Mᴴ j i
-    rwa [conjTranspose_apply, norm_star] at this
+  · exact (mx_le_iff _ (mx_nonneg M)).2 fun i j =>
+      (by simpa only [conjTranspose_apply, norm_star] using entry_le_mx M j i)
+  · exact (mx_le_iff _ (mx_nonneg Mᴴ)).2 fun i j =>
+      (by simpa only [conjTranspose_apply, norm_star] using entry_le_mx Mᴴ j i)
 
 theorem mx_mul_le {m : ℕ} (A B' : Matrix (Fin m) (Fin m) ℂ) :
     C2.mx (A * B') ≤ m * C2.mx A * C2.mx B' := by
@@ -275,10 +267,9 @@ theorem zhat_norm_linear_bound : C2.ZhatBound := by
   refine (dot_bound _ _ _ hE).trans ?_
   have h1 := fvec_sum_le k r z a
   have h2 := fvec_sum_le k r z' b
-  have h3 : 0 ≤ ∑ i, ‖fvec k r z a i‖ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-  have h4 : 0 ≤ ∑ i, ‖fvec k r z' b i‖ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-  have h5 := gN_nonneg g
-  exact mul_le_mul_of_nonneg_right (mul_le_mul h1 h2 h4 (by linarith)) h5
+  exact mul_le_mul_of_nonneg_right
+    (mul_le_mul h1 h2 (Finset.sum_nonneg fun _ _ => norm_nonneg _) (by linarith))
+    (gN_nonneg g)
 
 theorem polynomial_normInv : C2.NormInv := fun _ _ _ hg => ⟨gN_inv hg, gN_ge_one hg⟩
 

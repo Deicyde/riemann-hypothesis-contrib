@@ -64,8 +64,7 @@ theorem mem_ordR (sg : Formalism.MainNotions.S.Loc.SplitAt A.Fp A.Ep A.cj (Forma
     (h12 : Ideal.Quotient.mk (Ideal.span {sg.q}) ⟨(sg.e x).1, h1⟩ =
       Ideal.Quotient.mk (Ideal.span {sg.q}) ⟨(sg.e x).2, h2⟩) :
     x ∈ PI.LocHaarRR.ordR sg := by
-  simp only [PI.LocHaarRR.ordR]
-  rw [Subring.mem_comap, Subring.mem_map]
+  simp only [PI.LocHaarRR.ordR, Subring.mem_comap, Subring.mem_map]
   exact ⟨(⟨_, h1⟩, ⟨_, h2⟩), h12, rfl⟩
 
 theorem ordR_sub (sg : Formalism.MainNotions.S.Loc.SplitAt A.Fp A.Ep A.cj (Formalism.MainNotions.S.Loc.resChar p)) {x : A.Ep}

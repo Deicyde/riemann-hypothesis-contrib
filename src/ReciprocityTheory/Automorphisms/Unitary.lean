@@ -64,8 +64,7 @@ theorem conjT_mul (σ : R →+* R) (g h : Matrix (Fin n) (Fin n) R) :
   rw [Matrix.map_mul, Matrix.transpose_mul]
 
 theorem conjT_one (σ : R →+* R) : conjT σ (1 : Matrix (Fin n) (Fin n) R) = 1 := by
-  unfold conjT
-  simp
+  simp [conjT]
 
 theorem conjT_conjT (σ : R →+* R) (hσ : ∀ x, σ (σ x) = x) (g : Matrix (Fin n) (Fin n) R) :
     conjT σ (conjT σ g) = g := by

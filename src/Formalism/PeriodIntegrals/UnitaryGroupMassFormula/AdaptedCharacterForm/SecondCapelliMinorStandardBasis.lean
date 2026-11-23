@@ -57,10 +57,8 @@ open Formalism.REAL
 
 theorem mulVec_col {n : ℕ} (P Q : Matrix (Fin n) (Fin n) ℂ) (h : Q * P = 1) (k : Fin n) :
     (Q *ᵥ fun p => P p k) = Pi.single k 1 := by
-  funext i
-  have h1 := congrFun (congrFun h i) k
-  rw [Matrix.mul_apply, Matrix.one_apply] at h1
-  simp only [Matrix.mulVec, dotProduct, h1, Pi.single_apply]
+  ext i
+  simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.one_apply, Pi.single_apply] using congrFun (congrFun h i) k
 
 theorem chatA_single {A : Type*} [Ring A] [Algebra ℂ A] {m : ℕ} (E : Fin m → Fin m → A) (u : ℂ)
     (l : Fin m) (γ : Fin m → ℂ) (hγ : ∀ j, j ≠ l → γ j = 0) :
@@ -92,8 +90,7 @@ theorem coefB {n : ℕ} (γ γ' : Fin (n + 2) → ℂ) (hγ : ∀ j : Fin (n + 2
     apply hne
     have h1 : i.val < i'.val := h
     refine ⟨Fin.ext ?_, Fin.ext ?_⟩ <;> simp only [Fin.val_zero, Fin.val_one] <;> omega
-  rw [(hγ i' hi').1, (hγ i' hi').2]
-  ring
+  simp [(hγ i' hi').1, (hγ i' hi').2]
 
 theorem second_capelli_minor_standard_basis {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin (n + 2) → Fin (n + 2) → A)
     (u : ℂ) (γ γ' : Fin (n + 2) → ℂ) (hγ : ∀ j : Fin (n + 2), 2 ≤ j.val → γ j = 0 ∧ γ' j = 0) :

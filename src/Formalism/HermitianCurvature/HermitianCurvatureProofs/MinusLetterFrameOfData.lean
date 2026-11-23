@@ -71,11 +71,8 @@ lemma comm_inv {x xi y : B} (h1 : x * xi = 1) (h2 : xi * x = 1) (h : Commute x y
 
 lemma star_inv [StarRing B] {x xi : B} (h1 : x * xi = 1) (h : star x = x) : star xi = xi := by
   have h3 : star xi * x = 1 := by
-    have := congrArg star h1
-    rwa [star_mul, star_one, h] at this
-  calc star xi = star xi * (x * xi) := by rw [h1, mul_one]
-    _ = (star xi * x) * xi := by rw [mul_assoc]
-    _ = xi := by rw [h3, one_mul]
+    simpa only [star_mul, star_one, h] using congrArg star h1
+  exact left_inv_eq_right_inv h3 h1
 
 lemma t21_commutator_identity [Algebra ℂ B] (a c a' c' : B) (Y Y' Yb : ℂ) (hne : Y ≠ Y')
     (h1 : (Y - Y') • (a * c' - c' * a) = c * a' - c' * a)
@@ -128,8 +125,7 @@ lemma free_pow {c : S} {b : SlopeTestRemainingChoices S A} (h : FreeOf c b) (n :
 
 lemma free_star {c : S} {b : SlopeTestRemainingChoices S A} (h : FreeOf c b) : FreeOf c (star b) := by
   intro i j
-  have := (h j i).star_star
-  rwa [star_eU] at this
+  simpa only [star_eU] using (h j i).star_star
 
 lemma freeOf2_of_entries {c : S} {p q r s : SlopeTestRemainingChoices S A} (hp : FreeOf c p) (hq : FreeOf c q) (hr : FreeOf c r)
     (hs : FreeOf c s) : FreeOf2 c !![p, q; r, s] := by
@@ -146,8 +142,7 @@ lemma comm_lit {w p q r s : SlopeTestRemainingChoices S A} (hp : Commute w p) (h
 lemma freeOf2_mul {c : S} {M N : M2 (SlopeTestRemainingChoices S A)} (hM : FreeOf2 c M) (hN : FreeOf2 c N) :
     FreeOf2 c (M * N) := by
   intro i j k l
-  rw [Matrix.mul_apply]
-  exact Commute.sum_right _ _ _ fun m _ => (hM i m k l).mul_right (hN m j k l)
+  simpa only [Matrix.mul_apply] using Commute.sum_right _ _ _ fun m _ => (hM i m k l).mul_right (hN m j k l)
 
 lemma ins_comm_ins {a : S} {M N : M2 (SlopeTestRemainingChoices S A)} (fM : FreeOf2 a M) (fN : FreeOf2 a N) (h : M * N = N * M) :
     Commute (ins a M) (ins a N) := by

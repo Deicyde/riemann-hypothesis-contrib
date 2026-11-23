@@ -128,16 +128,14 @@ theorem ps_fockF_pos {σ : Type} (f : MvPolynomial σ ℂ) (hf : f ≠ 0) : 0 < 
 theorem ps_nfL_pos {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) (F : MvPolynomial (ι × Fin n × Fin n) ℂ)
     (hF : F ≠ 0) : 0 < Formalism.L2.Col.nfL lam F F := by
   rw [Formalism.L2.Col.nfL_apply, Formalism.L2.Forms.nfAll]
-  refine div_pos (ps_fockF_pos F hF) (Finset.prod_pos fun τ _ => ?_)
-  exact ps_fockF_pos _ (Formalism.GradedWeylDivisibility.hwNe ℂ n n le_rfl _)
+  exact div_pos (ps_fockF_pos F hF) (Finset.prod_pos fun τ _ => ps_fockF_pos _ (Formalism.GradedWeylDivisibility.hwNe ℂ n n le_rfl _))
 
 theorem ps_nfL_symm {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) (F F' : MvPolynomial (ι × Fin n × Fin n) ℂ) :
     star (Formalism.L2.Col.nfL lam F F') = Formalism.L2.Col.nfL lam F' F := by
   rw [Formalism.L2.Col.nfL_apply, Formalism.L2.Col.nfL_apply, Formalism.L2.Forms.nfAll, Formalism.L2.Forms.nfAll, star_div₀,
     ← Formalism.GradedWeylDivisibility.fockHerm, star_prod]
   congr 1
-  refine Finset.prod_congr rfl fun τ _ => ?_
-  exact (Formalism.GradedWeylDivisibility.fockHerm _ _ _).symm
+  exact Finset.prod_congr rfl fun τ _ => (Formalism.GradedWeylDivisibility.fockHerm _ _ _).symm
 
 theorem pairingPositive_holds : PairPos := by
   classical
@@ -254,9 +252,7 @@ theorem ps_bVVfun_rat (K : Type) [Field K] [CharZero K] {ι : Type} [Fintype ι]
     (i : VVIdx lam) : ∃ q : MvPolynomial (ι × Fin n × Fin n) ℚ, bVVfun K lam i = map (algebraMap ℚ K) q := by
   obtain ⟨P, hP⟩ := bVVfun_int K lam i
   refine ⟨map (Int.castRingHom ℚ) P, ?_⟩
-  rw [hP, map_map]
-  have e : (algebraMap ℚ K).comp (Int.castRingHom ℚ) = Int.castRingHom K := RingHom.ext_int _ _
-  rw [e]
+  rw [hP, map_map, show (algebraMap ℚ K).comp (Int.castRingHom ℚ) = Int.castRingHom K from RingHom.ext_int _ _]
 
 theorem ps_fock_sep {K : Type} [Field K] [StarRing K] [CharZero K] {ι : Type} [Fintype ι] {n : ℕ}
     (lam : ι → DomWeight n) (x : Pol K ι n) (hx : x ∈ VV K lam) (h : ∀ y ∈ VV K lam, fockL x y = 0) : x = 0 := by

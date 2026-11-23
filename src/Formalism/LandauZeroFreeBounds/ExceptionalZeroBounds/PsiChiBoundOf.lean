@@ -80,8 +80,7 @@ lemma exp_neg_sqrt_log_mem_unit_interval {c₀ y : ℝ} (hc0 : 0 < c₀) :
     0 < Real.exp (-(c₀ / 2) * Real.sqrt (Real.log y)) ∧
       Real.exp (-(c₀ / 2) * Real.sqrt (Real.log y)) ≤ 1 := by
   refine ⟨Real.exp_pos _, Real.exp_le_one_iff.2 ?_⟩
-  have := mul_nonneg hc0.le (Real.sqrt_nonneg (Real.log y))
-  linarith
+  nlinarith [mul_nonneg hc0.le (Real.sqrt_nonneg (Real.log y))]
 
 lemma chebyshev_character_nonprincipal_bound {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (hχ : χ ≠ 1) {c₁ : ℝ}
     (hc₁ : 0 < c₁) (hc₁' : c₁ ≤ 1 / 20) (B : Finset ℝ) (hB : ExcZeros c₁ χ B)

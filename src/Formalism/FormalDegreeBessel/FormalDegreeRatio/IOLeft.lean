@@ -112,16 +112,13 @@ theorem gl_relation_adjoint_holds : GlRelAd := by
   have h1 : ∀ a b c d, E a b * E c d - E c d * E a b =
       (1 : Matrix (Fin n) (Fin n) ℂ) b c • E a d - (1 : Matrix (Fin n) (Fin n) ℂ) d a • E c b := by
     intro a b c d
-    rw [hE a b c d]
-    simp only [Matrix.one_apply, ite_smul, one_smul, zero_smul]
+    simpa only [Matrix.one_apply, ite_smul, one_smul, zero_smul] using hE a b c d
   have h3 := commutator_left_transform_of_commutation_relation (fun a b => ∑ j, Q b j • E a j) (Q * 1) P (commutator_right_transform_of_commutation_relation E 1 Q h1)
   beta_reduce at h3
   have e : ∀ a b, (∑ c, ∑ d, (P c a * Q b d) • E c d) = ∑ i, P i a • ∑ j, Q b j • E i j := by
     intro a b
     simp only [Finset.smul_sum, smul_smul]
   intro a b c d
-  simp only [e]
-  rw [h3 a b c d, Matrix.mul_one, hQP]
-  simp only [Matrix.one_apply, ite_smul, one_smul, zero_smul]
+  simpa only [e, Matrix.mul_one, hQP, Matrix.one_apply, ite_smul, one_smul, zero_smul] using h3 a b c d
 
 end Formalism.QuantumDeterminants

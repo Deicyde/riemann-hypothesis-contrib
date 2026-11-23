@@ -79,8 +79,7 @@ theorem isStrictUpper_strictUpper {d : ℕ} (v : UT d → ℂ) : IsStrictUpper (
 
 theorem isStrictUpper_neg {d : ℕ} {X : Matrix (Fin d) (Fin d) ℂ} (hX : IsStrictUpper X) :
     IsStrictUpper (-X) := by
-  intro i j h
-  simp [hX i j h]
+  simpa only [IsStrictUpper, Matrix.neg_apply, neg_eq_zero] using hX
 
 theorem pow_apply_eq_zero {d : ℕ} {X : Matrix (Fin d) (Fin d) ℂ} (hX : IsStrictUpper X) (k : ℕ) :
     ∀ i j : Fin d, (j : ℕ) < i + k → (X ^ k) i j = 0 := by
@@ -88,10 +87,7 @@ theorem pow_apply_eq_zero {d : ℕ} {X : Matrix (Fin d) (Fin d) ℂ} (hX : IsStr
   | zero =>
     intro i j h
     rw [pow_zero]
-    refine Matrix.one_apply_ne ?_
-    intro e
-    subst e
-    simp at h
+    exact Matrix.one_apply_ne (ne_of_gt (by simpa using h))
   | succ k ih =>
     intro i j h
     rw [pow_succ, Matrix.mul_apply]

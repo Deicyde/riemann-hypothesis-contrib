@@ -127,8 +127,7 @@ theorem hypIAt_ev {eps : ℝ} (Fm : FamP eps) (hLa : 0 < Fm.GK.La) (hCN : Corner
     Ev Fm fun x i => Joints.HypIAt (Fm.D x i) (Fm.L x i) (Fm.Gx x i) Fm.GK := by
   obtain ⟨i0⟩ := Fm.Ix_zero
   have heps : 0 < eps := by
-    have := (Fm.L 0 i0).sc.eps_pos
-    rwa [Fm.L_eps] at this
+    simpa [Fm.L_eps] using (Fm.L 0 i0).sc.eps_pos
   obtain ⟨C31, _, h1⟩ := TopChoiceBounds.family_uniform_constant_holds Fm
   have h1' : Ev Fm fun x i => AuxBlock8.adm1 (Fm.D x i) (Fm.L x i) (Fm.Gx x i) C31 := h1
   have h4 : Ev Fm fun x i => AuxBlock8.ArchimedeanSignatureMatching (Fm.D x i) (Fm.L x i) Fm.GK := TopChoiceBounds.family_band_ratio_statement Fm hCN

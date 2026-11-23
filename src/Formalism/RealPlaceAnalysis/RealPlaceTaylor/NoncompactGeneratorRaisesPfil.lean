@@ -66,8 +66,7 @@ variable {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ} (ε : Fin n → Bo
     (E : Fin n → Fin n → Module.End ℂ V) (u : V)
 
 theorem mem_kSpan_self' : u ∈ kSpan ε E u := by
-  unfold kSpan
-  exact Submodule.mem_sInf.mpr fun S hS => hS.1
+  simpa only [kSpan] using (Submodule.mem_sInf.mpr (fun S hS => hS.1) : u ∈ sInf {p : Submodule ℂ V | u ∈ p ∧ KStable ε E p})
 
 theorem compact_span_compact_stable : KStable ε E (kSpan ε E u) := by
   intro a b hab x hx
@@ -144,10 +143,8 @@ theorem compact_generator_word_mem_pfil (hE : GlRel E) (a b : Fin n) (hab : ε a
   | nil =>
     intro _
     have hy' : E a b y ∈ kSpan ε E u := compact_span_compact_stable ε E u a b hab y hy
-    have h0 := word_action_mem_pfil ε E u 0 [] (le_refl _) (by intro p hp; cases hp) (E a b y) hy'
-    rw [ew_nil] at h0
-    rw [ew_nil]
-    exact h0
+    simpa [ew_nil] using
+      word_action_mem_pfil ε E u 0 [] (le_refl _) (by intro p hp; cases hp) (E a b y) hy'
   | cons p w ih =>
     intro hnc
     have hnc' : ∀ q ∈ w, ε q.1 ≠ ε q.2 := fun q hq => hnc q (List.mem_cons.mpr (Or.inr hq))
@@ -200,12 +197,11 @@ theorem poincare_filtration_zero : pfil ε E u 0 = kSpan ε E u := by
   · apply Submodule.span_le.mpr
     rintro z ⟨w, hw, hnc, y, hy, rfl⟩
     cases w with
-    | nil => rw [SetLike.mem_coe, ew_nil]; exact hy
+    | nil => simpa [ew_nil] using hy
     | cons p w => simp at hw
   · intro y hy
-    have h0 := word_action_mem_pfil ε E u 0 [] (le_refl _) (by intro p hp; cases hp) y hy
-    rw [ew_nil] at h0
-    exact h0
+    simpa [ew_nil] using
+      word_action_mem_pfil ε E u 0 [] (le_refl _) (by intro p hp; cases hp) y hy
 
 theorem pfil_le_cyclic (j : ℕ) : pfil ε E u j ≤ cyc E u := by
   apply Submodule.span_le.mpr
@@ -510,8 +506,7 @@ theorem word_product_zero (E : Fin n → Fin n → Module.End ℂ V) (α : Fin 0
 
 theorem word_product_succ (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (α : Fin (j + 1) → Fin n × Fin n) :
     u1W E α = E (α (Fin.last j)).1 (α (Fin.last j)).2 * u1W E (Fin.init α) := by
-  unfold u1W
-  rw [List.ofFn_succ', List.concat_eq_append, List.reverse_append]
+  simp only [u1W, List.ofFn_succ', List.concat_eq_append, List.reverse_append]
   rfl
 
 theorem commutator_word_operator_sum (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) (c d : Fin n) :
@@ -778,13 +773,11 @@ end U1Theta
 
 theorem thetaFil_of (hp : PfilFacts) : ThetaFil := by
   intro V _ _ n ε E u hE
-  exact ⟨fun j F hF => theta_noncompact_mem_pfil ε E u j F hF, fun j => pfil_succ_le_theta_image_sup ε E u j,
-    fun j F hF σ => symmetrization_perm_sub_mem ε E u hE j F hF σ⟩
+  exact ⟨theta_noncompact_mem_pfil ε E u, pfil_succ_le_theta_image_sup ε E u, symmetrization_perm_sub_mem ε E u hE⟩
 
 theorem arr_module_facts : ArrModule := by
   intro V _ _ n ε E j
-  exact ⟨fun hE => ⟨arr_operators_gl_relation E hE, fun c d F => symmetrization_equivariant E hE c d F⟩,
-    fun hU => arr_operators_compact_unitary ε E hU⟩
+  exact ⟨fun hE => ⟨arr_operators_gl_relation E hE, symmetrization_equivariant E hE⟩, arr_operators_compact_unitary ε E⟩
 
 theorem theta_filtration_holds : ThetaFil := thetaFil_of pfil_facts_hold
 

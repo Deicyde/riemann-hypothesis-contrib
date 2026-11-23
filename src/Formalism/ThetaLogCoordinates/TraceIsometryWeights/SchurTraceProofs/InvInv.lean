@@ -303,8 +303,7 @@ theorem Om_mem {NN : Submodule K W} (hN : ∀ a b, ∀ x ∈ NN, E a b x ∈ NN)
 theorem Pstep_mem {NN : Submodule K W} (hN : ∀ a b, ∀ x ∈ NN, E a b x ∈ NN) (S : Finset ι) (z : ι) (l : ℕ) :
     ∀ x ∈ NN, Pstep E S z l x ∈ NN := by
   intro x hx
-  simp only [Pstep, LinearMap.sum_apply, LinearMap.smul_apply]
-  exact Submodule.sum_mem _ (fun q _ => Submodule.smul_mem _ _ (Om_mem hN S z q x hx))
+  simpa only [Pstep, LinearMap.sum_apply, LinearMap.smul_apply] using Submodule.sum_mem _ (fun q _ => Submodule.smul_mem _ _ (Om_mem hN S z q x hx))
 
 theorem Om_vanish (h : GlRel E) {NN : Submodule K W} (hN : ∀ a b, ∀ x ∈ NN, E a b x ∈ NN) {l : ℕ}
     (hev : ∀ (z : ι) (k : ℤ), ∀ x ∈ NN, E z z x = (k : K) • x → (l : ℤ) < |k| → x = 0)
@@ -348,8 +347,7 @@ theorem cc_rec [CharZero K] (m q : ℕ) : cc K m q + cc K m (q + 1) * (((q : K) 
   ring
 
 theorem cc_zero [CharZero K] (m : ℕ) : cc K m 0 = 1 := by
-  have : (m.factorial : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
-  simp [cc, this]
+  simp [cc, Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero m)]
 
 theorem Pstep_eq (S : Finset ι) (z : ι) (l : ℕ) :
     Pstep E S z l = ∑ q ∈ range (l + 1), cc K S.card q • Om E S z q := rfl

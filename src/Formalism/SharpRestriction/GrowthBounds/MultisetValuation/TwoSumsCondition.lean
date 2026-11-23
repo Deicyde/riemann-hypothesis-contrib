@@ -94,7 +94,6 @@ private theorem coeff_pow_mem_of_lower_coeff_mem {K : Type} [Field K] (R : Subri
     exact Subring.zero_mem _
   · push_neg at hz
     refine Subring.prod_mem _ fun i hi => ih _ ?_
-    have hik : i < k := Finset.mem_range.mp hi
     obtain ⟨j, hj, hji⟩ : ∃ j ∈ range k, j ≠ i := by
       by_cases h : i = 0
       · exact ⟨1, Finset.mem_range.mpr (by omega), by omega⟩

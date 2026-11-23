@@ -54,6 +54,7 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.HaarMirror
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.Exists
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.LaplaceOperators.KTypeLemma.StdGapOfGapLap
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.LaplaceOperators.LaplaceFoundations.PsiFor
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.FdConsA
 
 @[expose] public section
 
@@ -75,10 +76,6 @@ theorem fdc_big {ε : Fin n → Bool} {h : ℝ} (hh : thrS ε + 1 < h) :
     (16 * (n : ℝ) * (S7.q0 ε : ℝ) + 8 * Real.sqrt (2 * (S7.q0 ε : ℝ)))
   linarith
 
-theorem one_le_q0_of_p_q_pos {ε : Fin n → Bool} (hp : 1 ≤ pOf ε) (hq : 1 ≤ qOf ε) : 1 ≤ S7.q0 ε := by
-  show 1 ≤ min (pOf ε) (qOf ε)
-  exact le_min hp hq
-
 theorem fdc_eight {ε : Fin n → Bool} {h : ℝ} (hh : thrS ε + 1 < h) :
     8 * (n : ℝ) * (S7.q0 ε : ℝ) < h := by
   unfold thrS at hh
@@ -92,52 +89,11 @@ theorem fdc_stdGap {ε : Fin n → Bool} {μ : Fin n → ℝ} {h : ℝ} (hμ : I
     (hh : thrS ε + 1 < h) : StdGap ε μ :=
   ⟨hμ.1, h, hg, fdc_big hh⟩
 
-theorem fdc_hc_add {μ : Fin n → ℝ} {s : Fin n} (hμ : IsHCParam μ) (hs : StrictAnti (μ + Pi.single s 1)) :
-    IsHCParam (μ + Pi.single s 1) := by
-  refine ⟨hs, fun a => ?_⟩
-  obtain ⟨m, hm⟩ := hμ.2 a
-  by_cases has : a = s
-  · subst has
-    refine ⟨m + 1, ?_⟩
-    rw [Pi.add_apply, Pi.single_eq_same]
-    push_cast
-    linarith
-  · refine ⟨m, ?_⟩
-    rw [Pi.add_apply, Pi.single_eq_of_ne has, add_zero]
-    exact hm
-
-theorem fdc_w_ne {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) : T.w ≠ 0 := by
-  letI := T.instNACG
-  intro h
-  have h1 := T.w_norm
-  rw [h, norm_zero] at h1
-  exact zero_ne_one h1
-
 theorem fdc_model {ε : Fin n → Bool} (hp : 1 ≤ pOf ε) (hq : 1 ≤ qOf ε) {μ : Fin n → ℝ} {h : ℝ}
     (hμ : IsHCParam μ) (hg : GapAtLeast ε μ h) (hh : thrS ε + 1 < h) (T : KType ε (lowK ε μ)) :
     ∃ m : Fin n → ℤ, IsMu μ m ∧ IsPsiFor ε μ T (PsiM T m) := by
   obtain ⟨m, hm⟩ := Lap.LemK.exists_isMu hμ
   exact ⟨m, hm, (Lap.Base.psiFor n ε μ h T m hμ hm hg (one_le_q0_of_p_q_pos hp hq) (fdc_eight hh)).1⟩
-
-abbrev FdcGood (ε : Fin n → Bool) (μ : Fin n → ℝ) (d : ℝ) : Prop :=
-  ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), Formalism.MainNotions.S.IsDS ε μ σ ∧ Formalism.MainNotions.S.IsFdeg (muCD ε) σ d
-
-def fdcD (ε : Fin n → Bool) (μ : Fin n → ℝ) : ℝ := by
-  classical
-  exact if h : ∃ d, FdcGood ε μ d then h.choose else 0
-
-theorem fdc_fdegOf_eq {ε : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')} (U : H ≃ₗᵢ[ℂ] H')
-    (hU : ∀ g ∈ Formalism.MainNotions.S.UJset ε, ∀ x : H, U (σ g x) = σ' g (U x)) (ν : Measure (Formalism.REAL.UJ ε)) (v : H) :
-    Formalism.MainNotions.S.fdegOf ν σ' (U v) = Formalism.MainNotions.S.fdegOf ν σ v := by
-  have hfun : (fun g : Formalism.REAL.UJ ε => ‖⟪U v, σ' (Formalism.MainNotions.S.umat g) (U v)⟫_ℂ‖ ^ 2) =
-      fun g => ‖⟪v, σ (Formalism.MainNotions.S.umat g) v⟫_ℂ‖ ^ 2 := by
-    funext g
-    rw [← hU (Formalism.MainNotions.S.umat g) g.2 v, LinearIsometryEquiv.inner_map_map]
-  simp only [Formalism.MainNotions.S.fdegOf, Formalism.MainNotions.S.coefOn]
-  rw [LinearIsometryEquiv.norm_map, hfun]
 
 theorem fdcGood_unique {ε : Fin n → Bool} {μ : Fin n → ℝ} {h : ℝ} (hμ : IsHCParam μ) (hg : GapAtLeast ε μ h)
     (hh : thrS ε + 1 < h) {d d' : ℝ} (h1 : FdcGood ε μ d) (h2 : FdcGood ε μ d') : d = d' := by

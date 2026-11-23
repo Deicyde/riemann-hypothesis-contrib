@@ -69,11 +69,11 @@ theorem int_cauchy_schwarz {X : Type} [AddCommGroup X] (F : X →+ X →+ ℤ)
     exact h1
   rcases (hpos u).lt_or_eq with ht | ht
   · have h2 := key (-(F u v)) (F u u)
-    have h3 : 0 ≤ F u u * (F u u * F v v - F u v ^ 2) := by nlinarith [h2]
+    have h3 : 0 ≤ F u u * (F u u * F v v - F u v ^ 2) := by linarith [h2]
     have h4 : 0 ≤ F u u * F v v - F u v ^ 2 := by
       by_contra hc
       push_neg at hc
-      nlinarith [mul_neg_of_pos_of_neg ht hc]
+      linarith [mul_neg_of_pos_of_neg ht hc]
     linarith
   · rw [← ht]
     simp only [zero_mul]
@@ -83,7 +83,7 @@ theorem int_cauchy_schwarz {X : Type} [AddCommGroup X] (F : X →+ X →+ ℤ)
     have h2 := key (-(F v v + 1) * F u v) 1
     rw [← ht] at h2
     have hv := hpos v
-    nlinarith [h2, hs, hv]
+    linarith [mul_le_mul_of_nonneg_left hs (by linarith : (0:ℤ) ≤ F v v + 1)]
 
 theorem seq_bound (a c : ℕ → ℤ) (n : ℕ) (hpos : ∀ k, 0 ≤ a k)
     (hlc : ∀ k, a (k + 1) ^ 2 ≤ a k * a (k + 2))
@@ -104,8 +104,8 @@ theorem seq_bound (a c : ℕ → ℤ) (n : ℕ) (hpos : ∀ k, 0 ≤ a k)
       have h1 := hlc 0
       rw [← h] at h1 H
       simp at h1 H
-      nlinarith [sq_nonneg (a 1)]
-  have h01 : a 0 < a 1 := by nlinarith
+      linarith [sq_nonneg (a 1)]
+  have h01 : a 0 < a 1 := by linarith [mul_nonneg hS0 ha0.le]
   have hind : ∀ k, 0 < a k ∧ a 1 * a k ≤ a (k + 1) * a 0 := by
     intro k
     induction k with
@@ -115,16 +115,16 @@ theorem seq_bound (a c : ℕ → ℤ) (n : ℕ) (hpos : ∀ k, 0 ≤ a k)
       have hk1 : 0 < a (k + 1) := by
         by_contra hc
         push_neg at hc
-        nlinarith [mul_pos (by linarith : (0:ℤ) < a 1) hk]
+        linarith [mul_pos (by linarith : (0:ℤ) < a 1) hk, mul_le_mul_of_nonneg_right hc ha0.le]
       refine ⟨hk1, ?_⟩
       have h2 := hlc k
       have h3 : a k * (a 1 * a (k + 1)) ≤ a k * (a (k + 2) * a 0) := by
-        nlinarith [mul_le_mul_of_nonneg_left hk' hk1.le]
+        linarith [mul_le_mul_of_nonneg_left hk' hk1.le, mul_le_mul_of_nonneg_right h2 ha0.le]
       exact le_of_mul_le_mul_left h3 hk
   have hmono : ∀ k, a k ≤ a (k + 1) := by
     intro k
     obtain ⟨hk, hk'⟩ := hind k
-    have : a 0 * a k ≤ a 0 * a (k + 1) := by nlinarith [mul_le_mul_of_nonneg_right h01.le hk.le]
+    have : a 0 * a k ≤ a 0 * a (k + 1) := by linarith [mul_le_mul_of_nonneg_right h01.le hk.le]
     exact le_of_mul_le_mul_left this ha0
   have hmono' : Monotone a := monotone_nat_of_le_succ hmono
   rcases n with _ | m
@@ -139,16 +139,16 @@ theorem seq_bound (a c : ℕ → ℤ) (n : ℕ) (hpos : ∀ k, 0 ≤ a k)
       have hi' : i ≤ m := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
       have h1 : -(c i * a i) ≤ |c i| * a i := by
         have := neg_abs_le (c i)
-        nlinarith [hpos i]
+        linarith [mul_le_mul_of_nonneg_right this (hpos i)]
       have h2 : |c i| * a i ≤ |c i| * a m :=
         mul_le_mul_of_nonneg_left (hmono' hi') (abs_nonneg _)
       linarith
     have hrec' : a (m + 1) = -(∑ i ∈ Finset.range (m + 1), c i * a i) := by
       rw [Finset.sum_range_succ]; linarith
-    have h5 : (S + 1) * a 0 * a m < a 1 * a m := by nlinarith
-    have h6 : (S + 1) * a m * a 0 < a (m + 1) * a 0 := by nlinarith
+    have h5 : (S + 1) * a 0 * a m < a 1 * a m := mul_lt_mul_of_pos_right H hm
+    have h6 : (S + 1) * a m * a 0 < a (m + 1) * a 0 := by linarith
     have h7 : (S + 1) * a m < a (m + 1) := lt_of_mul_lt_mul_right h6 ha0.le
-    nlinarith
+    linarith
 
 end GlobalTheory.PosFormAdjoint
 

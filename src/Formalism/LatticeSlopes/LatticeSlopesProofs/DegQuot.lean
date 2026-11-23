@@ -66,11 +66,9 @@ theorem linearIndependent_coe_basis''' {E : Type*} [NormedAddCommGroup E] [Inner
   have hs : Submodule.span ℤ (Set.range fun i => (b i : E)) = L := by
     have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b := Set.range_comp L.subtype b
     rw [h1, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
-  have hd : DiscreteTopology (Submodule.span ℤ (Set.range fun i => (b i : E))) := by
-    rw [hs]; infer_instance
+  have hd : DiscreteTopology (Submodule.span ℤ (Set.range fun i => (b i : E))) := by rw [hs]; infer_instance
   rw [linearIndependent_iff_card_eq_finrank_span, Real.finrank_eq_int_finrank_of_discrete hd]
-  unfold Set.finrank
-  rw [hs, Module.finrank_eq_card_basis b]
+  unfold Set.finrank; rw [hs, Module.finrank_eq_card_basis b]
 
 theorem discreteTopology_span_range_of_linearIndependent {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
     {ι : Type*} [Fintype ι] (c : ι → E) (hc : LinearIndependent ℝ c) :
@@ -120,8 +118,7 @@ theorem discreteTopology_span_range_of_linearIndependent {E : Type*} [NormedAddC
 
 theorem span_range_coe_basis' {E : Type*} [AddCommGroup E] (L : Submodule ℤ E) {ι : Type*}
     (b : Basis ι ℤ L) : span ℤ (Set.range (fun i => (b i : E))) = L := by
-  have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b := Set.range_comp L.subtype b
-  rw [h1, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
+  rw [show (Set.range fun i => (b i : E)) = L.subtype '' Set.range b from Set.range_comp L.subtype b, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
 
 theorem degree_quotient : DegQuot := by

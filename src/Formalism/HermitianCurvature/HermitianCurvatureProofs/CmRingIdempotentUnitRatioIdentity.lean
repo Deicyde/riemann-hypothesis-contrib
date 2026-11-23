@@ -69,8 +69,7 @@ lemma cmRing_idempotent_unitRatio_identity (f : ℕ) (hf : 1 ≤ f) (Ct Z Th : �
   have hTh' : 0 < Th⁻¹ := inv_pos.mpr hTh
   have hf0 : f ≠ 0 := by omega
   have hCtf : Ct ≤ Ct ^ f := by
-    calc Ct = Ct ^ 1 := (pow_one Ct).symm
-      _ ≤ Ct ^ f := pow_le_pow_right₀ hCt hf
+    simpa using pow_le_pow_right₀ hCt hf
   have hZf : 0 ≤ Z ^ f := pow_nonneg hZ f
   have key : Th⁻¹ ^ f ≤ (Ct * Z) ^ f := by
     rw [inv_pow, mul_pow]
@@ -107,7 +106,6 @@ lemma sqrtTTLower (x bb cT Cb mr TT : ℝ) (hx : 1 ≤ x) (hcT : 0 < cT) (hCb : 
     (hbb : x ^ (Cb / 2) ≤ bb) (hTT : (bb ^ (cT * mr)) ^ 2 ≤ TT) :
     x * x ^ (cT * Cb - 1) ≤ Real.sqrt TT := by
   have hx0 : 0 < x := by linarith
-  have hbb0 : 0 < bb := lt_of_lt_of_le (Real.rpow_pos_of_pos hx0 _) hbb
   have e1 : x * x ^ (cT * Cb - 1) = x ^ (cT * Cb) := by
     conv_lhs => arg 1; rw [← Real.rpow_one x]
     rw [← Real.rpow_add hx0]; ring_nf
@@ -139,9 +137,6 @@ lemma quantOne (x fr mr K P W Del : ℝ) (hx : 1 ≤ x) (hm : 0 < mr) (hmf : mr 
   have hm3 : mr ^ 3 ≤ fr ^ 4 := by
     calc mr ^ 3 ≤ fr ^ 3 := pow_le_pow_left₀ hm.le hmf 3
       _ ≤ fr ^ 4 := pow_le_pow_right₀ hf (by norm_num)
-  have hx3 : x ≤ x ^ 3 := by
-    calc x = x ^ 1 := (pow_one x).symm
-      _ ≤ x ^ 3 := pow_le_pow_right₀ hx (by norm_num)
   have A1 : (P * W) ^ 2 * (x * (10 * mr) ^ 3) = P ^ 2 * (1000 * W ^ 2) * x * mr ^ 3 := by ring
   rw [A1]
   have B1 : P ^ 2 * (1000 * W ^ 2) * x * mr ^ 3 ≤ P ^ 2 * x * x * fr ^ 4 := by
@@ -149,7 +144,7 @@ lemma quantOne (x fr mr K P W Del : ℝ) (hx : 1 ≤ x) (hm : 0 < mr) (hmf : mr 
     have hp2 : 0 ≤ P ^ 2 := sq_nonneg P
     nlinarith [mul_le_mul_of_nonneg_left this (mul_nonneg hp2 hx0.le)]
   have B2 : P ^ 2 * x * x * fr ^ 4 ≤ x ^ 4 * fr ^ 4 * K := by
-    have hxx : x * x ≤ x ^ 4 := by nlinarith
+    have hxx : x * x ≤ x ^ 4 := by simpa [pow_two] using pow_le_pow_right₀ hx (by norm_num : (2:ℕ) ≤ 4)
     have : P ^ 2 * (x * x) * fr ^ 4 ≤ K * x ^ 4 * fr ^ 4 := by
       apply mul_le_mul_of_nonneg_right _ (by positivity)
       exact mul_le_mul hPK hxx (by positivity) hK
@@ -160,7 +155,6 @@ lemma quantitative_fourth_power_bound (x fr mr K P V s Del : ℝ) (hx : 1 ≤ x)
     (hf : 1 ≤ fr) (hP : 0 ≤ P) (hPK : P ≤ K) (hV : 0 < V) (hVx : 40 * V ≤ x) (hs0 : 0 ≤ s)
     (hs : s ≤ x) (hDel : x ^ 4 * fr ^ 4 * K ≤ Del) :
     P * (V * s * (10 * mr)) ≤ Del / 4 := by
-  have hx0 : 0 < x := by linarith
   have hK : 0 ≤ K := le_trans hP hPK
   have hV' : V ≤ x / 40 := by linarith
   have h1 : V * s ≤ x / 40 * x := mul_le_mul hV' hs hs0 (by linarith)
@@ -202,7 +196,6 @@ theorem threshold_products : ThresholdProducts := by
   intro ι _ t B1 B k C A0 Ct ka N I g Del TT i s hC hA0 hCt hka hkapi hN hI hg hDel hTT hCN ht htp hB1 hB hi
   have hC0 : 0 ≤ C := by linarith
   have hg0 : 0 < g := by linarith
-  have hq0 : 0 ≤ C * Real.pi * N / I := by positivity
   have hbase0 : 0 ≤ C * ka * N / (g * I) := by positivity
   have hbase : C * ka * N / (g * I) ≤ C * Real.pi * N / I := by
     rw [div_le_div_iff₀ (by positivity) hI]
@@ -213,7 +206,6 @@ theorem threshold_products : ThresholdProducts := by
       mul_le_mul_of_nonneg_right (le_trans h1 h2) hI.le
     linarith
   have hbase1 : C * ka * N / (g * I) ≤ 1 := le_trans hbase hCN
-  have hsk : 0 ≤ Real.sqrt k := Real.sqrt_nonneg _
   have hCB : ∀ w, C * B w ≤ C * A0 * Real.sqrt k * t w := fun w => by
     have := mul_le_mul_of_nonneg_left (hB w).2 hC0
     linarith
@@ -492,7 +484,6 @@ theorem final_smallness : FinalSmall := by
   have hbbT : bb ≤ T ^ f := by
     have : Real.log bb ≤ Real.log (T ^ f) := by rw [Real.log_pow]; exact hlogbb
     exact (Real.log_le_log_iff (by linarith) (by positivity)).mp this
-  have hf2 : 2 ≤ f := by omega
   have hr1 : ((r:ℝ) + 1) ≤ 2 ^ f := by
     have : r + 1 < 2 ^ f := lt_of_le_of_lt (by omega) Nat.lt_two_pow_self
     exact_mod_cast this.le

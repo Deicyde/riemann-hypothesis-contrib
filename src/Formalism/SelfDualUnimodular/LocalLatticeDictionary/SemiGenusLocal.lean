@@ -183,7 +183,6 @@ theorem core {p : Ideal (𝓞 K)} (hK : Formalism.HermitianLatticesTheory.IsCMUn
 
 theorem semi_genus_local : SemiGenusLoc := by
   intro K _ _ _ V _ _ _ h hK hsy hnd p hp M₁ M₂ h1 h2
-  obtain ⟨g, hg, hm⟩ := core hK hp _ V rfl h hsy hnd M₁ M₂ h1 h2
-  exact ⟨g, hg, hm⟩
+  exact core hK hp _ V rfl h hsy hnd M₁ M₂ h1 h2
 
 end Formalism.L2.SG.Pf.LatDictZ.Z0.SGC

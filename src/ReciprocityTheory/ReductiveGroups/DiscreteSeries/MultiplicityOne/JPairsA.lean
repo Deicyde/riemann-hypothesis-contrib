@@ -61,12 +61,10 @@ attribute [local instance] Matrix.frobeniusNormedAddCommGroup
 theorem gN_eq_frob {k r : ℕ} (g : Mat k r) : gN g = ‖g‖ := by
   rw [frobenius_norm_def, gN, Real.sqrt_eq_rpow]
   congr 1
-  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-  rw [Complex.normSq_eq_norm_sq, Real.rpow_two]
+  simp only [Complex.normSq_eq_norm_sq, Real.rpow_two]
 
 theorem gN_mul_le {k r : ℕ} (A B : Mat k r) : gN (A * B) ≤ gN A * gN B := by
-  rw [gN_eq_frob, gN_eq_frob, gN_eq_frob]
-  exact frobenius_norm_mul A B
+  simpa only [gN_eq_frob] using frobenius_norm_mul A B
 
 theorem gN_conjTranspose {k r : ℕ} (A : Mat k r) : gN Aᴴ = gN A := by
   rw [gN_eq_frob, gN_eq_frob, frobenius_norm_conjTranspose]
@@ -127,17 +125,14 @@ theorem Hpk_sq : Hpk k r * Hpk k r = 1 :=
   mat_eq_of_mulVec' k r fun v => by rw [← Matrix.mulVec_mulVec, Hpk_mulVec_mulVec, Matrix.one_mulVec]
 
 theorem UH_left_inv {g : Mat k r} (hg : g ∈ GV k r) : Hpk k r * gᴴ * Hpk k r * g = 1 := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
-    _ = 1 := by rw [hg', Hpk_sq]
+    _ = 1 := by rw [hg, Hpk_sq]
 
 theorem GV_mul {g x : Mat k r} (hg : g ∈ GV k r) (hx : x ∈ GV k r) : g * x ∈ GV k r := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  have hx' : xᴴ * Hpk k r * x = Hpk k r := hx
   show (g * x)ᴴ * Hpk k r * (g * x) = Hpk k r
   rw [conjTranspose_mul]
   calc xᴴ * gᴴ * Hpk k r * (g * x) = xᴴ * (gᴴ * Hpk k r * g) * x := by simp only [Matrix.mul_assoc]
-    _ = Hpk k r := by rw [hg', hx']
+    _ = Hpk k r := by rw [hg, hx]
 
 end hpk
 

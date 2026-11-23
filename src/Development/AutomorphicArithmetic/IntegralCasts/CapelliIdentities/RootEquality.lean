@@ -75,1242 +75,68 @@ public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.RootEquality.G.{u_1, u_2} :
-    (F : Type u_1) →
-      (Ω : Type u_2) →
-        [inst : Field F] →
-          [inst_1 : Field Ω] →
-            [@Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))] →
-              Type u_2 :=
-    fun (F : Type u_1) (Ω : Type u_2) [inst : Field F] [inst_1 : Field Ω]
-        [inst_2 :
-          @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))] ↦
-      @AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2 inst_2
+namespace UpperTheory.Reformulated.B.RootEquality
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.Dec.{u_1, u_2} :
-    {F : Type u_1} →
-      {Ω : Type u_2} →
-        [inst : Field F] →
-          [inst_1 : Field Ω] →
-            [inst_2 :
-                @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))] →
-              @ValuationSubring Ω inst_1 →
-                @Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2) :=
-    fun {F : Type u_1} {Ω : Type u_2} [inst : Field F] [inst_1 : Field Ω]
-        [inst_2 :
-          @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))]
-        (A : @ValuationSubring Ω inst_1) ↦
-      @ValuationSubring.decompositionSubgroup F Ω inst inst_1 inst_2 A
+@[reducible] noncomputable def G.{u_1, u_2} (F : Type u_1) (Ω : Type u_2)
+    [Field F] [Field Ω] [Algebra F Ω] : Type u_2 :=
+  Ω ≃ₐ[F] Ω
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.IsPlaceOver.{u_1, u_2} :
-    {F : Type u_1} →
-      {Ω : Type u_2} →
-        [inst : Field F] →
-          [inst_1 : Field Ω] →
-            [@Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))] →
-              @ValuationSubring Ω inst_1 →
-                @IsDedekindDomain.HeightOneSpectrum (@NumberField.RingOfIntegers F inst)
-                    (@NumberField.instCommRingRingOfIntegers F inst) →
-                  Prop :=
-    fun {F : Type u_1} {Ω : Type u_2} [inst : Field F] [inst_1 : Field Ω]
-        [inst_2 :
-          @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))]
-        (A : @ValuationSubring Ω inst_1)
-        (v :
-          @IsDedekindDomain.HeightOneSpectrum (@NumberField.RingOfIntegers F inst)
-            (@NumberField.instCommRingRingOfIntegers F inst)) ↦
-      ∀ (x : @NumberField.RingOfIntegers F inst),
-        Iff
+noncomputable def Dec.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
+    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Subgroup (G F Ω) :=
+  ValuationSubring.decompositionSubgroup F A
 
-          (@LT.lt (@ValuationSubring.ValueGroup Ω inst_1 A)
-            (@Preorder.toLT (@ValuationSubring.ValueGroup Ω inst_1 A)
-              (@PartialOrder.toPreorder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@SemilatticeInf.toPartialOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@Lattice.toSemilatticeInf (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DistribLattice.toLattice (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@instDistribLatticeOfLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@LinearOrderedCommMonoidWithZero.toLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                            (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))
-            (@DFunLike.coe
-              (@Valuation Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))
-                (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))
-              Ω (fun (x : Ω) ↦ @ValuationSubring.ValueGroup Ω inst_1 A)
-              (@Valuation.instFunLike Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1))
-                (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))
-              (@ValuationSubring.valuation Ω inst_1 A)
-              (@DFunLike.coe
-                (@RingHom F Ω
-                  (@Semiring.toNonAssocSemiring F
-                    (@CommSemiring.toSemiring F (@Semifield.toCommSemiring F (@Field.toSemifield F inst))))
-                  (@Semiring.toNonAssocSemiring Ω
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))))
-                F (fun (x : F) ↦ Ω)
-                (@RingHom.instFunLike F Ω
-                  (@Semiring.toNonAssocSemiring F
-                    (@CommSemiring.toSemiring F (@Semifield.toCommSemiring F (@Field.toSemifield F inst))))
-                  (@Semiring.toNonAssocSemiring Ω
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))))
-                (@Algebra.algebraMap F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2)
-                (@NumberField.RingOfIntegers.val F inst x)))
-            (@OfNat.ofNat (@ValuationSubring.ValueGroup Ω inst_1 A) (nat_lit 1)
-              (@One.toOfNat1 (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@InvOneClass.toOne (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@DivInvOneMonoid.toInvOneClass (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DivisionMonoid.toDivInvOneMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DivisionCommMonoid.toDivisionMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@CommGroupWithZero.toDivisionCommMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@LinearOrderedCommGroupWithZero.toCommGroupWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))))))))))
-          (@Membership.mem (@NumberField.RingOfIntegers F inst)
-            (@Ideal (@NumberField.RingOfIntegers F inst)
-              (@CommSemiring.toSemiring (@NumberField.RingOfIntegers F inst)
-                (@CommRing.toCommSemiring (@NumberField.RingOfIntegers F inst)
-                  (@NumberField.instCommRingRingOfIntegers F inst))))
-            (@SetLike.instMembership
-              (@Ideal (@NumberField.RingOfIntegers F inst)
-                (@CommSemiring.toSemiring (@NumberField.RingOfIntegers F inst)
-                  (@CommRing.toCommSemiring (@NumberField.RingOfIntegers F inst)
-                    (@NumberField.instCommRingRingOfIntegers F inst))))
-              (@NumberField.RingOfIntegers F inst)
-              (@Submodule.setLike (@NumberField.RingOfIntegers F inst) (@NumberField.RingOfIntegers F inst)
-                (@CommSemiring.toSemiring (@NumberField.RingOfIntegers F inst)
-                  (@CommRing.toCommSemiring (@NumberField.RingOfIntegers F inst)
+noncomputable def IsPlaceOver.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
+    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω)
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) : Prop :=
+  ∀ x : NumberField.RingOfIntegers F, A.valuation (algebraMap F Ω x.val) < 1 ↔ x ∈ v.asIdeal
 
-                    (@NumberField.instCommRingRingOfIntegers F inst)))
-                (@Semiring.toAddCommMonoid (@NumberField.RingOfIntegers F inst)
-                  (@CommSemiring.toSemiring (@NumberField.RingOfIntegers F inst)
-                    (@CommRing.toCommSemiring (@NumberField.RingOfIntegers F inst)
-                      (@NumberField.instCommRingRingOfIntegers F inst))))
-                (@Semiring.toModule (@NumberField.RingOfIntegers F inst)
-                  (@CommSemiring.toSemiring (@NumberField.RingOfIntegers F inst)
-                    (@CommRing.toCommSemiring (@NumberField.RingOfIntegers F inst)
-                      (@NumberField.instCommRingRingOfIntegers F inst))))))
-            (@IsDedekindDomain.HeightOneSpectrum.asIdeal (@NumberField.RingOfIntegers F inst)
-              (@NumberField.instCommRingRingOfIntegers F inst) v)
-            x)
+noncomputable def LC {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) [TopologicalSpace Γ] : Prop :=
+  ∀ m : M, IsLocallyConstant fun g : Γ ↦ ρ g m
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.LC :
-    {R Γ M : Type} →
-      [inst : CommRing R] →
-        [inst_1 : Group Γ] →
-          [inst_2 : AddCommGroup M] →
-            [inst_3 :
-                @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@AddCommGroup.toAddCommMonoid M inst_2)] →
-              @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2)
-                  inst_3 →
-                [TopologicalSpace Γ] → Prop :=
-    fun {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M]
-        [inst_3 :
-          @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-            (@AddCommGroup.toAddCommMonoid M inst_2)]
-        (ρ :
-          @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-            (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-        [inst_4 : TopologicalSpace Γ] ↦
-      ∀ (m : M),
-        @IsLocallyConstant Γ M inst_4 fun (g : Γ) ↦
-          @DFunLike.coe
-            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-              (@RingHom.id R
-                (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-            M (fun (x : M) ↦ M)
-            (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)) (@AddCommGroup.toAddCommMonoid M inst_2)
-              (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-              (@RingHom.id R
-                (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-            (@DFunLike.coe
-              (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-              Γ
-              (fun (x : Γ) ↦
-                @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@RingHom.id R
-                    (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-              (@MonoidHom.instFunLike Γ
-                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-
-                  (@RingHom.id R
-                    (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                (@MulOneClass.toMulOne Γ
-                  (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                (@MulOneClass.toMulOne
-                  (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                    (@RingHom.id R
-                      (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                    M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                  (@MulZeroOneClass.toMulOneClass
-                    (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@RingHom.id R
-                        (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                      M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                    (@instMulZeroOneClassOfSemiring
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                        M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                      (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-              ρ g)
-            m
-
-theorem UpperTheory.Reformulated.B.RootEquality.aux5 :
-    ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M]
-      [inst_3 :
-        @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@AddCommGroup.toAddCommMonoid M inst_2)]
-      (ρ :
-        @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-      [inst_4 : TopologicalSpace Γ] {x y : Γ → M},
-      @Membership.mem (Γ → M) (Set (Γ → M)) (@Set.instMembership (Γ → M))
-          (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-            And (@IsLocallyConstant Γ M inst_4 z)
-              (∀ (g h : Γ),
-                @Eq M
-                  (z
-                    (@HMul.hMul Γ Γ Γ
-                      (@instHMul Γ
-                        (@MulOne.toMul Γ
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                      g h))
-                  (@HAdd.hAdd M M M
-                    (@instHAdd M
-                      (@AddCommMagma.toAdd M
-                        (@AddCommSemigroup.toAddCommMagma M
-                          (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                    (z g)
-                    (@DFunLike.coe
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-
-                        M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                      M (fun (x : M) ↦ M)
-                      (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                      (@DFunLike.coe
-                        (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-                        Γ
-                        (fun (x : Γ) ↦
-                          @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                        (@MonoidHom.instFunLike Γ
-                          (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                          (@MulOneClass.toMulOne
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                            (@MulZeroOneClass.toMulOneClass
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@instMulZeroOneClassOfSemiring
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                        ρ g)
-                      (z h)))))
-          x →
-        @Membership.mem (Γ → M) (Set (Γ → M)) (@Set.instMembership (Γ → M))
-
-            (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-              And (@IsLocallyConstant Γ M inst_4 z)
-                (∀ (g h : Γ),
-                  @Eq M
-                    (z
-                      (@HMul.hMul Γ Γ Γ
-                        (@instHMul Γ
-                          (@MulOne.toMul Γ
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                        g h))
-                    (@HAdd.hAdd M M M
-                      (@instHAdd M
-                        (@AddCommMagma.toAdd M
-                          (@AddCommSemigroup.toAddCommMagma M
-                            (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                      (z g)
-                      (@DFunLike.coe
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                          inst_3)
-                        M (fun (x : M) ↦ M)
-                        (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                        (@DFunLike.coe
-                          (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                            (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-                          Γ
-                          (fun (x : Γ) ↦
-                            @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                          (@MonoidHom.instFunLike Γ
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                            (@MulOneClass.toMulOne
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@MulZeroOneClass.toMulOneClass
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@instMulZeroOneClassOfSemiring
-                                  (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@RingHom.id R
-                                      (@Semiring.toNonAssocSemiring R
-                                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                    M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                    inst_3 inst_3)
-                                  (@Module.End.instSemiring R M
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                          ρ g)
-                        (z h)))))
-            y →
-          @Membership.mem (Γ → M) (Set (Γ → M)) (@Set.instMembership (Γ → M))
-            (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-              And (@IsLocallyConstant Γ M inst_4 z)
-                (∀ (g h : Γ),
-                  @Eq M
-                    (z
-                      (@HMul.hMul Γ Γ Γ
-                        (@instHMul Γ
-                          (@MulOne.toMul Γ
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                        g h))
-                    (@HAdd.hAdd M M M
-                      (@instHAdd M
-                        (@AddCommMagma.toAdd M
-                          (@AddCommSemigroup.toAddCommMagma M
-                            (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                      (z g)
-                      (@DFunLike.coe
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                          inst_3)
-                        M (fun (x : M) ↦ M)
-                        (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                        (@DFunLike.coe
-                          (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                            (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-
-                          Γ
-                          (fun (x : Γ) ↦
-                            @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                          (@MonoidHom.instFunLike Γ
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                            (@MulOneClass.toMulOne
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@MulZeroOneClass.toMulOneClass
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@instMulZeroOneClassOfSemiring
-                                  (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@RingHom.id R
-                                      (@Semiring.toNonAssocSemiring R
-                                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                    M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                    inst_3 inst_3)
-                                  (@Module.End.instSemiring R M
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                          ρ g)
-                        (z h)))))
-            (@HAdd.hAdd (Γ → M) (Γ → M) (Γ → M)
-              (@instHAdd (Γ → M)
-                (@AddZero.toAdd (Γ → M)
-                  (@AddZeroClass.toAddZero (Γ → M)
-                    (@AddMonoid.toAddZeroClass (Γ → M)
-                      (@AddCommMonoid.toAddMonoid (Γ → M)
-                        (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2))))))
-              x y) := by
-  exact fun ρ _ _ _ hx hy ↦ ⟨hx.1.add hy.1, fun g h ↦ by
+theorem aux5 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) [TopologicalSpace Γ] {x y : Γ → M}
+    (hx : x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)})
+    (hy : y ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}) :
+    x + y ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)} :=
+  ⟨hx.1.add hy.1, fun g h ↦ by
     simp only [Pi.add_apply, hx.2 g h, hy.2 g h, map_add (f := _)]; abel⟩
 
-theorem UpperTheory.Reformulated.B.RootEquality.aux6 :
-    ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M]
+theorem aux6 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) [TopologicalSpace Γ] :
+    IsLocallyConstant (0 : Γ → M) ∧
+      ∀ g h : Γ, (0 : Γ → M) (g * h) = (0 : Γ → M) g + ρ g ((0 : Γ → M) h) :=
+  ⟨IsLocallyConstant.const _, fun _ _ ↦ by simp⟩
 
-      [inst_3 :
-        @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@AddCommGroup.toAddCommMonoid M inst_2)]
-      (ρ :
-        @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-      [inst_4 : TopologicalSpace Γ],
-      And
-        (@IsLocallyConstant Γ M inst_4
-          (@OfNat.ofNat (Γ → M) (nat_lit 0)
-            (@Zero.toOfNat0 (Γ → M)
-              (@AddZero.toZero (Γ → M)
-                (@AddZeroClass.toAddZero (Γ → M)
-                  (@AddMonoid.toAddZeroClass (Γ → M)
-                    (@AddCommMonoid.toAddMonoid (Γ → M)
-                      (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2))))))))
-        (∀ (g h : Γ),
-          @Eq M
-            (@OfNat.ofNat (Γ → M) (nat_lit 0)
-              (@Zero.toOfNat0 (Γ → M)
-                (@AddZero.toZero (Γ → M)
-                  (@AddZeroClass.toAddZero (Γ → M)
-                    (@AddMonoid.toAddZeroClass (Γ → M)
-                      (@AddCommMonoid.toAddMonoid (Γ → M)
-                        (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2))))))
-              (@HMul.hMul Γ Γ Γ
-                (@instHMul Γ
-                  (@MulOne.toMul Γ
-                    (@MulOneClass.toMulOne Γ
-                      (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                g h))
-            (@HAdd.hAdd M M M
-              (@instHAdd M
-                (@AddCommMagma.toAdd M
-                  (@AddCommSemigroup.toAddCommMagma M
-                    (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-              (@OfNat.ofNat (Γ → M) (nat_lit 0)
-                (@Zero.toOfNat0 (Γ → M)
-                  (@AddZero.toZero (Γ → M)
-                    (@AddZeroClass.toAddZero (Γ → M)
-                      (@AddMonoid.toAddZeroClass (Γ → M)
-                        (@AddCommMonoid.toAddMonoid (Γ → M)
-                          (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2))))))
-                g)
-              (@DFunLike.coe
-                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@RingHom.id R
-                    (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                M (fun (x : M) ↦ M)
-                (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)) (@AddCommGroup.toAddCommMonoid M inst_2)
-                  (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                  (@RingHom.id R
-                    (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                (@DFunLike.coe
-                  (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                    (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2)
-                    inst_3)
-
-                  Γ
-                  (fun (x : Γ) ↦
-                    @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@RingHom.id R
-                        (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                      M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                  (@MonoidHom.instFunLike Γ
-                    (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@RingHom.id R
-                        (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                      M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                    (@MulOneClass.toMulOne Γ
-                      (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                    (@MulOneClass.toMulOne
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                        M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                      (@MulZeroOneClass.toMulOneClass
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                          inst_3)
-                        (@instMulZeroOneClassOfSemiring
-                          (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                          (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                  ρ g)
-                (@OfNat.ofNat (Γ → M) (nat_lit 0)
-                  (@Zero.toOfNat0 (Γ → M)
-                    (@AddZero.toZero (Γ → M)
-                      (@AddZeroClass.toAddZero (Γ → M)
-                        (@AddMonoid.toAddZeroClass (Γ → M)
-                          (@AddCommMonoid.toAddMonoid (Γ → M)
-                            (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦
-                              @AddCommGroup.toAddCommMonoid M inst_2))))))
-                  h)))) := by
-  exact fun ρ _ ↦ ⟨IsLocallyConstant.const _, fun g h ↦ by simp⟩
-
-theorem UpperTheory.Reformulated.B.RootEquality.aux7 :
-    ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M]
-      [inst_3 :
-        @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@AddCommGroup.toAddCommMonoid M inst_2)]
-      (ρ :
-        @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-      [inst_4 : TopologicalSpace Γ] (c : R) {x : Γ → M},
-      @Membership.mem (Γ → M) (Set (Γ → M)) (@Set.instMembership (Γ → M))
-
-          (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-            And (@IsLocallyConstant Γ M inst_4 z)
-              (∀ (g h : Γ),
-                @Eq M
-                  (z
-                    (@HMul.hMul Γ Γ Γ
-                      (@instHMul Γ
-                        (@MulOne.toMul Γ
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                      g h))
-                  (@HAdd.hAdd M M M
-                    (@instHAdd M
-                      (@AddCommMagma.toAdd M
-                        (@AddCommSemigroup.toAddCommMagma M
-                          (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                    (z g)
-                    (@DFunLike.coe
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                        M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                      M (fun (x : M) ↦ M)
-                      (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                      (@DFunLike.coe
-                        (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-                        Γ
-                        (fun (x : Γ) ↦
-                          @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                        (@MonoidHom.instFunLike Γ
-                          (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                          (@MulOneClass.toMulOne
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-
-                            (@MulZeroOneClass.toMulOneClass
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@instMulZeroOneClassOfSemiring
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                        ρ g)
-                      (z h)))))
-          x →
-        @Membership.mem (Γ → M) (Set (Γ → M)) (@Set.instMembership (Γ → M))
-          (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-            And (@IsLocallyConstant Γ M inst_4 z)
-              (∀ (g h : Γ),
-                @Eq M
-                  (z
-                    (@HMul.hMul Γ Γ Γ
-                      (@instHMul Γ
-                        (@MulOne.toMul Γ
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                      g h))
-                  (@HAdd.hAdd M M M
-                    (@instHAdd M
-                      (@AddCommMagma.toAdd M
-                        (@AddCommSemigroup.toAddCommMagma M
-                          (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                    (z g)
-                    (@DFunLike.coe
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                        M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3)
-                      M (fun (x : M) ↦ M)
-                      (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                      (@DFunLike.coe
-                        (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-                        Γ
-                        (fun (x : Γ) ↦
-                          @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                        (@MonoidHom.instFunLike Γ
-                          (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                            inst_3)
-                          (@MulOneClass.toMulOne Γ
-                            (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                          (@MulOneClass.toMulOne
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                            (@MulZeroOneClass.toMulOneClass
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@instMulZeroOneClassOfSemiring
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                        ρ g)
-                      (z h)))))
-          (@HSMul.hSMul R (Γ → M) (Γ → M)
-            (@instHSMul R (Γ → M)
-              (@SMulZeroClass.toSMul R (Γ → M)
-                (@AddZero.toZero (Γ → M)
-                  (@AddZeroClass.toAddZero (Γ → M)
-                    (@AddMonoid.toAddZeroClass (Γ → M)
-                      (@AddCommMonoid.toAddMonoid (Γ → M)
-                        (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)))))
-                (@DistribSMul.toSMulZeroClass R (Γ → M)
-                  (@AddMonoid.toAddZeroClass (Γ → M)
-                    (@AddCommMonoid.toAddMonoid (Γ → M)
-                      (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)))
-                  (@DistribMulAction.toDistribSMul R (Γ → M)
-                    (@Semiring.toMonoid R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))
-                    (@AddCommMonoid.toAddMonoid (Γ → M)
-                      (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2))
-                    (@Module.toDistribMulAction R (Γ → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                      (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)
-
-                      (@Pi.Function.module Γ R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                        (@AddCommGroup.toAddCommMonoid M inst_2) inst_3))))))
-            c x) := by
-  exact fun ρ _ c _ hx ↦ ⟨hx.1.comp (fun m ↦ c • m), fun g h ↦ by
+theorem aux7 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) [TopologicalSpace Γ] (c : R) {x : Γ → M}
+    (hx : x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}) :
+    c • x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)} :=
+  ⟨hx.1.comp (fun m ↦ c • m), fun g h ↦ by
     simp only [Pi.smul_apply, hx.2 g h, map_smul, smul_add]⟩
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.Zl : {R Γ M : Type} →
-  [inst : CommRing R] →
-    [inst_1 : Group Γ] →
-      [inst_2 : AddCommGroup M] →
-        [inst_3 : Module R M] → Representation R Γ M → [TopologicalSpace Γ] → Submodule R (Γ → M) := fun {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M]
-        [inst_3 :
-          @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-            (@AddCommGroup.toAddCommMonoid M inst_2)]
-        (ρ :
-          @Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-            (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1)) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-        [inst_4 : TopologicalSpace Γ] ↦
-      @Submodule.mk R (Γ → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-        (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)
-        (@Pi.Function.module Γ R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-          (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-        (@AddSubmonoid.mk (Γ → M)
-          (@AddMonoid.toAddZeroClass (Γ → M)
-            (@AddCommMonoid.toAddMonoid (Γ → M)
-              (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)))
-          (@AddSubsemigroup.mk (Γ → M)
-            (@AddZero.toAdd (Γ → M)
-              (@AddZeroClass.toAddZero (Γ → M)
-                (@AddMonoid.toAddZeroClass (Γ → M)
-                  (@AddCommMonoid.toAddMonoid (Γ → M)
-                    (@Pi.addCommMonoid Γ (fun (a : Γ) ↦ M) fun (i : Γ) ↦ @AddCommGroup.toAddCommMonoid M inst_2)))))
-            (@Set.ofPred (Γ → M) fun (z : Γ → M) ↦
-              And (@IsLocallyConstant Γ M inst_4 z)
-                (∀ (g h : Γ),
-                  @Eq M
-                    (z
-                      (@HMul.hMul Γ Γ Γ
-                        (@instHMul Γ
-                          (@MulOne.toMul Γ
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))))
-                        g h))
-                    (@HAdd.hAdd M M M
-                      (@instHAdd M
-                        (@AddCommMagma.toAdd M
-                          (@AddCommSemigroup.toAddCommMagma M
-                            (@AddCommMonoid.toAddCommSemigroup M (@AddCommGroup.toAddCommMonoid M inst_2)))))
-                      (z g)
+noncomputable def Zl {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) [TopologicalSpace Γ] : Submodule R (Γ → M) where
+  carrier := {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}
+  add_mem' := aux5 ρ
+  zero_mem' := aux6 ρ
+  smul_mem' := aux7 ρ
 
-                      (@DFunLike.coe
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                          inst_3)
-                        M (fun (x : M) ↦ M)
-                        (@LinearMap.instFunLike R R M M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                          (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3 inst_3
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst)))))
-                        (@DFunLike.coe
-                          (@Representation R Γ M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                            (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))
-                            (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)
-                          Γ
-                          (fun (x : Γ) ↦
-                            @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                          (@MonoidHom.instFunLike Γ
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                              inst_3)
-                            (@MulOneClass.toMulOne Γ
-                              (@Monoid.toMulOneClass Γ (@DivInvMonoid.toMonoid Γ (@Group.toDivInvMonoid Γ inst_1))))
-                            (@MulOneClass.toMulOne
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2) inst_3
-                                inst_3)
-                              (@MulZeroOneClass.toMulOneClass
-                                (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                  (@RingHom.id R
-                                    (@Semiring.toNonAssocSemiring R
-                                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                  M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
-                                  inst_3 inst_3)
-                                (@instMulZeroOneClassOfSemiring
-                                  (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@RingHom.id R
-                                      (@Semiring.toNonAssocSemiring R
-                                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))))
-                                    M M (@AddCommGroup.toAddCommMonoid M inst_2) (@AddCommGroup.toAddCommMonoid M inst_2)
+noncomputable def UnrCount (l : ℕ) (D : Type) [Group D] [TopologicalSpace D] (J : Subgroup D) :
+    Prop :=
+  ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] (ρ : Representation R D M),
+    LC ρ → (∀ m : M, l • m = 0) → (∀ g ∈ J, ρ g = 1) →
+      {z : D → M | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.Finite ∧
+        {z : D → M | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.ncard = Nat.card M
 
-                                    inst_3 inst_3)
-                                  (@Module.End.instSemiring R M
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst))
-                                    (@AddCommGroup.toAddCommMonoid M inst_2) inst_3)))))
-                          ρ g)
-                        (z h)))))
-            (@UpperTheory.Reformulated.B.RootEquality.aux5 R Γ M inst inst_1 inst_2 inst_3 ρ inst_4))
-          (@UpperTheory.Reformulated.B.RootEquality.aux6 R Γ M inst inst_1 inst_2 inst_3 ρ inst_4))
-        (@UpperTheory.Reformulated.B.RootEquality.aux7 R Γ M inst inst_1 inst_2 inst_3 ρ inst_4)
+noncomputable def Inertia.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
+    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Set (G F Ω) :=
+  {σ : G F Ω | σ ∈ ValuationSubring.decompositionSubgroup F A ∧
+    ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x) < 1}
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.UnrCount :
-    Nat → (D : Type) → [inst : Group D] → [TopologicalSpace D] → @Subgroup D inst → Prop :=
-    fun (l : Nat) (D : Type) [inst : Group D] [inst_1 : TopologicalSpace D] (J : @Subgroup D inst) ↦
-      ∀ (R M : Type) [inst_2 : CommRing R] [inst_3 : AddCommGroup M]
-        [inst_4 :
-          @_root_.Module R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-            (@AddCommGroup.toAddCommMonoid M inst_3)]
-        [Finite M]
-        (ρ :
-          @Representation R D M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-            (@DivInvMonoid.toMonoid D (@Group.toDivInvMonoid D inst)) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4),
-        @UpperTheory.Reformulated.B.RootEquality.LC R D M inst_2 inst inst_3 inst_4 ρ inst_1 →
-          (∀ (m : M),
-              @Eq M
-                (@HSMul.hSMul Nat M M
-                  (@instHSMul Nat M
-                    (@NSMul.toSMul M
-                      (@AddMonoid.toNSMul M
-                        (@SubNegMonoid.toAddMonoid M (@AddGroup.toSubNegMonoid M (@AddCommGroup.toAddGroup M inst_3))))))
-                  l m)
-                (@OfNat.ofNat M (nat_lit 0)
-                  (@Zero.toOfNat0 M
-                    (@NegZeroClass.toZero M
-                      (@SubNegZeroMonoid.toNegZeroClass M
-                        (@SubtractionMonoid.toSubNegZeroMonoid M
-                          (@SubtractionCommMonoid.toSubtractionMonoid M
-                            (@AddCommGroup.toDivisionAddCommMonoid M inst_3)))))))) →
-            (∀ (g : D),
-                @Membership.mem D (@Subgroup D inst)
-                    (@SetLike.instMembership (@Subgroup D inst) D (@Subgroup.instSetLike D inst)) J g →
-                  @Eq
-                    (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                      (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                      (@RingHom.id R
-                        (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                      M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4 inst_4)
-                    (@DFunLike.coe
-                      (@Representation R D M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                        (@DivInvMonoid.toMonoid D (@Group.toDivInvMonoid D inst)) (@AddCommGroup.toAddCommMonoid M inst_3)
-                        inst_4)
-                      D
-                      (fun (x : D) ↦
-                        @LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                          inst_4)
-                      (@MonoidHom.instFunLike D
-
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                          inst_4)
-                        (@MulOneClass.toMulOne D
-                          (@Monoid.toMulOneClass D (@DivInvMonoid.toMonoid D (@Group.toDivInvMonoid D inst))))
-                        (@MulOneClass.toMulOne
-                          (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@RingHom.id R
-                              (@Semiring.toNonAssocSemiring R
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                            M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                            inst_4)
-                          (@MulZeroOneClass.toMulOneClass
-                            (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@RingHom.id R
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                              M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                              inst_4)
-                            (@instMulZeroOneClassOfSemiring
-                              (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                                (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                                (@RingHom.id R
-                                  (@Semiring.toNonAssocSemiring R
-                                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                                M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                                inst_4)
-                              (@Module.End.instSemiring R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                                (@AddCommGroup.toAddCommMonoid M inst_3) inst_4)))))
-                      ρ g)
-                    (@OfNat.ofNat
-                      (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                        (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                        (@RingHom.id R
-                          (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                        M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4 inst_4)
-                      (nat_lit 1)
-                      (@One.toOfNat1
-                        (@LinearMap R R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@RingHom.id R
-                            (@Semiring.toNonAssocSemiring R
-                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))))
-                          M M (@AddCommGroup.toAddCommMonoid M inst_3) (@AddCommGroup.toAddCommMonoid M inst_3) inst_4
-                          inst_4)
-                        (@Module.End.instOne R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@AddCommGroup.toAddCommMonoid M inst_3) inst_4)))) →
-              And
-                (@Set.Finite (D → M)
-                  (@Set.ofPred (D → M) fun (z : D → M) ↦
-                    And
-                      (@Membership.mem (D → M)
-                        (@Submodule R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                          (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-
-                          (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@AddCommGroup.toAddCommMonoid M inst_3) inst_4))
-                        (@SetLike.instMembership
-                          (@Submodule R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-                            (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@AddCommGroup.toAddCommMonoid M inst_3) inst_4))
-                          (D → M)
-                          (@Submodule.setLike R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-                            (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@AddCommGroup.toAddCommMonoid M inst_3) inst_4)))
-                        (@UpperTheory.Reformulated.B.RootEquality.Zl R D M inst_2 inst inst_3 inst_4 ρ inst_1) z)
-                      (∀ (g : D),
-                        @Membership.mem D (@Subgroup D inst)
-                            (@SetLike.instMembership (@Subgroup D inst) D (@Subgroup.instSetLike D inst)) J g →
-                          @Eq M (z g)
-                            (@OfNat.ofNat M (nat_lit 0)
-                              (@Zero.toOfNat0 M
-                                (@NegZeroClass.toZero M
-                                  (@SubNegZeroMonoid.toNegZeroClass M
-                                    (@SubtractionMonoid.toSubNegZeroMonoid M
-                                      (@SubtractionCommMonoid.toSubtractionMonoid M
-                                        (@AddCommGroup.toDivisionAddCommMonoid M inst_3))))))))))
-                (@Eq Nat
-                  (@Set.ncard (D → M)
-                    (@Set.ofPred (D → M) fun (z : D → M) ↦
-                      And
-                        (@Membership.mem (D → M)
-                          (@Submodule R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                            (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-                            (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@AddCommGroup.toAddCommMonoid M inst_3) inst_4))
-                          (@SetLike.instMembership
-                            (@Submodule R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-                              (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                                (@AddCommGroup.toAddCommMonoid M inst_3) inst_4))
-                            (D → M)
-                            (@Submodule.setLike R (D → M) (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                              (@Pi.addCommMonoid D (fun (a : D) ↦ M) fun (i : D) ↦ @AddCommGroup.toAddCommMonoid M inst_3)
-                              (@Pi.Function.module D R M (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_2))
-                                (@AddCommGroup.toAddCommMonoid M inst_3) inst_4)))
-                          (@UpperTheory.Reformulated.B.RootEquality.Zl R D M inst_2 inst inst_3 inst_4 ρ inst_1) z)
-                        (∀ (g : D),
-                          @Membership.mem D (@Subgroup D inst)
-                              (@SetLike.instMembership (@Subgroup D inst) D (@Subgroup.instSetLike D inst)) J g →
-                            @Eq M (z g)
-                              (@OfNat.ofNat M (nat_lit 0)
-                                (@Zero.toOfNat0 M
-                                  (@NegZeroClass.toZero M
-                                    (@SubNegZeroMonoid.toNegZeroClass M
-                                      (@SubtractionMonoid.toSubNegZeroMonoid M
-                                        (@SubtractionCommMonoid.toSubtractionMonoid M
-                                          (@AddCommGroup.toDivisionAddCommMonoid M inst_3))))))))))
-                  (Nat.card M))
-
-noncomputable def UpperTheory.Reformulated.B.RootEquality.Inertia.{u_1, u_2} :
-    {F : Type u_1} →
-      {Ω : Type u_2} →
-
-        [inst : Field F] →
-          [inst_1 : Field Ω] →
-            [inst_2 :
-                @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))] →
-              @ValuationSubring Ω inst_1 → Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) :=
-    fun {F : Type u_1} {Ω : Type u_2} [inst : Field F] [inst_1 : Field Ω]
-        [inst_2 :
-          @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))]
-        (A : @ValuationSubring Ω inst_1) ↦
-      @Set.ofPred (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) fun (σ : @UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) ↦
-        And
-          (@Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-            (@Subgroup
-              (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                inst_2)
-              (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2))
-            (@SetLike.instMembership
-              (@Subgroup
-                (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                  inst_2)
-                (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2))
-              (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                inst_2)
-              (@Subgroup.instSetLike
-                (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                  inst_2)
-                (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2)))
-            (@ValuationSubring.decompositionSubgroup F Ω inst inst_1 inst_2 A) σ)
-          (∀ (x : Ω),
-            @LE.le (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@Preorder.toLE (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@PartialOrder.toPreorder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@SemilatticeInf.toPartialOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@Lattice.toSemilatticeInf (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DistribLattice.toLattice (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@instDistribLatticeOfLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommMonoidWithZero.toLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                                (@ValuationSubring.ValueGroup Ω inst_1 A)
-                                (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))
-                (@DFunLike.coe
-                  (@Valuation Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                      (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))
-                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))
-                  Ω (fun (x : Ω) ↦ @ValuationSubring.ValueGroup Ω inst_1 A)
-
-                  (@Valuation.instFunLike Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1))
-                    (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                      (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))
-                  (@ValuationSubring.valuation Ω inst_1 A) x)
-                (@OfNat.ofNat (@ValuationSubring.ValueGroup Ω inst_1 A) (nat_lit 1)
-                  (@One.toOfNat1 (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@InvOneClass.toOne (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DivInvOneMonoid.toInvOneClass (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DivisionMonoid.toDivInvOneMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@DivisionCommMonoid.toDivisionMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@CommGroupWithZero.toDivisionCommMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@LinearOrderedCommGroupWithZero.toCommGroupWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                                (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))))))))) →
-              @LT.lt (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@Preorder.toLT (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@PartialOrder.toPreorder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@SemilatticeInf.toPartialOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@Lattice.toSemilatticeInf (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DistribLattice.toLattice (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@instDistribLatticeOfLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommMonoidWithZero.toLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                                (@ValuationSubring.ValueGroup Ω inst_1 A)
-                                (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))
-                (@DFunLike.coe
-                  (@Valuation Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                      (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))
-                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))
-                  Ω (fun (x : Ω) ↦ @ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@Valuation.instFunLike Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1))
-                    (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                      (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))
-                  (@ValuationSubring.valuation Ω inst_1 A)
-                  (@HSub.hSub Ω Ω Ω
-                    (@instHSub Ω
-                      (@SubNegMonoid.toSub Ω
-                        (@AddGroup.toSubNegMonoid Ω
-                          (@AddGroupWithOne.toAddGroup Ω
-                            (@Ring.toAddGroupWithOne Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))))))
-                    (@DFunLike.coe (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) Ω (fun (x : Ω) ↦ Ω)
-                      (@AlgEquiv.instFunLike F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                        inst_2 inst_2)
-                      σ x)
-                    x))
-                (@OfNat.ofNat (@ValuationSubring.ValueGroup Ω inst_1 A) (nat_lit 1)
-                  (@One.toOfNat1 (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@InvOneClass.toOne (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DivInvOneMonoid.toInvOneClass (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DivisionMonoid.toDivInvOneMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@DivisionCommMonoid.toDivisionMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@CommGroupWithZero.toDivisionCommMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@LinearOrderedCommGroupWithZero.toCommGroupWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-
-                                (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))))))))))
-
-theorem UpperTheory.Reformulated.B.RootEquality.aux11.{u_1, u_2} :
-    ∀ {F : Type u_1} {Ω : Type u_2} [inst : Field F] [@NumberField F inst] [inst_2 : Field Ω]
-      [inst_3 :
-        @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))]
-      (A : @ValuationSubring Ω inst_2) {σ τ : @UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3},
-      @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-          (@Set.instMembership (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-          (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A) σ →
-        @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-            (@Set.instMembership (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-            (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A) τ →
-          @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-            (@Set.instMembership (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-            (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A)
-            (@HMul.hMul (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (@instHMul (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (@MulOne.toMul (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@MulOneClass.toMulOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@Monoid.toMulOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@DivInvMonoid.toMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                        (@Group.toDivInvMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                          (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                            inst_3)))))))
-              σ τ) := by
-  intro F Ω _ _ _ _ A σ τ hσ hτ
+theorem aux11.{u_1, u_2} {F : Type u_1} {Ω : Type u_2} [Field F] [NumberField F]
+    [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) {σ τ : G F Ω}
+    (hσ : σ ∈ Inertia A) (hτ : τ ∈ Inertia A) : σ * τ ∈ Inertia A := by
   refine ⟨mul_mem hσ.1 hτ.1, fun x hx ↦ ?_⟩
   have h1 := hτ.2 x hx
   have h2 : A.valuation (τ x) ≤ 1 := by
@@ -1323,169 +149,15 @@ theorem UpperTheory.Reformulated.B.RootEquality.aux11.{u_1, u_2} :
   rw [this]
   exact Valuation.map_add_lt _ h3 h1
 
-theorem UpperTheory.Reformulated.B.RootEquality.aux12.{u_1, u_2} :
-    ∀ {F : Type u_2} {Ω : Type u_1} [inst : Field F] [inst_1 : Field Ω]
-      [inst_2 :
-        @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))]
-      (A : @ValuationSubring Ω inst_1),
-      And
-        (@Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-          (@Subgroup
-            (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-              inst_2)
-            (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2))
-          (@SetLike.instMembership
-            (@Subgroup
-              (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                inst_2)
-              (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2))
-            (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-              inst_2)
-            (@Subgroup.instSetLike
-              (@AlgEquiv F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
+theorem aux12.{u_1, u_2} {F : Type u_2} {Ω : Type u_1} [Field F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) :
+    (1 : G F Ω) ∈ ValuationSubring.decompositionSubgroup F A ∧
+      ∀ x : Ω, A.valuation x ≤ 1 → A.valuation ((1 : G F Ω) x - x) < 1 :=
+  ⟨one_mem _, fun _ _ ↦ by simp⟩
 
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2
-                inst_2)
-              (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1))) inst_2)))
-          (@ValuationSubring.decompositionSubgroup F Ω inst inst_1 inst_2 A)
-          (@OfNat.ofNat (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) (nat_lit 1)
-            (@One.toOfNat1 (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-              (@MulOne.toOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                (@MulOneClass.toMulOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                  (@Monoid.toMulOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                    (@DivInvMonoid.toMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                      (@Group.toDivInvMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                        (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                          inst_2)))))))))
-        (∀ (x : Ω),
-          @LE.le (@ValuationSubring.ValueGroup Ω inst_1 A)
-              (@Preorder.toLE (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@PartialOrder.toPreorder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@SemilatticeInf.toPartialOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@Lattice.toSemilatticeInf (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DistribLattice.toLattice (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@instDistribLatticeOfLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@LinearOrderedCommMonoidWithZero.toLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                              (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))
-              (@DFunLike.coe
-                (@Valuation Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                    (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))
-                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))
-                Ω (fun (x : Ω) ↦ @ValuationSubring.ValueGroup Ω inst_1 A)
-                (@Valuation.instFunLike Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1))
-                  (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                    (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))
-                (@ValuationSubring.valuation Ω inst_1 A) x)
-              (@OfNat.ofNat (@ValuationSubring.ValueGroup Ω inst_1 A) (nat_lit 1)
-                (@One.toOfNat1 (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@InvOneClass.toOne (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DivInvOneMonoid.toInvOneClass (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DivisionMonoid.toDivInvOneMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DivisionCommMonoid.toDivisionMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@CommGroupWithZero.toDivisionCommMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommGroupWithZero.toCommGroupWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))))))))) →
-            @LT.lt (@ValuationSubring.ValueGroup Ω inst_1 A)
-              (@Preorder.toLT (@ValuationSubring.ValueGroup Ω inst_1 A)
-                (@PartialOrder.toPreorder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@SemilatticeInf.toPartialOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@Lattice.toSemilatticeInf (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DistribLattice.toLattice (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@instDistribLatticeOfLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@LinearOrderedCommMonoidWithZero.toLinearOrder (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                              (@ValuationSubring.ValueGroup Ω inst_1 A)
-
-                              (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))
-              (@DFunLike.coe
-                (@Valuation Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                    (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A))
-                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))
-                Ω (fun (x : Ω) ↦ @ValuationSubring.ValueGroup Ω inst_1 A)
-                (@Valuation.instFunLike Ω (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1))
-                  (@LinearOrderedCommGroupWithZero.toLinearOrderedCommMonoidWithZero
-                    (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))
-                (@ValuationSubring.valuation Ω inst_1 A)
-                (@HSub.hSub Ω Ω Ω
-                  (@instHSub Ω
-                    (@SubNegMonoid.toSub Ω
-                      (@AddGroup.toSubNegMonoid Ω
-                        (@AddGroupWithOne.toAddGroup Ω
-                          (@Ring.toAddGroupWithOne Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_1)))))))
-                  (@DFunLike.coe (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) Ω (fun (x : Ω) ↦ Ω)
-                    (@AlgEquiv.instFunLike F Ω Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                      inst_2 inst_2)
-                    (@OfNat.ofNat (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2) (nat_lit 1)
-                      (@One.toOfNat1 (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                        (@MulOne.toOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                          (@MulOneClass.toMulOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                            (@Monoid.toMulOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                              (@DivInvMonoid.toMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                                (@Group.toDivInvMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_1 inst_2)
-                                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                                    (@DivisionSemiring.toSemiring Ω
-                                      (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_1)))
-                                    inst_2))))))))
-                    x)
-                  x))
-              (@OfNat.ofNat (@ValuationSubring.ValueGroup Ω inst_1 A) (nat_lit 1)
-                (@One.toOfNat1 (@ValuationSubring.ValueGroup Ω inst_1 A)
-                  (@InvOneClass.toOne (@ValuationSubring.ValueGroup Ω inst_1 A)
-                    (@DivInvOneMonoid.toInvOneClass (@ValuationSubring.ValueGroup Ω inst_1 A)
-                      (@DivisionMonoid.toDivInvOneMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                        (@DivisionCommMonoid.toDivisionMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                          (@CommGroupWithZero.toDivisionCommMonoid (@ValuationSubring.ValueGroup Ω inst_1 A)
-                            (@LinearOrderedCommGroupWithZero.toCommGroupWithZero (@ValuationSubring.ValueGroup Ω inst_1 A)
-                              (@ValuationSubring.instLinearOrderedCommGroupWithZeroValueGroup Ω inst_1 A)))))))))) := by
-  exact fun A ↦ ⟨one_mem _, fun x _ ↦ by simp⟩
-
-theorem UpperTheory.Reformulated.B.RootEquality.algebra_smulCommClass_complex.{u_1, u_2} :
-    ∀ {F : Type u_1} {Ω : Type u_2} [inst : Field F] [@NumberField F inst] [inst_2 : Field Ω]
-      [inst_3 :
-        @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))]
-      (A : @ValuationSubring Ω inst_2) {σ : @UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3},
-      @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-          (@Set.instMembership (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-          (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A) σ →
-        @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) (Set (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-          (@Set.instMembership (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3))
-
-          (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A)
-          (@Inv.inv (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-            (@InvOneClass.toInv (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (@DivInvOneMonoid.toInvOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (@DivisionMonoid.toDivInvOneMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@Group.toDivisionMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)))))
-            σ) := by
-  intro F Ω _ _ _ _ A σ hσ
+theorem algebra_smulCommClass_complex.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
+    [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) {σ : G F Ω} (hσ : σ ∈ Inertia A) : σ⁻¹ ∈ Inertia A := by
   have hi := inv_mem hσ.1
   refine ⟨hi, fun x hx ↦ ?_⟩
   have h2 : A.valuation (σ⁻¹ x) ≤ 1 := by
@@ -1498,49 +170,12 @@ theorem UpperTheory.Reformulated.B.RootEquality.algebra_smulCommClass_complex.{u
   rw [this] at h3
   rwa [Valuation.map_sub_swap]
 
-noncomputable def UpperTheory.Reformulated.B.RootEquality.Ine.{u_1, u_2} :
-    {F : Type u_1} →
-      {Ω : Type u_2} →
-        [inst : Field F] →
-          [@NumberField F inst] →
-            [inst_2 : Field Ω] →
-              [inst_3 :
-                  @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))] →
-                @ValuationSubring Ω inst_2 →
-                  @Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3) :=
-    fun {F : Type u_1} {Ω : Type u_2} [inst : Field F] [inst_1 : @NumberField F inst] [inst_2 : Field Ω]
-        [inst_3 :
-          @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))]
-        (A : @ValuationSubring Ω inst_2) ↦
-      @Subgroup.mk (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-        (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-        (@Submonoid.mk (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-          (@Monoid.toMulOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-            (@DivInvMonoid.toMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (@Group.toDivInvMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                  inst_3))))
-          (@Subsemigroup.mk (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-            (@MulOne.toMul (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (@MulOneClass.toMulOne (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (@Monoid.toMulOneClass (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@DivInvMonoid.toMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@Group.toDivInvMonoid (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                        inst_3))))))
-            (@UpperTheory.Reformulated.B.RootEquality.Inertia F Ω inst inst_2 inst_3 A) (@UpperTheory.Reformulated.B.RootEquality.aux11 F Ω inst inst_1 inst_2 inst_3 A))
-          (@UpperTheory.Reformulated.B.RootEquality.aux12 F Ω inst inst_2 inst_3 A))
-        (@UpperTheory.Reformulated.B.RootEquality.algebra_smulCommClass_complex F Ω inst inst_1 inst_2 inst_3 A)
-
-namespace UpperTheory.Reformulated.B.RootEquality
+noncomputable def Ine.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
+    [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Subgroup (G F Ω) where
+  carrier := Inertia (F := F) A
+  mul_mem' := aux11 (F := F) A
+  one_mem' := aux12 (F := F) A
+  inv_mem' := algebra_smulCommClass_complex (F := F) A
 
 section Grp
 
@@ -1570,7 +205,7 @@ private theorem fix_stable (I : Subgroup D) [hI : I.Normal] (g : D) {m : M} (hm 
   intro t ht
   have h := hm _ (hI.conj_mem' t ht g)
   have e : t * g = g * (g⁻¹ * t * g) := by group
-  rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply, h]
+  rw [← mul_apply_eq_comp, ← map_mul, e, map_mul, mul_apply_eq_comp, h]
 
 omit [IsTopologicalGroup D] in
 private theorem val_mem_fix (I : Subgroup D) [hI : I.Normal] {z : D → M} (hz : z ∈ ZK ρ I)
@@ -1591,12 +226,12 @@ private theorem eq_zero_of_dense (I : Subgroup D) (φ : D)
     { carrier := {g | z g = 0}
       mul_mem' := fun {a b} ha hb ↦ by
         have := hz.1.2 a b
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        simp only [Set.mem_ofPred_eq] at ha hb ⊢
         rw [this, ha, hb, map_zero, add_zero]
       one_mem' := hz.2 1 (one_mem _)
       inv_mem' := fun {a} ha ↦ by
         have := hz.1.2 a⁻¹ a
-        simp only [Set.mem_setOf_eq] at ha ⊢
+        simp only [Set.mem_ofPred_eq] at ha ⊢
         rw [inv_mul_cancel, hz.2 1 (one_mem _), ha, map_zero, add_zero] at this
         exact this.symm }
   have hU : U = ⊤ := ha U (hz.1.1.isOpen_fiber 0) (fun g hg ↦ hz.2 g hg) h0
@@ -1644,7 +279,7 @@ private theorem exists_cocycle [Finite M] (hρ : LC ρ) (I : Subgroup D) [hI : I
           rw [map_mul, Equiv.Perm.mul_apply, ha.2 _ hb.1]
         refine ⟨h0 ▸ add_mem ha.1 (fix_stable ρ I a hb.1), fun y hy ↦ ?_⟩
         rw [h0, map_mul, Equiv.Perm.mul_apply, hb.2 y hy,
-          ha.2 _ (add_mem hb.1 (fix_stable ρ I b hy)), map_add, map_mul, Module.End.mul_apply,
+          ha.2 _ (add_mem hb.1 (fix_stable ρ I b hy)), map_add, map_mul, mul_apply_eq_comp,
           add_assoc]
       one_mem' := by simp
       inv_mem' := fun {a} ha ↦ by
@@ -1829,7 +464,7 @@ private theorem frac [NumberField F] [Algebra.IsAlgebraic F Ω] {q : ℕ} (hq0 :
     show f d ∈ cen A
     rw [mem_cen] at hn ⊢
     rw [← h1, map_mul]
-    exact mul_lt_one_of_nonneg_of_lt_one_right ((A.valuation_le_one_iff _).2 hx) zero_le hn
+    exact lt_of_le_of_lt (mul_le_of_le_one_left zero_le ((A.valuation_le_one_iff _).2 hx)) hn
 
 private theorem coe_smul (σ : G F Ω) (b : 𝓞 Ω) : ((σ • b : 𝓞 Ω) : Ω) = σ b := rfl
 
@@ -1878,7 +513,7 @@ private theorem mem_ine [NumberField F] [Algebra.IsAlgebraic F Ω] {q : ℕ} (hq
     rw [h2]
     refine Valuation.map_sub_lt _ (hb b) ?_
     rw [map_mul]
-    exact mul_lt_one_of_nonneg_of_lt_one_right hx zero_le (hb s)
+    exact lt_of_le_of_lt (mul_le_of_le_one_left zero_le hx) (hb s)
   rwa [map_mul, h1, mul_one] at h3
 
 private theorem isOpen_fix [Algebra.IsAlgebraic F Ω] (x : Ω) :
@@ -2020,6 +655,7 @@ private theorem exists_frob (h : IsPlaceOver A v) : ∃ φ ∈ Dec (F := F) A, �
   exact h1
 
 attribute [local instance] Ideal.Quotient.field in
+omit [IsAlgClosure F Ω] in
 private theorem exists_pow (h : IsPlaceOver A v) {g : G F Ω} (hg : g ∈ Dec A) (S : Finset (𝓞 Ω)) :
     ∃ j : ℕ, ∀ b ∈ S, A.valuation (g b - b ^ (Nat.card (𝓞 F ⧸ v.asIdeal) ^ j)) < 1 := by
   classical
@@ -2065,11 +701,11 @@ private theorem dense (h : IsPlaceOver A v) (φ : Dec (F := F) A)
     (fun S ↦ by
       obtain ⟨j, hj⟩ := exists_pow h g.2 S
       refine ⟨φ ^ j, pow_mem hφU j, ?_⟩
-      simp only [Set.mem_iInter, Set.mem_setOf_eq]
+      simp only [Set.mem_iInter, Set.mem_ofPred_eq]
       intro b hb
       have := Valuation.map_sub_lt _ (frob_pow hφ j b) (hj b hb)
       rwa [sub_sub_sub_cancel_right] at this)
-  simp only [Set.mem_iInter, Set.mem_setOf_eq] at hσ
+  simp only [Set.mem_iInter, Set.mem_ofPred_eq] at hσ
   have h1 : g⁻¹ * σ ∈ U := hI (mem_ine A (one_lt_q v).ne_bot (val_q h) (g⁻¹ * σ).2 fun b ↦ by
     rw [← dec_lt A g.2, map_sub]
     have : g.1 ((g⁻¹ * σ).1 b) = σ.1 b := g.1.apply_symm_apply _
@@ -2095,7 +731,7 @@ private theorem levels (h : IsPlaceOver A v) (φ : Dec (F := F) A)
   have : NeZero (q ^ n - 1) := ⟨hN0⟩
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
-  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (q ^ n - 1)
+  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot Ω (q ^ n - 1)
   have hroot : ∀ (σ : G F Ω) (x : Ω), x ^ (q ^ n - 1) = 1 → (σ x) ^ (q ^ n - 1) = 1 :=
     fun σ x hx ↦ by rw [← map_pow, hx, map_one]
   let V : Subgroup (Dec (F := F) A) :=
@@ -2153,254 +789,17 @@ end Fr
 
 end UpperTheory.Reformulated.B.RootEquality
 
-theorem UpperTheory.Reformulated.B.RootEquality.unrBare :
-    ∀ (l : Nat) [Fact (Nat.Prime l)] (F Ω : Type) [inst : Field F] [inst_1 : @NumberField F inst] [inst_2 : Field Ω]
-      [inst_3 :
-        @Algebra F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))]
-      [@IsAlgClosure F Ω (@Field.toCommRing F inst) inst_2 inst_3
+namespace UpperTheory.Reformulated.B.RootEquality
 
-          (@Module.Flat.isTorsionFree F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-            (@Semiring.toAddCommMonoid Ω
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))))
-            (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-              (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-            (@Module.Flat.instOfIsDedekindDomainOfIsTorsionFree F Ω (@Field.toCommRing F inst)
-              (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-              (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-                (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-              (@IsPrincipalIdealRing.isDedekindDomain F (@Field.toCommRing F inst)
-                (@IsDomain.of_isSimpleRing F (@Field.toCommRing F inst)
-                  (@DivisionRing.isSimpleRing F (@Field.toDivisionRing F inst)))
-                (@IsPrincipalIdealRing.of_isSimpleRing F (@Field.toCommRing F inst)
-                  (@DivisionRing.isSimpleRing F (@Field.toDivisionRing F inst))))
-              (@Module.Flat.isTorsionFree F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                (@AddCommGroup.toAddCommMonoid Ω
-                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                (@Module.FaithfullyFlat.toFlat F Ω (@Field.toCommRing F inst)
-                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                  (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                  (@Module.FaithfullyFlat.instOfNontrivialOfFree F Ω (@Field.toCommRing F inst)
-                    (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                    (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)
-                    (@IsLocalRing.toNontrivial Ω
-                      (@CommSemiring.toSemiring Ω (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2)))
-                      (@UpperTheory.V.Alg.IsCO.toIsLocalRing Ω Ω (@Field.toCommRing Ω inst_2)
-                        (@HenselianLocalRing.toIsLocalRing Ω (@Field.toCommRing Ω inst_2) (@Field.henselian Ω inst_2))
-                        (@Field.toCommRing Ω inst_2)
-                        (@Algebra.id Ω (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2)))
-                        (@UpperTheory.V.Alg.IsCO.self Ω (@Field.toCommRing Ω inst_2)
-                          (@HenselianLocalRing.toIsLocalRing Ω (@Field.toCommRing Ω inst_2) (@Field.henselian Ω inst_2))
-                          (@instIsNoetherianRingOfIsArtinianRing Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))
-                            (@instIsArtinianOfIsSemisimpleModuleOfFinite Ω
-                              (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                              (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                              (@Semiring.toModule Ω
-                                (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                              (@IsSemisimpleRing.isSemisimpleModule Ω
-                                (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                (@Semiring.toModule Ω
-                                  (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                (@instIsSemisimpleModuleOfIsSimpleModule Ω
-                                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                  (@Semiring.toModule Ω
-                                    (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                  (@instIsSimpleModule Ω (@Field.toDivisionRing Ω inst_2))))
-                              (@Module.Invertible.instFinite Ω Ω (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2))
-                                (@AddCommGroup.toAddCommMonoid Ω
-                                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                (@Semiring.toModule Ω
-                                  (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                (@Module.Invertible.inst Ω (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2))))))
-                          (@UpperTheory.V.Alg.IsCO.complete Ω Ω (@Field.toCommRing Ω inst_2)
+theorem unrBare (l : ℕ) [Fact (Nat.Prime l)] (F Ω : Type) [Field F] [NumberField F]
+    [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω)
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) (C : Type)
+    [CommGroup C] [Finite C] (χ : Dec (F := F) A →* C)
+    (h : IsPlaceOver A v) (_ : IsOpen (χ.ker : Set (Dec (F := F) A)))
+    (hl : (Nat.card C).Coprime l) :
+    UnrCount l (Dec (F := F) A) ((Ine (F := F) A).subgroupOf (Dec (F := F) A) ⊓ χ.ker) := by
+  obtain ⟨φ, hφ, hφ'⟩ := exists_frob h
+  have := ine_normal (F := F) (A := A)
+  exact count χ hl _ ⟨φ, hφ⟩ (dense h ⟨φ, hφ⟩ hφ') (levels h ⟨φ, hφ⟩ hφ')
 
-                            (@HenselianLocalRing.toIsLocalRing Ω (@Field.toCommRing Ω inst_2) (@Field.henselian Ω inst_2))
-                            (@Field.toCommRing Ω inst_2)
-                            (@Algebra.id Ω (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2)))
-                            (@UpperTheory.V.Alg.IsCO.self Ω (@Field.toCommRing Ω inst_2)
-                              (@HenselianLocalRing.toIsLocalRing Ω (@Field.toCommRing Ω inst_2) (@Field.henselian Ω inst_2))
-                              (@instIsNoetherianRingOfIsArtinianRing Ω
-                                (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))
-                                (@instIsArtinianOfIsSemisimpleModuleOfFinite Ω
-                                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                  (@Semiring.toModule Ω
-                                    (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                  (@IsSemisimpleRing.isSemisimpleModule Ω
-                                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                    (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                    (@Semiring.toModule Ω
-                                      (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                    (@instIsSemisimpleModuleOfIsSimpleModule Ω
-                                      (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                      (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                      (@Semiring.toModule Ω
-                                        (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                      (@instIsSimpleModule Ω (@Field.toDivisionRing Ω inst_2))))
-                                  (@Module.Invertible.instFinite Ω Ω
-                                    (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2))
-                                    (@AddCommGroup.toAddCommMonoid Ω
-                                      (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                    (@Semiring.toModule Ω
-                                      (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                    (@Module.Invertible.inst Ω
-                                      (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2))))))
-                              (@instIsAdicCompleteMaximalIdealOfIsArtinianRing Ω (@Field.toCommRing Ω inst_2)
-                                (@instIsArtinianOfIsSemisimpleModuleOfFinite Ω
-                                  (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                  (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                  (@Semiring.toModule Ω
-                                    (@CommSemiring.toSemiring Ω (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2))))
-                                  (@IsSemisimpleRing.isSemisimpleModule Ω
-                                    (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                    (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                    (@Semiring.toModule Ω
-                                      (@CommSemiring.toSemiring Ω
-                                        (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2))))
-                                    (@instIsSemisimpleModuleOfIsSimpleModule Ω
-                                      (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)) Ω
-                                      (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                                      (@Semiring.toModule Ω
-                                        (@Ring.toSemiring Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                      (@instIsSimpleModule Ω (@Field.toDivisionRing Ω inst_2))))
-                                  (@Module.Invertible.instFinite Ω Ω
-                                    (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2))
-                                    (@AddCommGroup.toAddCommMonoid Ω
-                                      (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2))))
-                                    (@Semiring.toModule Ω
-                                      (@CommSemiring.toSemiring Ω
-                                        (@CommRing.toCommSemiring Ω (@Field.toCommRing Ω inst_2))))
-                                    (@Module.Invertible.inst Ω
-                                      (@Semifield.toCommSemiring Ω (@Field.toSemifield Ω inst_2)))))
-                                (@HenselianLocalRing.toIsLocalRing Ω (@Field.toCommRing Ω inst_2)
-                                  (@Field.henselian Ω inst_2))))))))
-
-                    (@Module.Free.of_divisionRing F Ω (@Field.toDivisionRing F inst)
-                      (@Ring.toAddCommGroup Ω (@DivisionRing.toRing Ω (@Field.toDivisionRing Ω inst_2)))
-                      (@Algebra.toModule F Ω (@CommRing.toCommSemiring F (@Field.toCommRing F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                        inst_3)))))))]
-      (A : @ValuationSubring Ω inst_2)
-      (v :
-        @IsDedekindDomain.HeightOneSpectrum (@NumberField.RingOfIntegers F inst)
-          (@NumberField.instCommRingRingOfIntegers F inst))
-      (C : Type) [inst_5 : CommGroup C] [Finite C]
-      (χ :
-        @MonoidHom (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A)) C
-          (@MulOneClass.toMulOne (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-            (@Monoid.toMulOneClass (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-              (@DivInvMonoid.toMonoid (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                (@Group.toDivInvMonoid (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                  (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)
-                    (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))))))
-          (@MulOneClass.toMulOne C
-            (@Monoid.toMulOneClass C (@DivInvMonoid.toMonoid C (@Group.toDivInvMonoid C (@CommGroup.toGroup C inst_5)))))),
-      @UpperTheory.Reformulated.B.RootEquality.IsPlaceOver F Ω inst inst_2 inst_3 A v →
-        @IsOpen (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-            (@instTopologicalSpaceSubtype (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-              (fun (x : @UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) ↦
-                @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3))
-                  (@SetLike.instMembership
-                    (@Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                        inst_3))
-                    (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@Subgroup.instSetLike (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                        inst_3)))
-                  (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A) x)
-              (@krullTopology F Ω inst inst_2 inst_3))
-            (@SetLike.coe
-              (@Subgroup (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                  (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A)))
-              (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-              (@Subgroup.instSetLike (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                  (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A)))
-              (@MonoidHom.ker (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-
-                  (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                C
-                (@Monoid.toMulOneClass C (@DivInvMonoid.toMonoid C (@Group.toDivInvMonoid C (@CommGroup.toGroup C inst_5))))
-                χ)) →
-          (Nat.card C).Coprime l →
-            @UpperTheory.Reformulated.B.RootEquality.UnrCount l (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-              (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                  (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-              (@instTopologicalSpaceSubtype (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                (fun (x : @UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3) ↦
-                  @Membership.mem (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                        (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                        inst_3))
-                    (@SetLike.instMembership
-                      (@Subgroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                        (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                          inst_3))
-                      (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                      (@Subgroup.instSetLike (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                        (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                          (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                          inst_3)))
-                    (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A) x)
-                (@krullTopology F Ω inst inst_2 inst_3))
-              (@Min.min
-                (@Subgroup (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                  (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)
-                    (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A)))
-                (@Subgroup.instMin (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                  (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)
-                    (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A)))
-                (@Subgroup.subgroupOf (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                  (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2))) inst_3)
-                  (@UpperTheory.Reformulated.B.RootEquality.Ine F Ω inst inst_1 inst_2 inst_3 A) (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                (@MonoidHom.ker (↥(@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                  (@Subgroup.toGroup (@UpperTheory.Reformulated.B.RootEquality.G F Ω inst inst_2 inst_3)
-                    (@AlgEquiv.aut F Ω (@Semifield.toCommSemiring F (@Field.toSemifield F inst))
-                      (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst_2)))
-                      inst_3)
-                    (@UpperTheory.Reformulated.B.RootEquality.Dec F Ω inst inst_2 inst_3 A))
-                  C
-                  (@Monoid.toMulOneClass C
-                    (@DivInvMonoid.toMonoid C (@Group.toDivInvMonoid C (@CommGroup.toGroup C inst_5))))
-                  χ)) := by
-  intro l _ F Ω _ _ _ _ _ A v C _ _ χ h _ hl
-  obtain ⟨φ, hφ, hφ'⟩ := UpperTheory.Reformulated.B.RootEquality.exists_frob h
-  have := UpperTheory.Reformulated.B.RootEquality.ine_normal (F := F) (A := A)
-  exact UpperTheory.Reformulated.B.RootEquality.count χ hl _ ⟨φ, hφ⟩ (UpperTheory.Reformulated.B.RootEquality.dense h ⟨φ, hφ⟩ hφ')
-    (UpperTheory.Reformulated.B.RootEquality.levels h ⟨φ, hφ⟩ hφ')
+end UpperTheory.Reformulated.B.RootEquality

@@ -71,7 +71,6 @@ theorem isOpen_Oint : IsOpen (Oint F) := by
 
 theorem algebraMap_int_mem_Oint (m : 𝓞 F) :
     algebraMap F (FiniteAdeleRing (𝓞 F) F) (m : F) ∈ Oint F := by
-  intro v
-  exact coe_algebraMap_mem (𝓞 F) F v m
+  exact fun v => coe_algebraMap_mem (𝓞 F) F v m
 
 end ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact

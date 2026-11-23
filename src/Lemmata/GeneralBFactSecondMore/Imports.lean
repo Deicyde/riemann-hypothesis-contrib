@@ -57,16 +57,14 @@ theorem goal1 :
   intro E U _ _ _ _ _ _ N hN x
   have hx : x ∈ Submodule.span E (N : Set U) := by rw [hN]; exact Submodule.mem_top
   induction hx using Submodule.span_induction with
-  | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hy⟩
-  | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact N.zero_mem⟩
+  | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
+  | zero => exact ⟨1, one_ne_zero, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨d1, hd1, h1⟩ := hy
     obtain ⟨d2, hd2, h2⟩ := hz
     refine ⟨d1 * d2, mul_ne_zero hd1 hd2, ?_⟩
-    rw [smul_add]
-    apply N.add_mem
-    · rw [mul_comm, mul_smul]; exact N.smul_mem d2 h1
-    · rw [mul_smul]; exact N.smul_mem d1 h2
+    simpa only [smul_add] using N.add_mem (by rw [mul_comm, mul_smul]; exact N.smul_mem d2 h1)
+      (by rw [mul_smul]; exact N.smul_mem d1 h2)
   | smul a y _ hy =>
     obtain ⟨d, hd, h⟩ := hy
     obtain ⟨⟨n, m⟩, hm⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) a

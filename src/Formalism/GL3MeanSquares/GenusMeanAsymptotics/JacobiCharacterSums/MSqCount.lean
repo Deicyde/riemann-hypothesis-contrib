@@ -111,13 +111,10 @@ theorem liX_sub_ge {a b : ℝ} (ha : 2 ≤ a) (hab : a ≤ b) :
   exact one_div_le_one_div_of_le hlogt (Real.log_le_log (by linarith) ht.2)
 
 theorem liX_two : liX 2 = 0 := by
-  unfold liX
-  simp
+  simp [liX]
 
 theorem liX_nonneg {a : ℝ} (ha : 2 ≤ a) : 0 ≤ liX a := by
-  have h := liX_sub_ge (le_refl (2:ℝ)) ha
-  rw [liX_two, sub_zero] at h
-  exact le_trans (div_nonneg (by linarith) (Real.log_nonneg (by linarith))) h
+  simpa [liX_two] using le_trans (div_nonneg (by linarith) (Real.log_nonneg (by linarith))) (liX_sub_ge (le_refl (2:ℝ)) ha)
 
 theorem exp_neg_le_one_sub_half {w : ℝ} (h0 : 0 ≤ w) (h1 : w ≤ 1) : Real.exp (-w) ≤ 1 - w / 2 := by
   have he1 : Real.exp (-1) ≤ 1 / 2 := by
@@ -302,8 +299,7 @@ theorem range_ok {C₀ ε x Λ Y : ℝ} (hε : 0 < ε) (hx : 1 ≤ x) (hΛ : 1 �
     rw [Real.log_mul (by norm_num) hxr.ne', Real.log_rpow hxpos] at h
     exact h
   have hlog6 : Real.log 6 ≤ 5 := by
-    have := Real.log_le_sub_one_of_pos (by norm_num : (0:ℝ) < 6)
-    linarith
+    linarith [Real.log_le_sub_one_of_pos (by norm_num : (0:ℝ) < 6)]
   have hlogpos : 0 ≤ Real.log (Λ + 2) := Real.log_nonneg (by linarith)
   have hkey : |C₀| * Real.log (Λ + 2) ≤ L ^ 2 / 4 := by
     have hA0 := abs_nonneg C₀

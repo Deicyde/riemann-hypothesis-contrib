@@ -51,6 +51,7 @@ import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.Closure
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.UnitarizeA
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.UnitarizeD
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.Unitarize
 
 @[expose] public section
 
@@ -64,35 +65,6 @@ namespace ReciprocityTheory.ChartRestriction.DS.G2
 variable {n : ℕ}
 
 open UnitA UnitB
-
-section SlopeTestRemainingChoices
-
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D}
-
-def hvec (f : Fin n → D) : Fin n → H := fun c => ((f c : D) : H)
-
-theorem hvec_add (f g : Fin n → D) : hvec (f + g) = hvec f + hvec g := by
-  funext c; simp [hvec]
-
-theorem hvec_smul (a : ℂ) (f : Fin n → D) : hvec (a • f) = a • hvec f := by
-  funext c; simp [hvec]
-
-theorem mx_mem {M : Submodule ℂ D} (dual : Bool) (X : Matrix (Fin n) (Fin n) ℂ)
-    (hst : ∀ a b, ∀ f ∈ tensSub M, tensF dual E a b f ∈ tensSub M) {f : Fin n → D} (hf : f ∈ tensSub M) :
-    mx (tensF dual E) X f ∈ tensSub M := by
-  unfold mx
-  simp only [LinearMap.sum_apply, LinearMap.smul_apply]
-  exact Submodule.sum_mem _ fun a _ => Submodule.sum_mem _ fun b _ =>
-    Submodule.smul_mem _ _ (hst a b f hf)
-
-theorem mat_decomp2 (Y Z : Matrix (Fin n) (Fin n) ℂ) :
-    (1 / 2 : ℂ) • (Y - Z) + (Complex.I / 2) • (Complex.I • (Y + Z)) = -Z := by
-  rw [smul_smul, show Complex.I / 2 * Complex.I = -(1 / 2) by
-    rw [div_mul_eq_mul_div, Complex.I_mul_I]; ring]
-  module
-
-end SlopeTestRemainingChoices
 
 theorem tens_unitarize (dual : Bool) {lam : Fin n → ℝ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
     {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D}

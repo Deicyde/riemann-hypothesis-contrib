@@ -84,9 +84,8 @@ theorem dimension_induction_holds : DimStep := by
   intro p q H _ _ σ₁ σ₂ S X Y h1 h2 hcomm hS hS1 hS2 hSirr hXS hX0 hX1 hXi hYS hY0 hY2 hYi
   exact main (dimStep_good h1) (dimStep_good h2)
     (fun g g' v => by
-      show σ₁ g.1 (σ₂ g'.1 v) = σ₂ g'.1 (σ₁ g.1 v)
-      rw [← ContinuousLinearMap.comp_apply, hcomm _ g.2 _ g'.2]
-      rfl)
+      simpa only [ContinuousLinearMap.comp_apply] using
+        congrArg (fun T : H →L[ℂ] H => T v) (hcomm _ g.2 _ g'.2))
     (dimStep_stab.1 hS1) (dimStep_stab.1 hS2)
     (fun S' h s1 s2 => hSirr S' h (dimStep_stab.2 s1) (dimStep_stab.2 s2))
     hXS hX0 (dimStep_stab.1 hX1) (fun X' h s => hXi X' h (dimStep_stab.2 s))

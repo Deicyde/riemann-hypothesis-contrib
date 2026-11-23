@@ -456,8 +456,7 @@ theorem theoremF_of_sharp (H : TheoremFSharp) : TheoremF := by
     h23 h24 h25 h26
   have := H K W κ κ₁ I V ι b' X' cc b X N B h v Y Y' Ball γ s u HH e η δ h1 h2 h3 h4 h5 h6 h7 h8
     h9 h10 h11 h12 h13 h14 h15 h16 h17 h18 h19 h20 h21 h22 h23 h24 h25 h26
-  have hI : (1 : ℝ) ≤ (Fintype.card I : ℝ) := by exact_mod_cast Fintype.card_pos
-  have hl : 0 ≤ Real.log (Fintype.card I : ℝ) := Real.log_nonneg hI
+  have hl : 0 ≤ Real.log (Fintype.card I : ℝ) := Real.log_nonneg (by exact_mod_cast Fintype.card_pos)
   linarith
 
 theorem frame_theorem_log_ideal : TheoremF := theoremF_of_sharp frame_theorem_sharp

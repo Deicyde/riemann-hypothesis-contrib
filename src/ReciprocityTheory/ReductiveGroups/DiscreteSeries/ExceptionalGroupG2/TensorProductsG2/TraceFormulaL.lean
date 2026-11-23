@@ -1,6 +1,6 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.TraceFormulaC
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.TraceFormulaC
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -48,6 +48,8 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.Taylor
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.BochnerInequality.LayerBasic
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.RightDerivativeToL2
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.TraceFormulaF
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.TraceFormulaA
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.TraceFormulaL
 
 @[expose] public section
 
@@ -80,48 +82,6 @@ theorem tf_kstable_fin (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D 
   refine hcl.mem_of_tendsto hsum.tendsto_sum_nat (Filter.Eventually.of_forall fun N => ?_)
   refine Submodule.sum_mem _ fun m _ => Submodule.smul_mem _ _ ?_
   exact Submodule.mem_map_of_mem (actM_pow_mem_layer_of_inK hE hVK hZ hv0 m)
-
-theorem tf_tensGrp_kDiag (dual : Bool) {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε) (f : Fin n → H) :
-    tensGrp dual σ k f = kDiag dual σ k f := by
-  have hu : kᴴ * k = 1 := Matrix.mem_unitaryGroup_iff'.1 hk.1
-  have hinv : k⁻¹ = kᴴ := Matrix.inv_eq_left_inv hu
-  funext c
-  simp only [tensGrp, kDiag, hinv, Matrix.conjTranspose_apply]
-
-theorem tf_kirr_map {M M' : Type*} [AddCommGroup M] [Module ℂ M] [AddCommGroup M'] [Module ℂ M']
-    {E₁ : Fin n → Fin n → Module.End ℂ M} {E₂ : Fin n → Fin n → Module.End ℂ M'} {Λ : Fin n → ℝ}
-    {V : Submodule ℂ M} (hV : IsKIrrHW ε E₁ Λ V) (Ψ : M →ₗ[ℂ] M')
-    (hΨ : ∀ a b, ∀ x ∈ V, Ψ (E₁ a b x) = E₂ a b (Ψ x)) (hinj : ∀ x ∈ V, Ψ x = 0 → x = 0) :
-    IsKIrrHW ε E₂ Λ (V.map Ψ) := by
-  have := hV.1
-  refine ⟨Module.Finite.map _ _, ?_, ?_, ?_⟩
-  · rintro a b hab _ ⟨x, hx, rfl⟩
-    exact ⟨E₁ a b x, hV.2.1 a b hab x hx, hΨ a b x hx⟩
-  · intro S' hS' hst
-    have hT : IsKStableSub ε E₁ (S'.comap Ψ ⊓ V) := by
-      rintro a b hab x ⟨hx1, hx2⟩
-      refine ⟨?_, hV.2.1 a b hab x hx2⟩
-      show Ψ (E₁ a b x) ∈ S'
-      rw [hΨ a b x hx2]
-      exact hst a b hab _ hx1
-    rcases hV.2.2.1 _ inf_le_right hT with h | h
-    · left
-      rw [eq_bot_iff]
-      intro s hs
-      obtain ⟨x, hx, rfl⟩ := hS' hs
-      have hx0 : x ∈ S'.comap Ψ ⊓ V := ⟨hs, hx⟩
-      rw [h, Submodule.mem_bot] at hx0
-      rw [hx0, map_zero]
-      exact Submodule.zero_mem _
-    · right
-      refine le_antisymm hS' ?_
-      rintro _ ⟨x, hx, rfl⟩
-      have hx' : x ∈ S'.comap Ψ ⊓ V := by rw [h]; exact hx
-      exact hx'.1
-  · obtain ⟨w, hwV, hw0, hw1, hw2⟩ := hV.2.2.2
-    refine ⟨Ψ w, ⟨w, hwV, rfl⟩, fun h => hw0 (hinj w hwV h), fun a => ?_, fun a b hab h => ?_⟩
-    · rw [← hΨ a a w hwV, hw1 a, map_smul]
-    · rw [← hΨ a b w hwV, hw2 a b hab h, map_zero]
 
 theorem tf_kfin_tens (dual : Bool) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) {V : Submodule ℂ D}
     (hVf : FiniteDimensional ℂ V) (hVk : IsKStableSub ε E V) {f : Fin n → D} (hf : f ∈ tensSub (genSub E V)) :

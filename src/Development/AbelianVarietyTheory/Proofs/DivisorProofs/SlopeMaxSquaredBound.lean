@@ -131,8 +131,28 @@ theorem latW_ne_bot (h : GramAt p i) : latW (p.T.U ((i : ℕ) + 1)) (Gk p i) ≠
 
 
 set_option maxHeartbeats 1000000 in
-theorem slopeMax_le (h6 : GlobalTheory.Published.TamagawaSpecialUnitary) {PP A : ℝ} (hR : RecTied D L) (hG : GramAt p i)
-    (hN : HostNum D L PP A 1) (hW : WtNum p i PP) :
+/-- Parametric `slopeMax_sq` power bound for any supremum constant family `K : ℕ → ℝ → ℝ`
+satisfying the local slope comparison and `250 * f^2 * r^2 * L` log bound. -/
+theorem slopeMax_le_of_const {PP A : ℝ} (hR : RecTied D L) (hG : GramAt p i)
+    (hN : HostNum D L PP A 1) (hW : WtNum p i PP)
+    (K : ℕ → ℝ → ℝ)
+    (hcmp : GlobalTheory.LevGeo.Laws D ((i : ℕ) + 1) _ _ (p.T.U ((i : ℕ) + 1))
+        (GlobalTheory.LevGeo.coreDict p.T.toCore ((i : ℕ) + 1)) →
+      ∀ [NeZero p.T.Q.H.d] (χ : DirichletCharacter ℂ p.T.Q.H.d), GlobalTheory.IsKroneckerChar χ →
+      GoodW (p.T.U ((i : ℕ) + 1)) (xiR D) (fun _ => D.sp.W ((i : ℕ) + 1))
+        (GlobalTheory.LevGeo.coreDict p.T.toCore ((i : ℕ) + 1)) (Gk p i) →
+      slopeMax_sq (normW (p.T.U ((i : ℕ) + 1)) (xiR D) (fun _ => D.sp.W ((i : ℕ) + 1))
+          (GlobalTheory.LevGeo.coreDict p.T.toCore ((i : ℕ) + 1)) (Gk p i))
+        (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) ≤
+        2 * GlobalTheory.LevGeo.lamSup D.host.E D.R.r (dat p i).q D.host.d p.T.Q.l.M (GlobalTheory.CM.logOm D.host.E χ).re
+            ((GlobalTheory.LevGeo.absA (dat p i) (wtA (p.κ i)) : ℕ) : ℝ) ((fdeg D.host.E * D.R.r * (p.κ i).n : ℕ) : ℝ) +
+          2 * Real.log (K p.T.Q.l.M (((GlobalTheory.LevGeo.absA (dat p i) (wtA (p.κ i)) : ℕ) : ℝ) +
+            ((fdeg D.host.E * D.R.r * (p.κ i).n : ℕ) : ℝ) + 1)) +
+          Real.log |(discr p.T.Q.c.F : ℝ)| / (Module.finrank ℚ p.T.Q.c.F : ℝ))
+    (hlog : ∀ (M : ℕ) (w L' : ℝ), 2 ≤ D.R.r → 1 ≤ D.host.d → 1 ≤ M → 1 ≤ L' → 1 ≤ w →
+      Real.log ((fdeg D.host.E : ℝ) * D.R.r) ≤ L' → Real.log M ≤ 30 * L' →
+      Real.log (dE D.host.E) ≤ 4 * (fdeg D.host.E : ℝ) * L' → Real.log D.host.d ≤ 4 * L' →
+      Real.log w ≤ 2 * L' → Real.log (K M w) ≤ 250 * (fdeg D.host.E : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2 * L') :
     slopeMax_sq (nrmK p.fw i) (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) ≤ L.sc.x ^ (2 * A + 4) * L.sc.b := by
   have hj : Formalism.L2.Pj.InR D ((i : ℕ) + 1) := ⟨by omega, i.2⟩
   obtain ⟨hLaws, hnorm⟩ := GlobalTheory.LevGeo.laws_of_coreJ D p.T _ p.fw.laws hj
@@ -142,7 +162,7 @@ theorem slopeMax_le (h6 : GlobalTheory.Published.TamagawaSpecialUnitary) {PP A :
   obtain ⟨_, χ, hχ, hOm, -, -⟩ := GlobalTheory.T.logPeriod_eq_kroneckerCharacter_logPeriod_of_host D L p.T.Q p.fw.laws.pins.1 p.Del p.h0
   have hgood : GoodW (p.T.U ((i : ℕ) + 1)) (xiR D) (fun _ => D.sp.W ((i : ℕ) + 1))
       (GlobalTheory.LevGeo.coreDict p.T.toCore ((i : ℕ) + 1)) (Gk p i) := ⟨by rw [hn]; exact hG.2.2.2.1, hG.2.2.2.2⟩
-  have main := GlobalTheory.T.kronecker_character_frame_third h6 D _ _ _ _ _ _ _ _ hLaws χ hχ (wtA (p.κ i)) (p.κ i).n hW.dom hgood (latW_ne_bot p i hG)
+  have main := hcmp hLaws χ hχ hgood
   rw [hn] at main
   refine main.trans ?_
   rw [hOm, p.fw.laws.pins.2.1.1, hW.cols]
@@ -194,8 +214,7 @@ theorem slopeMax_le (h6 : GlobalTheory.Published.TamagawaSpecialUnitary) {PP A :
     have : 0 ≤ (D.R.f : ℝ) * L.sc.L := by positivity
     linarith [hN.disc]
   have hl3 : Real.log (D.host.d : ℝ) ≤ 4 * (2 * L.sc.L) := by linarith [hN.logd]
-  have n1 := (GlobalTheory.T.supremum_constant_log_bound D.host.E D.R.r D.host.d _ (s + t + 1) (2 * L.sc.L) hr2 hd hM (by linarith) (by linarith)
-    hl1 hlM hl2 hl3 hlw).2
+  have n1 := hlog _ (s + t + 1) (2 * L.sc.L) hr2 hd hM (by linarith) (by linarith) hl1 hlM hl2 hl3 hlw
   have n2 := GlobalTheory.T.meanLogSupNormLoss_le_linear_in_weight D.host.E D.R.r (dat p i).q D.host.d _ (ofRecord D L p.Del p.h0).logOm s t (2 * L.sc.L) (by omega) hd hM
     (by linarith) hs0 ht0 hl1 hlM hl2 hl3 hlw
   have n3 := (log_rd_le_fieldSz _).trans (hR.core_size_le p (by linarith))
@@ -206,6 +225,16 @@ theorem slopeMax_le (h6 : GlobalTheory.Published.TamagawaSpecialUnitary) {PP A :
     norm_cast
   rw [e]
   exact collect hf hr (Nat.cast_nonneg _) hq hL hLx hb hZ hW.om (add_nonneg hs0 ht0) (by linarith) n2 n1 n3
+
+theorem slopeMax_le (h6 : GlobalTheory.Published.TamagawaSpecialUnitary) {PP A : ℝ} (hR : RecTied D L) (hG : GramAt p i)
+    (hN : HostNum D L PP A 1) (hW : WtNum p i PP) :
+    slopeMax_sq (nrmK p.fw i) (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) ≤ L.sc.x ^ (2 * A + 4) * L.sc.b :=
+  slopeMax_le_of_const p i hR hG hN hW (GlobalTheory.LevGeo.supConst D.host.E D.R.r D.host.d)
+    (fun hLaws _ χ hχ hgood => GlobalTheory.T.kronecker_character_frame_third h6 D _ _ _ _ _ _ _ _
+      hLaws χ hχ (wtA (p.κ i)) (p.κ i).n hW.dom hgood (latW_ne_bot p i hG))
+    (fun M w L' hr2 hd hM hL' hw hl1 hlM hl2 hl3 hlw =>
+      (GlobalTheory.T.supremum_constant_log_bound D.host.E D.R.r D.host.d M w L' hr2 hd hM hL' hw
+        hl1 hlM hl2 hl3 hlw).2)
 
 theorem lamCore : GlobalTheory.CovTop.Hypotheses2 → Gram → Lifts fun Fm x _ ι p i _ A =>
     slopeMax_sq (nrmK p.fw i) (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) ≤ (Fm.L x ι).sc.x ^ A * (Fm.L x ι).sc.b := by

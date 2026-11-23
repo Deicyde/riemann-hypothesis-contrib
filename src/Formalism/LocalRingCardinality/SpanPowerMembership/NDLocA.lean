@@ -128,9 +128,8 @@ theorem val_lt_one_iff {A : ValuationSubring Ω} {j : Ω →+* PadicAlgCl l}
 
 variable (l) in
 theorem prime_l : Prime ((l : ℕ) : 𝓞 ℚ) := by
-  have h : Prime ((l : ℕ) : ℤ) := Nat.prime_iff_prime_int.mp hl.out
   rw [← MulEquiv.prime_iff Rat.ringOfIntegersEquiv.toMulEquiv]
-  simpa using h
+  simpa using (Nat.prime_iff_prime_int.mp hl.out)
 
 
 variable (l) in

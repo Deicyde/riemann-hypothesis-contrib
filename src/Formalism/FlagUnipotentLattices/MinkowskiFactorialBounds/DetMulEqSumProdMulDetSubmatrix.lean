@@ -93,16 +93,14 @@ lemma det_submatrix_castLE_of_unitLower {R : Type*} [CommRing R] {N l : ℕ} (hl
     (Lo.submatrix (Fin.castLE hl) (Fin.castLE hl)).det = 1 := by
   rw [Matrix.det_of_lowerTriangular]
   · simp [h1]
-  · intro i j hij
-    exact h0 _ _ (by simpa using hij)
+  · exact fun i j hij => h0 _ _ (by simpa using hij)
 
 lemma det_submatrix_castLE_of_unitUpper {R : Type*} [CommRing R] {N l : ℕ} (hl : l ≤ N)
     (Up : Matrix (Fin N) (Fin N) R) (h1 : ∀ i, Up i i = 1) (h0 : ∀ i j, j < i → Up i j = 0) :
     (Up.submatrix (Fin.castLE hl) (Fin.castLE hl)).det = 1 := by
   rw [Matrix.det_of_upperTriangular]
   · simp [h1]
-  · intro i j hij
-    exact h0 _ _ (by simpa using hij)
+  · exact fun i j hij => h0 _ _ (by simpa using hij)
 
 theorem leadingMinorTriangularInvariant : LeadingMinorInvariant := by
   intro R _ N l hl Lo W Up hL1 hL0 hU1 hU0
@@ -241,10 +239,9 @@ lemma det_consRow {R : Type*} [CommRing R] {r : ℕ} (Y : Matrix (Fin r) (Fin (r
     (consRowMatrix u Y).det = ∑ b, u b * cofVec Y b := by
   rw [Matrix.det_succ_row_zero]
   refine Finset.sum_congr rfl fun b _ => ?_
-  have : (consRowMatrix u Y).submatrix Fin.succ b.succAbove =
-      Y.submatrix id b.succAbove := by
-    ext i j; rfl
-  rw [this, s5bCons_zero]; simp only [cofVec]; ring
+  rw [show (consRowMatrix u Y).submatrix Fin.succ b.succAbove =
+      Y.submatrix id b.succAbove from by ext i j; rfl, s5bCons_zero]
+  simp only [cofVec]; ring
 
 lemma neg_one_pow_mul_neg_one_pow {R : Type*} [CommRing R] (n : ℕ) : ((-1 : R) ^ n) * ((-1) ^ n) = 1 := by
   rw [← mul_pow]; simp

@@ -70,8 +70,7 @@ lemma hh_zero (d : ℕ) : hh 0 d = 0 := by
   · rw [div_self h, Real.log_one]
 
 lemma fT_zero (k' : ℕ) : fT k' 0 = 0 := by
-  rw [fT_eq]
-  exact Finset.sum_eq_zero fun d _ => hh_zero d
+  simp [fT_eq, hh_zero]
 
 lemma hh_nonneg {z : ℝ} {d : ℕ} (hz : 0 ≤ z) (hd : 1 ≤ d) : 0 ≤ hh z d := by
   have hd' : (1 : ℝ) ≤ d := by exact_mod_cast hd
@@ -139,10 +138,7 @@ lemma dom_anti {n : ℕ} {la : ℕ → ℤ} (h : Dom n la) {i j : ℕ} (hij : i 
   | zero => intro _; simp
   | succ k ih =>
     intro hj
-    have h1 := h (i + k) (by omega)
-    have h2 := ih (by omega)
-    show la (i + k + 1) ≤ la i
-    exact h1.trans h2
+    exact (h (i + k) (by omega)).trans (ih (by omega))
 
 lemma pos_idx {n Ns : ℕ} {la : ℕ → ℤ} (h : Dom n la)
     (hc : ((range n).filter fun m => 0 < la m).card ≤ Ns) {i : ℕ} (hi : i < n) (hp : 0 < la i) :
@@ -150,8 +146,7 @@ lemma pos_idx {n Ns : ℕ} {la : ℕ → ℤ} (h : Dom n la)
   have hsub : range (i + 1) ⊆ (range n).filter fun m => 0 < la m := by
     intro m hm
     rw [Finset.mem_range] at hm
-    rw [Finset.mem_filter, Finset.mem_range]
-    exact ⟨by omega, lt_of_lt_of_le hp (dom_anti h (by omega) hi)⟩
+    exact Finset.mem_filter.mpr ⟨by rw [Finset.mem_range]; omega, lt_of_lt_of_le hp (dom_anti h (by omega) hi)⟩
   have := Finset.card_le_card hsub
   rw [Finset.card_range] at this
   omega
@@ -162,8 +157,7 @@ lemma neg_idx {n Ns : ℕ} {la : ℕ → ℤ} (h : Dom n la)
   have hsub : Ico t n ⊆ (range n).filter fun m => la m < 0 := by
     intro m hm
     rw [Finset.mem_Ico] at hm
-    rw [Finset.mem_filter, Finset.mem_range]
-    exact ⟨hm.2, lt_of_le_of_lt (dom_anti h hm.1 hm.2) hp⟩
+    exact Finset.mem_filter.mpr ⟨by simpa [Finset.mem_range] using hm.2, lt_of_le_of_lt (dom_anti h hm.1 hm.2) hp⟩
   have := Finset.card_le_card hsub
   rw [Nat.card_Ico] at this
   omega
@@ -343,13 +337,11 @@ lemma G_split {n : ℕ} {la : ℕ → ℤ} (hd : Dom n la) {i j : ℕ} (hij : i 
       hi0, hj0]
     simp [hh_zero]
   · have hm : max (-(la j)) 0 = la i - la j := by
-      rw [hi0, max_eq_left (show (0 : ℤ) ≤ -la j by linarith)]
-      ring
+      rw [hi0, max_eq_left (show (0 : ℤ) ≤ -la j by linarith), zero_sub]
     rw [if_neg (show ¬(la i ≠ 0 ∧ la j ≠ 0) from fun h => h.1 hi0), if_neg hj0, if_pos hi0, hm]
     ring
   · have hm : max (la i) 0 = la i - la j := by
-      rw [hj0, sub_zero]
-      exact max_eq_left (by linarith)
+      rw [hj0, sub_zero, max_eq_left (by linarith)]
     rw [if_neg (show ¬(la i ≠ 0 ∧ la j ≠ 0) from fun h => h.2 hj0), if_pos hj0, if_neg hi0, hm]
     ring
   · rw [if_pos ⟨hi0, hj0⟩, if_neg hj0, if_neg hi0]
@@ -372,12 +364,9 @@ private theorem sum_rows_lemma_2 {n Ns : ℕ} (p : ℕ → Prop) [DecidablePred 
       ∑ i ∈ range n, R i ≤ (∑ i ∈ range n, B i) + (Ns : ℝ) * b := by
   have h1 := sum_ite_const_le (n := n) p hc ha
   have h2 := sum_ite_const_le (n := n) p hc hb
-  have l1 : ∑ i ∈ range n, (B i - (if p i then a else 0)) ≤ ∑ i ∈ range n, R i :=
-    Finset.sum_le_sum fun i hi => (hR i hi).1
-  have l2 : ∑ i ∈ range n, R i ≤ ∑ i ∈ range n, (B i + (if p i then b else 0)) :=
-    Finset.sum_le_sum fun i hi => (hR i hi).2
-  rw [Finset.sum_sub_distrib] at l1
-  rw [Finset.sum_add_distrib] at l2
+  have l1 := Finset.sum_le_sum fun i hi => (hR i hi).1
+  have l2 := Finset.sum_le_sum fun i hi => (hR i hi).2
+  simp only [Finset.sum_sub_distrib, Finset.sum_add_distrib] at l1 l2
   constructor <;> linarith
 
 private theorem factor_pos_lemma_3 {n : ℕ} {la : ℕ → ℤ} (hd : Formalism.InvariantFactorPaths.BranchingDimensions.Dom n la) {i j : ℕ} (hij : i < j)
@@ -396,11 +385,8 @@ private theorem log_weylDim_lemma_4 {n : ℕ} {la : ℕ → ℤ} (hd : Formalism
     intro j hj i hi
     rw [Finset.mem_range] at hj hi
     exact factor_pos_lemma_3 hd hi hj
-  have hinner : ∀ j ∈ range n,
-      0 < ∏ i ∈ range j, (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) :=
-    fun j hj => Finset.prod_pos (hpos j hj)
   unfold weylDim
-  refine ⟨Finset.prod_pos hinner, ?_⟩
+  refine ⟨Finset.prod_pos fun j hj => Finset.prod_pos (hpos j hj), ?_⟩
   rw [Real.log_prod]
   · apply Finset.sum_congr rfl
     intro j hj
@@ -409,7 +395,7 @@ private theorem log_weylDim_lemma_4 {n : ℕ} {la : ℕ → ℤ} (hd : Formalism
     · intro i hi
       exact (hpos j hj i hi).ne'
   · intro j hj
-    exact (hinner j hj).ne'
+    exact (Finset.prod_pos (hpos j hj)).ne'
 
 lemma sum_pa_le {Ns n : ℕ} {la : ℕ → ℤ} {L : ℝ} (hL0 : 0 ≤ L)
     (hP : ((range n).filter fun m => 0 < la m).card ≤ Ns)
@@ -434,10 +420,7 @@ lemma sum_pa_le {Ns n : ℕ} {la : ℕ → ℤ} {L : ℝ} (hL0 : 0 ≤ L)
     intro j hj
     rw [Finset.mem_range] at hj
     by_cases hj0 : la j = 0
-    · rw [if_neg (show ¬(la j ≠ 0) from fun h => h hj0)]
-      refine le_of_eq (Finset.sum_eq_zero fun i _ => ?_)
-      unfold pa
-      rw [if_neg (show ¬(la i ≠ 0 ∧ la j ≠ 0) from fun h => h.2 hj0)]
+    · simp [pa, hj0]
     · rw [if_pos hj0]
       have h1 : ∑ i ∈ range j, pa la i j ≤ ∑ i ∈ range j, (if la i ≠ 0 then L else 0) := by
         apply Finset.sum_le_sum
@@ -445,9 +428,7 @@ lemma sum_pa_le {Ns n : ℕ} {la : ℕ → ℤ} {L : ℝ} (hL0 : 0 ≤ L)
         rw [Finset.mem_range] at hi
         unfold pa
         by_cases hi0 : la i = 0
-        · rw [if_neg (show ¬(la i ≠ 0 ∧ la j ≠ 0) from fun h => h.1 hi0),
-            if_neg (show ¬(la i ≠ 0) from fun h => h hi0)]
-          all_goals exact le_rfl
+        · simp [hi0]
         · rw [if_pos ⟨hi0, hj0⟩, if_pos hi0]
           exact hG i j hi hj
       have h2 : ∑ i ∈ range j, (if la i ≠ 0 then L else 0) ≤
@@ -455,9 +436,7 @@ lemma sum_pa_le {Ns n : ℕ} {la : ℕ → ℤ} {L : ℝ} (hL0 : 0 ≤ L)
         apply Finset.sum_le_sum_of_subset_of_nonneg
           (fun x hx => Finset.mem_range.mpr (lt_trans (Finset.mem_range.mp hx) hj))
         intro i _ _
-        split_ifs
-        · exact hL0
-        · exact le_rfl
+        split_ifs <;> linarith
       have h3 : ∑ i ∈ range n, (if la i ≠ 0 then L else 0) ≤ ((2 * Ns : ℕ) : ℝ) * L :=
         sum_ite_const_le (fun m => la m ≠ 0) hnz hL0
       have h4 : ((2 * Ns : ℕ) : ℝ) = 2 * (Ns : ℝ) := by push_cast; ring
