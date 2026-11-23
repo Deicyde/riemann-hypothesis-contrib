@@ -222,8 +222,6 @@ theorem betaOnCut_of_tcritLower (HT : TcritLower) : BetaOnCut := by
     Finset.prod_nonneg (fun i _ => rho_nonneg c de de' Y l i h hlk hY)
   have hRl0 := rho_nonneg c de de' Y l l h hlk hY
   have hRk0 := rho_nonneg c de de' Y l (c.k - 1) h hlk hY
-    unfold Cfg.Nd
-    exact Finset.prod_nonneg (fun j _ => Real.sqrt_nonneg _)
   have hU0 : 0 < c.U1 (-Y) := (edgeFactorBound c Y l h hl hlk hY).1
   have hsq : Real.sqrt (14 * (c.v l + Y) / (5 * c.Del)) =
       Real.sqrt (14 / 5) * Real.sqrt ((c.v l + Y) / c.Del) := by
