@@ -61,7 +61,6 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.FdegTransfe
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.PsiPos
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.Exists
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.DatumEmbeddingMemHlam
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.SandwichA
 
 @[expose] public section
 
@@ -133,6 +132,18 @@ theorem swB_isFdeg_push {ε : Fin n → Bool} {A B : Type*} [NormedAddCommGroup 
   refine swB_isFdeg_pull U.symm (fun g hg y => ?_) hd
   apply U.injective
   rw [LinearIsometryEquiv.apply_symm_apply, hU g hg, LinearIsometryEquiv.apply_symm_apply]
+
+theorem swB_isFdeg_unique {ε : Fin n → Bool} {A : Type*} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
+    {τ : Matrix (Fin n) (Fin n) ℂ → (A →L[ℂ] A)} {ν : Measure (Formalism.REAL.UJ ε)} {d d' : ℝ} {w : A} (hw : w ≠ 0)
+    (hd : Formalism.MainNotions.S.IsFdeg ν τ d) (hd' : Formalism.MainNotions.S.IsFdeg ν τ d') : d = d' := by
+  rw [← fdegOf_of_isFdeg' hd hw, ← fdegOf_of_isFdeg' hd' hw]
+
+theorem swB_haar_eq {ε : Fin n → Bool} (ν : Measure (Formalism.REAL.UJ ε)) [ν.IsHaarMeasure] :
+    ∃ c : ℝ, 0 < c ∧ ν = ENNReal.ofReal c • Formalism.REAL.muG ε := by
+  have hs := Measure.haarScalarFactor_pos_of_isHaarMeasure ν (Formalism.REAL.muG ε)
+  have heq := Measure.isMulLeftInvariant_eq_smul ν (Formalism.REAL.muG ε)
+  have hc : (0 : ℝ) < (Measure.haarScalarFactor ν (Formalism.REAL.muG ε) : ℝ) := by exact_mod_cast hs
+  exact ⟨_, hc, by rw [ENNReal.ofReal_coe_nnreal]; exact heq⟩
 
 theorem swC_gap_shift {ε : Fin n → Bool} {μ : Fin n → ℝ} {h : ℝ} (hμ : GapAtLeast ε μ h) (dual : Bool)
     (s : Fin n) : GapAtLeast ε (shiftF dual μ s) (h - 1) := by

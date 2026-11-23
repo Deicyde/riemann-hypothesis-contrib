@@ -81,9 +81,10 @@ private theorem six_pow_mul_factorial_le_factorial_two_mul_add_one (k : ℕ) :
 
 private theorem sq_pow_div_odd_factorial_le_sq_div_six_pow_div_factorial (u : ℝ) (k : ℕ) :
     (u ^ 2) ^ k / ((2 * k + 1).factorial : ℝ) ≤ (u ^ 2 / 6) ^ k / (k.factorial : ℝ) := by
+  have hn : ((6 : ℝ) ^ k * (k.factorial : ℝ)) ≤ ((2 * k + 1).factorial : ℝ) := by
+    exact_mod_cast six_pow_mul_factorial_le_factorial_two_mul_add_one k
   rw [div_pow, div_div]
-  exact div_le_div_of_nonneg_left (by positivity) (by positivity)
-    (by exact_mod_cast six_pow_mul_factorial_le_factorial_two_mul_add_one k)
+  exact div_le_div_of_nonneg_left (by positivity) (by positivity) hn
 
 theorem shc_bounds (u : ℝ) : 1 ≤ shc u ∧ shc u ≤ Real.exp (u ^ 2 / 6) ∧ shc u ≤ Real.exp |u| := by
   by_cases hu : u = 0
@@ -238,7 +239,8 @@ private theorem sum_pairs_abs_sub_le_pred_mul_sum_abs (x : Fin n → ℝ) :
 
 private theorem pmat_eq_zero_of_sign_eq {ε : Fin n → Bool} (z : PCoord ε → ℂ) (a b : Fin n)
     (h : ε a = ε b) : pmat z a b = 0 := by
-  simpa using pmat_eq_zero_of_eq z h
+  unfold pmat
+  simp [h]
 
 private theorem matrix_rank_add_le' (P Q : Matrix (Fin n) (Fin n) ℂ) :
     (P + Q).rank ≤ P.rank + Q.rank := by

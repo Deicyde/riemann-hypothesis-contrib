@@ -70,7 +70,7 @@ theorem fdModel_of (hD : DegPsi) (hS : HlamStable) (hF : FormF) (hN : PsiNorm) (
   obtain ⟨hP, hDS⟩ := hM n ε lam T μ hl hμ
   have : CompleteSpace (Hlam ε (PsiM T μ) T.w) := hDS.1
   obtain ⟨d, hd⟩ := G2.fdcGood_of_isDS hDS
-  have hw : T.w ≠ 0 := fdc_w_ne T
+  have hw : T.w ≠ 0 := G2.fdc_w_ne T
   have hj0 : uniformisationL2 ε (PsiM T μ) T.w T.w ≠ 0 := by
     intro h
     have h0 : uniformisationL2 ε (PsiM T μ) T.w (0 : T.V) = 0 := by simpa using datumEmbedding_smul hP T.w 0 (0 : T.V)
