@@ -1,16 +1,21 @@
-import Mathlib
-import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceDoubleStepTrilinearFormPropertiesStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricPositionsDoubleIntegralExistsUniqueStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceLocalGroupClosedEmbeddingIntegralStatement
-import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsSelfDualOfHasConductor
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleStepLocalWeilActionLineCharactersCancelStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LocalModelWeilOperatorTrivialAtPlaceIsModelStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.WeilRepLinearModelGLPairApplyMemSchwartzBruhatFuStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricDoubleIntegralFiniteCombinationStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricDoubleIntegralsPositionOneEqCellSumStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RootExchangeEntriesMemSchwartzBruhatStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AddCharConductorIntegersContinuousNeOneStatement
+module
+
+public import Mathlib
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceDoubleStepTrilinearFormPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricPositionsDoubleIntegralExistsUniqueStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceLocalGroupClosedEmbeddingIntegralStatement
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsSelfDualOfHasConductor
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleStepLocalWeilActionLineCharactersCancelStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LocalModelWeilOperatorTrivialAtPlaceIsModelStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.WeilRepLinearModelGLPairApplyMemSchwartzBruhatFuStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricDoubleIntegralFiniteCombinationStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricDoubleIntegralsPositionOneEqCellSumStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RootExchangeEntriesMemSchwartzBruhatStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AddCharConductorIntegersContinuousNeOneStatement
+
+@[expose] public section
+
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SeeSaw GlobalTheory.LocMod GlobalTheory.QPl ValuativeRel
 open GlobalTheory.PosOne (toOne Covers TriPos SymDbl OneDbl comb)
@@ -45,14 +50,15 @@ theorem sum_rTrans_trc {D : D7} {V : HSp D} {G : Type} [Monoid G] (gl : G →* G
 
 theorem comb_lin {G A : Type} [AddCommGroup A] [Module ℂ A] [Monoid G] (τ : Representation ℂ G A) (l : A →ₗ[ℂ] ℂ)
     (e : G →₀ ℂ) (F : A) : GlobalTheory.PosOne.comb e (fun b => l (τ b F)) = l (e.sum fun b a => a • τ b F) := by
-  simp only [GlobalTheory.PosOne.comb, Finsupp.sum, map_sum, map_smul, smul_eq_mul]
+  set_option synthInstance.maxHeartbeats 100000 in
+    simp only [GlobalTheory.PosOne.comb, Finsupp.sum, map_sum, map_smul, smul_eq_mul]
 
 theorem coe_sum_sub {G X : Type} [AddCommGroup X] [Module ℂ X] {A : Submodule ℂ X} (e : G →₀ ℂ) (v : G → A) :
     (((e.sum fun b a => a • v b : A)) : X) = e.sum fun b a => a • (v b : X) := by
   simp only [Finsupp.sum, Submodule.coe_sum, Submodule.coe_smul]
 
-set_option maxHeartbeats 4000000 in
 
+set_option maxHeartbeats 4000000 in
 theorem valOne_all : ∀ D : D7, ValOne D := by
   intro D ψ hψ σ S Q G₁ G₂ hG₁ hG₂ hK₁ hK₂ c₁ c₂ hc₁ hc₂ f₁ f₂ hvac φ f hφ hf hTy g hg h₁ hh₁ h₂ hh₂
   obtain ⟨⟨T₁, O₁, hT₁, hO₁, rfl⟩, ⟨T₂, O₂, hT₂, hO₂, rfl⟩⟩ := hvac

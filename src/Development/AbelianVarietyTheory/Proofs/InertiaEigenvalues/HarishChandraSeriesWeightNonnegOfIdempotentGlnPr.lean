@@ -1,6 +1,10 @@
-import Mathlib
-import Formalism.SharpRestriction.LevelLetterCocycles.ArithmeticCylinders
-import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
+module
+
+public import Mathlib
+public import Formalism.SharpRestriction.LevelLetterCocycles.ArithmeticCylinders
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
+
+@[expose] public section
 
 section
 open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
@@ -29,7 +33,8 @@ theorem trace_alg (a : MonoidAlgebra ℂ G) (V : FDRep ℂ G) :
     ∑ x, a.coeff x * V.character x =
       LinearMap.trace ℂ V (Representation.asAlgebraHom (V.ρ : Representation ℂ G V) a) := by
   conv_rhs => rw [eq_sum_single a]
-  rw [map_sum, map_sum]
+  set_option synthInstance.maxHeartbeats 100000 in
+    rw [map_sum, map_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [Representation.asAlgebraHom_single, map_smul, smul_eq_mul]
   rfl

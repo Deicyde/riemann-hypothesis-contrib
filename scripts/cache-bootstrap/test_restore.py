@@ -64,9 +64,18 @@ def main():
             helper.main()
         assert (lib / "Subject.olean").read_bytes() == originals["olean"]
         (lib / "Subject.olean").write_bytes(b"corrupt existing output")
+        # Lake reads X.hash instead of hashing X, so a replaced output must not keep its old one.
+        stale = [lib / "Subject.olean.hash", lib / "Subject.olean.private.hash",
+                 lib / "Subject.ilean.hash", ir / "Subject.c.hash"]
+        unrelated = [lib / "SubjectExtra.olean.hash", lib / "Subject.trace.hash",
+                     ir / "Subject.olean.hash"]
+        for path in stale + unrelated:
+            path.write_text("0" * 16)
         with patch.object(sys, "argv", ["restore-cache", "--project", str(root), "--manifest", str(manifest), "--jobs", "2"]):
             helper.main()
         assert (lib / "Subject.olean").read_bytes() == originals["olean"]
+        assert not any(path.exists() for path in stale)
+        assert all(path.read_text() == "0" * 16 for path in unrelated)
 
         def rejects(function):
             try:
@@ -92,6 +101,10 @@ def main():
         rejects(lambda: helper.restore_jobs(root, root / ".lake/cache", [row]))
         (root / "src/Subject.lean").write_text("changed source\n")
         rejects(lambda: helper.check_project(root))
+        # The script itself still holds the real pins, so it stops on this fixture and says what to run instead.
+        stopped = subprocess.run([sys.executable, str(here.parent / "restore-cache.py"), "--project", str(root)],
+                                 capture_output=True, text=True)
+        assert stopped.returncode == 1 and "source scripts/cache-env.sh && lake build" in stopped.stderr, stopped.stderr
     print("PASS bulk restore: stock output bytes match; partial artifacts, changed source, traversal, and output symlinks reject")
 
 

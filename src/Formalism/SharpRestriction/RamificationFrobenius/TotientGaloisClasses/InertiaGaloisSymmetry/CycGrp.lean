@@ -1,5 +1,9 @@
-import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.InertiaGaloisSymmetry.RootEqOfSubMem
-import Mathlib
+module
+
+public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.InertiaGaloisSymmetry.RootEqOfSubMem
+public import Mathlib
+
+@[expose] public section
 
 open NumberField IntermediateField Ideal
 open scoped Pointwise
@@ -350,7 +354,7 @@ theorem frob : ∀ (p : ℕ) [Fact p.Prime], ¬ p ∣ H.condN →
   refine ⟨?_, ?_, ?_⟩
   · rw [hg]
     unfold HostRaw.psAt
-    rw [dif_pos hcop]
+    rw [dite_eq_left hcop]
   · rw [hg, art_snd_lemma H, hu0, ZMod.val_natCast, jac_lemma hpodd hd4,
       jacobiSym.mod_left ((p % H.condN : ℕ) : ℤ), jacobiSym.mod_left (p : ℤ)]
     congr 1
@@ -469,7 +473,7 @@ theorem decomp_typeI : ∀ (l : ℕ), l.Prime → l ∣ H.QS * H.q →
   have hσω : σ • ω = 1 - ω := by
     apply NumberField.RingOfIntegers.ext
     show σ (ω : H.E) = 1 - (ω : H.E)
-    rw [hωc, map_div₀, map_add, map_one, hσX, show σ (2 : H.E) = 2 from map_ofNat σ 2]
+    rw [hωc, map_div₀, map_add (f := _), map_one, hσX, show σ (2 : H.E) = 2 from map_ofNat σ 2]
     ring
   have hprod : (ω - ((a + 1 : ℤ) : 𝓞 H.E)) * (ω - (1 - ((a + 1 : ℤ) : 𝓞 H.E))) =
       -((l : ℤ) : 𝓞 H.E) * ((k * c : ℤ) : 𝓞 H.E) := by
