@@ -610,7 +610,7 @@ theorem contDiff_of_class_tendstoLocallyUniformly : ∀ {E : Type} [NormedAddCom
     ext x
     conv_lhs => rw [← hc x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, (h y).2, ContinuousLinearMap.sum_apply,
+      simp only [map_sum, map_smul, (h y).2, sum_apply,
       smul_apply, ContinuousLinearMap.smulRight_apply]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp only [Complex.real_smul, smul_eq_mul]
