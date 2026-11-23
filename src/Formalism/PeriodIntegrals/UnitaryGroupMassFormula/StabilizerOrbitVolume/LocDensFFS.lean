@@ -52,7 +52,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 public import Mathlib.FieldTheory.Finiteness
 public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.LocDensFFS
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.LocDensHTop
 
 @[expose] public section
 

@@ -2,15 +2,17 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsTwiceDifferentiableAt
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogDetComparableGramBound
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogDetComparableGramBoundStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.InFlagDomainOne
+public import Mathlib.LinearAlgebra.Matrix.Block
 public import Development.WeilBound.CoreStatements.PluriharmonicCharts.XPerCell
+public import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
+public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
 import Mathlib.Analysis.SpecialFunctions.Bernstein
-public import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
@@ -58,7 +60,6 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import ReciprocityTheory.AnalyticForms.LeviForms.HomDens
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
 import Std.Tactic.BVDecide.Normalize.Prop
 import GroundTheory.HeightsAndTheta.Heights.Antisymmetric.Statements
 import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodChartPotentialLeviForm
@@ -147,7 +148,7 @@ theorem plurRe_stepCorr {z0 : Fin e → ℂ} {b : (Fin e → ℂ) → Matrix (Fi
 theorem stepPot_unitary_mul {j : ℕ} {u : Matrix (Fin N) (Fin N) ℂ}
     (hu : gramOf (sigForm N j) u = diagonal fun i => ((sigForm N j i : ℝ) : ℂ))
     (i : Fin N) (g : Matrix (Fin N) (Fin N) ℂ) : stepPot N j i (u * g) = stepPot N j i g := by
-  have h k := (GlobalTheory.T.gram_log_unitary_triangular_invariance N (sigForm N j) k g u 1).1 hu
+  have h k := (_root_.GlobalTheory.CompanionTheory.Ar.PB.gramLog_inv N (sigForm N j) k g u 1).1 hu
   unfold stepPot
   simp only [h]
 

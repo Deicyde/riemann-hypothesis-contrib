@@ -3,8 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmConstantEqAtAllEmbeddings
 public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ClausesIffExistsUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupremumConstantLogBoundStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupremumConstantLogBound
 public import Development.AutomorphicArithmetic.FrobeniusLocalisation.RadBounds2
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
 import Formalism.LocalRingCardinality.HostCls
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -40,14 +43,11 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
 import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
 import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsRightActFunPull
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsoOverOfIsOpenImmersion
-public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
 import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
@@ -109,7 +109,7 @@ theorem supConst_quadratic_rows (D : D7) (M : ℕ) (Lb w C : ℝ)
     have h4 := le_of_mul_le_mul_left h3 (by linarith)
     linarith
   have hlogfr : Real.log ((ReciprocityTheory.ChartRestriction.G.FD.fdeg D.host.E : ℝ) * D.R.r) ≤ L := by
-    rw [hfd]; linarith
+    rw [hfd]; push_cast at hfrl; linarith
   have hmain := hbound L hr2 hd1 hM (by linarith) hw hlogfr (by linarith) hdE hlogd (by linarith)
   refine ⟨hmain.1, hmain.2.trans_eq ?_⟩
   rw [hfd, hL]
@@ -145,6 +145,6 @@ theorem supConst_size_rows_of_log_bound (D : D7) (M : ℕ) (Lb w C : ℝ)
 theorem supConst_size_rows : ∀ (D : D7) (M : ℕ) (Lb w : ℝ), 1 ≤ M → 1 ≤ Lb → Real.log M ≤ 30 * Lb → fieldSz D.host.E ≤ 3 * Lb → Real.log (D.R.f * D.R.r) ≤ Lb → 1 ≤ w → Real.log w ≤ 25 * Lb → 1 ≤ GlobalTheory.LevGeo.supConst D.host.E D.R.r D.host.d M w ∧ Real.log (GlobalTheory.LevGeo.supConst D.host.E D.R.r D.host.d M w) ≤ 4000 * ((D.R.f : ℝ) * D.R.r * Lb) ^ 3 :=
   fun D M Lb w hM hLb hMl hsz hfrl hw hwl =>
     supConst_size_rows_of_log_bound D M Lb w _ hM hLb hMl hsz hfrl hw hwl
-      fun L => GlobalTheory.T.supremum_constant_log_bound D.host.E D.R.r D.host.d M w L
+      fun L => _root_.GlobalTheory.SupConstSize.supConst_size D.host.E D.R.r D.host.d M w L
 
 end GlobalTheory.ConstSzRows

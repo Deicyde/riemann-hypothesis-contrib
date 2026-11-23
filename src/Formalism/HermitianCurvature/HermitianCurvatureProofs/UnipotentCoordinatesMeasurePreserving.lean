@@ -5,10 +5,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ConjugationI
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OppositeWeylSubgroupClosed
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixTranspose
 public import Mathlib.LinearAlgebra.Matrix.Permutation
-import Formalism.FormalDegreeBessel.FinalG
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactGroupHaarExists
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ComponentFamilySettingOfSetting
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.ConjugationContinuousOnInvertible
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DirectionsInParabolic
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DualCovolumeChangeOfVariables
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.HeisenbergLeviConjugationMeasure
@@ -16,17 +13,21 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.HermitianFor
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LevelSizesJointMean
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LocalConditionsAndQuotientSplitting
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LowerParabolicCoordinates
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.PeriodLatticeFactsSplitOfGeneral
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.PoissonJointFirstReduction
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ShearMeasurability
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.StabilizerFourthCondition
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.StabilizerPairs
+public import Formalism.HermitianCurvature.FiniteOrderIntersectionInSmooth
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.StabPairs
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.StabilizerSplit
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixMul
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.TwistedIsRealOrderLattice
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.TwoByOneBlock
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.UnipotentHeisenbergDecomposition
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.WittOrthonormalBasis
+import Formalism.FormalDegreeBessel.FinalG
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactGroupHaarExists
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.ConjugationContinuousOnInvertible
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.PeriodLatticeFactsSplitOfGeneral
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.TwistedIsRealOrderLattice
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.TwoByOneBlock
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -3645,7 +3646,7 @@ include hd hZ
 
 theorem u_lstg {ρ : B.Mat k r} (hρ : ρ ∈ C6.Rset γ) : (C2.uMap k r D.z ρ)ᴴ ∈ C2.Lstg (C2.monoP w d) := by
   rw [rset_eq D hγ hpos] at hρ
-  have h1 := (Formalism.FourierDecayAlt.P.stabilizer_pairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).1.mapsTo hρ
+  have h1 := (_root_.stabPairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).1.mapsTo hρ
   simp only [Set.mem_ofPred_eq] at h1
   rw [hZ] at h1
   have h2 : C2.uMap k r D.z ρ ∈ {u | u ∈ C2.UTset (r + 1) ∧ ∃ u' ∈ C2.UTset (r + 1), uᴴ * C2.monoP w d * u' =
@@ -3662,13 +3663,13 @@ theorem exists_rho (x : C2.Lstidx w → ℂ) : ∃ ρ ∈ C6.Rset γ, C2.uMap k 
   have hmem : ((low w x)ᴴ, u') ∈ {p : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ × Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ |
       p.1 ∈ C2.UTset (r + 1) ∧ p.2 ∈ C2.UTset (r + 1) ∧ p.1ᴴ * Zhat k r D.z D.z' γ * p.2 = Zhat k r D.z D.z' γ} := by
     refine ⟨hu1, hu', ?_⟩; rw [hZ]; exact he
-  obtain ⟨ρ, hρ, hρe⟩ := (Formalism.FourierDecayAlt.P.stabilizer_pairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).1.surjOn hmem
+  obtain ⟨ρ, hρ, hρe⟩ := (_root_.stabPairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).1.surjOn hmem
   refine ⟨ρ, by rw [rset_eq D hγ hpos]; exact hρ, ?_⟩
   exact congrArg Prod.fst hρe
 
 theorem u_inj : Set.InjOn (C2.uMap k r D.z) (C6.Rset γ) := by
   rw [rset_eq D hγ hpos]
-  exact (Formalism.FourierDecayAlt.P.stabilizer_pairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).2.1
+  exact (_root_.stabPairs k r D.z D.z' γ (std D) ⟨hγ, hpos⟩).2.1
 
 end posG
 

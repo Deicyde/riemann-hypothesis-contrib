@@ -1,9 +1,10 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompactAdeleRingModNumberField
 public import Mathlib.NumberTheory.NumberField.AdeleRing
 public import Formalism.LocalToGlobal.GlobalTheory.GL1.CompactFixesLattice.ExistsDenOfIsCompactAdele
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.IntAdCpctOpen
+public import Formalism.LocalToGlobal.AdelicCompactOpens.IntAdelesCompactOpen
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdicIntegersCompact.IsCompactAdicCompletionIntegers
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompactAdeleRingModNumberField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -148,7 +149,7 @@ theorem adl_cocompact : ∃ K : Set (AdeleRing (𝓞 F) F), IsCompact K ∧
     ∀ x, ∃ a : F, x - algebraMap F _ a ∈ K := by
   obtain ⟨C, hC, hCy⟩ := adl_inf_cocompact (F := F)
   refine ⟨C ×ˢ {x : FiniteAdeleRing (𝓞 F) F | ∀ v, x v ∈ v.adicCompletionIntegers F},
-    hC.prod (finiteAdeleIntegers_compactOpen F).2, fun x => ?_⟩
+    hC.prod (_root_.PI.IntAdCpctOpenWork.main F).2, fun x => ?_⟩
   obtain ⟨u, hu⟩ := Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.exists_sub_mem_intAd x.2
   obtain ⟨r, hr⟩ := hCy (x.1 - algebraMap F _ u)
   refine ⟨u + r, ?_, ?_⟩

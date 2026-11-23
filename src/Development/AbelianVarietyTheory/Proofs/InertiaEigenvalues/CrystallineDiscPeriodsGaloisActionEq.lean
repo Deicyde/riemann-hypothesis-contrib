@@ -1,11 +1,11 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinMemIdealPowOfXPowMulMem
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfAdicTopologicalBasisOverBreuilKisin
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinAinfDiscIsDomainNormBounds
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasis
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinMemIdealPowOfXPowMulMem
 import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfAdicTopologicalBasisOverBreuilKisinStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinAinfDiscIsDomainNormBoundsStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasisStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -106,7 +106,7 @@ theorem X_pow_mem_J_galPer : (X : bk.S) ^ bk.Ep.natDegree ∈ bk.J := by
   apply GlobalTheory.BSP.BK.X_pow_natDegree_mem_lE <;> assumption
 
 theorem ev_sep_galPer (b : Ainf l) (hb : ∀ n, bk.ev X ^ n ∣ b) : b = 0 := by
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
   have hc := tb.complete
   refine IsHausdorff.haus hc.toIsHausdorff b fun n => ?_
   rw [SModEq.zero, Ideal.smul_eq_mul, Ideal.mul_top]
@@ -127,7 +127,7 @@ theorem σA_ev_galPer {g : ↥(GK K)} (hg : bk.FixFlat g) (a : bk.S) : Per.σA (
   exact RingHom.congr_fun h a
 
 theorem ev_injective_galPer : Function.Injective bk.ev := by
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
   have key : ∀ a, tb.c tb.i₀ (bk.ev a * tb.b tb.i₀) = a := fun a => by
     rw [tb.c_mul, tb.c_self, mul_one]
   intro a a' h
@@ -149,9 +149,9 @@ theorem seed_gal_periods : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK 
         G (bk.iA τ) ^ s.N • s.W := by
   intro l _ K bk τ _ d ρ _ s g hg G hG
   obtain ⟨h0, h1⟩ := bk.ρ₀_pos_lt_one_galPer
-  haveI : IsDomain (bk.DA bk.ρ₀) := (GlobalTheory.T.breuilKisin_ainfDisc_isDomain_norm_bounds l K bk bk.ρ₀ h0 h1).1
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
-  have hinj : Function.Injective bk.iA := (GlobalTheory.T.closedDisc_toDisc_injective_of_adicBasis l K bk (Ainf l) bk.ev ι tb bk.ρ₀ h0 h1).1
+  haveI : IsDomain (bk.DA bk.ρ₀) := (_root_.GlobalTheory.BSP.discAinf_isDomain l K bk bk.ρ₀ h0 h1).1
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
+  have hinj : Function.Injective bk.iA := (_root_.GlobalTheory.BSP.toDisc_injective_of_topBasis l K bk (Ainf l) bk.ev ι tb bk.ρ₀ h0 h1).1
   have hGS : ∀ a, G (bk.iA (bk.ev a)) = bk.iA (bk.ev a) := fun a => by
     show G (toDisc l (bk.ev X) bk.ρ₀ (bk.ev a)) = _
     rw [hG.ext, bk.σA_ev_galPer hg]

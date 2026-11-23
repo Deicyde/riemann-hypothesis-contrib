@@ -2,7 +2,9 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HasValues
 public import Mathlib.Tactic.ENatToNat
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueTangentDualNumberStatement
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUnitFormLocalizationEtaleNbhd
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueTangentDualNumber
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic

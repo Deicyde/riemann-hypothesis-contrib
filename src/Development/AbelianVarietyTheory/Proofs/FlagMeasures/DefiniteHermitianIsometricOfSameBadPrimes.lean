@@ -1,13 +1,12 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MaximalHermitianLatticeBadPrimesIffGramDet
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MaximalHermitianLatticeBadPrimesIffGramDet
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen
 public import Formalism.HermitianLattices.StatementMass
 public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsMaximalIntegralHermitianLatticeOrthonormalStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MaximalHermitianLatticeBadPrimesIffGramDetStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsMaximalIntegralHermitianLatticeOrthonormal
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemHcompl
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitianStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitian
 public import Development.AbelianVarietyTheory.Proofs.HermitianTraceForms.ExistsOrthogonalBasisDotProductApplyEq
 import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
 import Mathlib.Algebra.Module.StablyFree.Basic
@@ -307,12 +306,12 @@ theorem exists_unimodular [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarT
     ∃ L : Submodule (𝓞 K) (V × K), Submodule.IsLattice K L ∧ IsUnimodular (ext h β) L := by
   have nd := nondeg_of_PD _ hp
   obtain ⟨M, hM⟩ := exists_intLat (ext h β)
-  obtain ⟨L, hL, -⟩ := (GlobalTheory.T.exists_maximal_integralHermitianLattice_orthonormal_maximal K (V × K) (ext h β) hK hs nd).1 M hM
+  obtain ⟨L, hL, -⟩ := (_root_.GlobalTheory.Mass.MaxExists.main K (V × K) (ext h β) hK hs nd).1 M hM
   obtain ⟨j, c, hc⟩ := exists_basis_ext h β b
   refine ⟨L, hL.1.1.toIsLattice, (locDual (𝓞 K) K (V × K) (ext h β) hs
     (fun r => LocWitt.star_int r) L hL.1.1.fg).2.2 fun P hm => ?_⟩
   by_contra hu
-  have := (GlobalTheory.T.maximalHermitianLattice_badPrimes_iff_gramDet K (V × K) (ext h β) hK hs nd L hL j c P hm).1 ⟨hm, hu⟩
+  have := (_root_.GlobalTheory.MaxLatDet.main K (V × K) (ext h β) hK hs nd L hL j c P hm).1 ⟨hm, hu⟩
   rw [hc] at this
   exact this.2 (hP P hm this.1)
 
@@ -342,7 +341,7 @@ theorem cancel {W : Type} [AddCommGroup W] [Module K W] [FiniteDimensional K V] 
   have w0 : φ (0, 1) ≠ 0 := by simp
   let e1 := LinearEquiv.toSpanNonzeroSingleton K _ _ w0
   let e2 := LinearEquiv.toSpanNonzeroSingleton K _ _ u0
-  obtain ⟨g, hg, hg1⟩ := (GlobalTheory.T.witt_extension_totally_definite_hermitian K (W × K) (ext k β) hK hs hp).1 _ _ (e1.symm.trans e2) (by
+  obtain ⟨g, hg, hg1⟩ := (_root_.GlobalTheory.Mass.Witt.witt_definite K (W × K) (ext k β) hK hs hp).1 _ _ (e1.symm.trans e2) (by
     intro x y
     obtain ⟨s, rfl⟩ := e1.surjective x
     obtain ⟨t, rfl⟩ := e1.surjective y
@@ -377,8 +376,8 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
   obtain ⟨b, d1, d2⟩ := exists_basis hK hs hp
   obtain ⟨b', -, d2'⟩ := exists_basis hK hs' hp'
   obtain ⟨τ⟩ : Nonempty (K →+* ℂ) := inferInstance
-  have p1 := fun P => GlobalTheory.T.maximalHermitianLattice_badPrimes_iff_gramDet K V h hK hs (nondeg_of_PD h hp) M hM _ b P
-  have p2 := fun P => GlobalTheory.T.maximalHermitianLattice_badPrimes_iff_gramDet K V' h' hK hs' (nondeg_of_PD h' hp') M' hM' _ b' P
+  have p1 := fun P => _root_.GlobalTheory.MaxLatDet.main K V h hK hs (nondeg_of_PD h hp) M hM _ b P
+  have p2 := fun P => _root_.GlobalTheory.MaxLatDet.main K V' h' hK hs' (nondeg_of_PD h' hp') M' hM' _ b' P
   generalize hβ : (Matrix.of fun i l => h (b i) (b l)).det = β at d1 d2 p1
   generalize hβ' : (Matrix.of fun i l => h' (b' i) (b' l)).det = β' at d2' p2
   have β0 : β ≠ 0 := by

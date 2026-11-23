@@ -2,10 +2,11 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.TranslateMemIndOrder
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUnitFormLocalizationEtaleNbhd
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ExtensionOrderEqSpanStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseChangePointsCompatStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ExtensionOrderEqSpan
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseChangePointsCompat
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.MemBtOrderIffBtSet
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegularFunctionIffSectionStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegularFunctionIffSection
+public import Mathlib.RingTheory.Flat.TorsionFree
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -55,7 +56,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
-public import Mathlib.RingTheory.Flat.TorsionFree
 import Development.WeilBound.CoreStatements.HodgeTatePoints.HtatHopfFlat
 
 @[expose] public section
@@ -331,7 +331,7 @@ lemma mem_btOrder_iff [Finite T] (Γ : QFGroup R T) (f : T → R) :
     mem_btOrder_iff_mem_btSet R T Γ ⊤ f
   rw [hmem]
   refine forall_congr' fun t => ?_
-  have := GlobalTheory.T.regular_function_iff_section R T Γ ⊤ (fun h => algebraMap R (FractionRing R) (f (t * h)))
+  have := _root_.GlobalTheory.CompanionTheory.Ar.BT.regularAt_forall_iff_exists_section R T Γ ⊤ (fun h => algebraMap R (FractionRing R) (f (t * h)))
   exact this
 
 lemma pushout_induction {A B C D : CommRingCat.{0}} {a : A ⟶ B} {c : A ⟶ C} {b : B ⟶ D} {d : C ⟶ D}
@@ -378,7 +378,7 @@ theorem val_mem_span [Finite T] [Module.Flat R R'] (Γ : QFGroup R T) (Γ' : QFG
     refine Submodule.subset_span ⟨fun t => valAt (Γ.pt t).left ⊤ (top_le_pre _) s, ⟨s, fun _ _ => rfl⟩, ?_⟩
     funext t
     rw [← valAt_comp (Γ'.pt t).left F ⊤ ⊤ _ (top_le_pre _) (top_le_pre _),
-      valAt_congr (GlobalTheory.T.base_change_points_compat R T Γ R' Γ' F hbc κ hκ t) _ _ (top_le_pre _),
+      valAt_congr (_root_.GlobalTheory.CompanionTheory.Ar.BT.genericPoint_baseChange R T Γ R' Γ' F hbc κ hκ t) _ _ (top_le_pre _),
       valAt_map κ _ _ (top_le_pre _)]
   · intro c n hn
     have : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) (((Γ'.G.hom.appLE ⊤ ⊤ (top_le_pre _)).hom c) * n)) =
@@ -422,7 +422,7 @@ lemma btOrder_le_ext [Finite T] [Module.Flat R R'] (Γ : QFGroup R T) (Γ' : QFG
     (hκ : κ.comp (algebraMap R _) = (algebraMap R' _).comp (algebraMap R R')) :
     Γ'.btOrder ⊤ ≤ extOrder (algebraMap R R') (Γ.btOrder ⊤) := by
   intro g hg
-  rw [GlobalTheory.T.extension_order_eq_span]
+  rw [_root_.GlobalTheory.CompanionTheory.Ar.BT.ExtSpan.extOrder_eq_span]
   refine alg_core κ hκ (secFn Γ) (Subalgebra.toSubmodule (Γ.btOrder ⊤)) (fun f => mem_btOrder_iff Γ f) g ?_
   intro t
   obtain ⟨x, hx⟩ := (mem_btOrder_iff Γ' g).1 hg t
@@ -446,7 +446,7 @@ lemma ext_le_btOrder [Finite T] (Γ : QFGroup R T) (Γ' : QFGroup R' T) (F : Γ'
   obtain ⟨s, hs⟩ := (mem_btOrder_iff Γ f).1 hf t
   refine ⟨(F.appLE ⊤ ⊤ (top_le_pre _)).hom s, fun h hh => ?_⟩
   rw [← valAt_comp (Γ'.pt h).left F ⊤ ⊤ _ _ (top_le_pre _),
-    valAt_congr (GlobalTheory.T.base_change_points_compat R T Γ R' Γ' F hbc κ hκ h) _ _ (top_le_pre _),
+    valAt_congr (_root_.GlobalTheory.CompanionTheory.Ar.BT.genericPoint_baseChange R T Γ R' Γ' F hbc κ hκ h) _ _ (top_le_pre _),
     valAt_map κ _ _ (top_le_pre _), hs h, hκ']
 
 end Sch

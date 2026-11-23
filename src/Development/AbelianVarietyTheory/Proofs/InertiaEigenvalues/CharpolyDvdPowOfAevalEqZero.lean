@@ -53,7 +53,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.UniNilp
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharpolyDvdPowOfAevalEqZero
+import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ScalarCommutation.SpecOfF
 
 @[expose] public section
 

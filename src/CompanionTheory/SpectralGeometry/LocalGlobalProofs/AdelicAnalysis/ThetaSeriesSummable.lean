@@ -2,8 +2,10 @@ module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
 public import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopologyStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopology
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SummableGaussianCoset
+public import Mathlib.Analysis.Normed.Group.Tannery
+public import ReciprocityTheory.ThetaSummability.TailSumEstimates.LatSumPi
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -11,7 +13,6 @@ import Mathlib.Algebra.Order.Star.Rat
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-public import Mathlib.Analysis.Normed.Group.Tannery
 import Mathlib.Analysis.SpecialFunctions.Bernstein
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
@@ -56,7 +57,6 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Separation.CompletelyRegular
 import Mathlib.Topology.Sheaves.Init
-public import ReciprocityTheory.ThetaSummability.TailSumEstimates.LatSumPi
 
 @[expose] public section
 
@@ -234,7 +234,7 @@ theorem support_denominator {gf : Matrix ι ι (A F)} (hu : IsUnit gf.det) {φ :
     (hφ : SB φ) :
     ∃ N : ℕ, 0 < N ∧ ∀ x : ι → F, φ (gf *ᵥ fun j => algebraMap F (A F) (x j)) ≠ 0 →
       ∀ j, ∃ r : 𝓞 F, (r : F) = (N : F) * x j := by
-  obtain ⟨-, -, -, -, -, -, hInt, -, hCpt, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
+  obtain ⟨-, -, -, -, -, -, hInt, -, hCpt, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
   have hcont : ∀ j, Continuous fun y : ι → A F => (gf⁻¹ *ᵥ y) j := fun j =>
     (continuous_apply j).comp (continuous_const.matrix_mulVec continuous_id)
   have hK : IsCompact (⋃ j, (fun y : ι → A F => (gf⁻¹ *ᵥ y) j) '' tsupport φ) :=
@@ -302,7 +302,7 @@ def indN (gf : Matrix ι ι (A F)) (N : ℕ) : (ι → A F) → ℂ := Set.indic
 
 theorem sb_indN {gf : Matrix ι ι (A F)} (hu : IsUnit gf.det) {N : ℕ} (hN : 0 < N) :
     SB (indN gf N) := by
-  obtain ⟨-, -, hT2, hOc, -, -, -, -, -, hOpenN⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
+  obtain ⟨-, -, hT2, hOc, -, -, -, -, -, hOpenN⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
   have hTc : IsCompact (mulOh (F := F) N) := by
     have : mulOh (F := F) N = (fun y : A F => (N : A F) * y) '' Oh F := by
       ext x
@@ -388,7 +388,7 @@ theorem exists_not_multiple {y : F} (hy : y ≠ 0) :
 
 theorem indN_eventually_zero {gf : Matrix ι ι (A F)} (hu : IsUnit gf.det) {x : ι → F} (hx : x ≠ 0) :
     ∀ᶠ n : ℕ in Filter.atTop, indN gf (n + 1) (gf *ᵥ fun j => algebraMap F (A F) (x j)) = 0 := by
-  obtain ⟨-, -, -, -, -, -, hInt, -, -, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
+  obtain ⟨-, -, -, -, -, -, hInt, -, -, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
   obtain ⟨j, hj⟩ := Function.ne_iff.1 hx
   obtain ⟨n₀, hn₀⟩ := exists_not_multiple (F := F) hj
   filter_upwards [Filter.eventually_ge_atTop n₀] with n hn

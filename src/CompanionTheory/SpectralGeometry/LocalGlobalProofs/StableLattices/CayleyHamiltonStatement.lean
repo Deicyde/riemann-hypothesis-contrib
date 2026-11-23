@@ -1,8 +1,9 @@
 module
 
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.HermitianCharacters.CharacteristicIdentity
 public import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.HeckeAlgebraActions.BackStable
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.QuantumDeterminantTensorStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.QuantumDeterminantTensor
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.HermitianCharacters.CharacteristicIdentity
 import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -51,7 +52,6 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
-public import Mathlib.LinearAlgebra.Dual.Lemmas
 
 @[expose] public section
 
@@ -283,6 +283,6 @@ theorem cayleyHam_of (H : QdetTens) : CayleyHam := by
   exact ⟨k, (smul_eq_zero.1 hz).resolve_left
     (pow_ne_zero _ (neg_ne_zero.2 (pow_ne_zero _ (by norm_num))))⟩
 
-theorem cayleyHam : CayleyHam := cayleyHam_of GlobalTheory.T.QuantumDeterminantTensor
+theorem cayleyHam : CayleyHam := cayleyHam_of _root_.GlobalTheory.CompanionTheory.RgExh.qdetTens
 
 end GlobalTheory.CompanionTheory.RgExhHecke.CayleyOm

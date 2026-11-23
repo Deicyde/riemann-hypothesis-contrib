@@ -50,7 +50,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.WeightedL2ConstMul
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.EnergyEstimateFromParts
 
 @[expose] public section
 

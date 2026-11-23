@@ -1,14 +1,17 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OfDualFamilies
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrtStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPeriodPairIdealCurveLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyHomLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyInverseHalfDifferentStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HermitianPairingRationalValuesStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeCovolumePosAndSelfDualStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrt
+public import Mathlib.Analysis.SpecialFunctions.Elliptic.Weierstrass
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPeriodPairIdealCurveLattice
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyHomLattice
+public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyInverseHalfDifferent
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HermitianPairingRationalValues
+public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.IsDiscriminantTwelfthRootOfIdealLattice
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeCovolumePosAndSelfDual
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaFunctionSelfDualExistsEqSmulStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OfDualFamilies
 import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -158,8 +161,8 @@ theorem of_dual_families (hG : admG1 D) (hC : Crv D cc δ)
     (hA : A = AddSubgroup.closure
       {z | ∃ w ∈ lamOf D cc δ, ∃ x ∈ S, z = w • embV D (tor0 D cc δ) x}) :
     (∀ F ∈ ThSp D (tor0 D cc δ) A, ∀ G ∈ ThSp D (tor0 D cc δ) A, G ≠ 0 → ∃ c : ℂ, F = c • G) ∧ (∀ x ∈ A, ∀ F, Wd D (tor0 D cc δ) x F = fun z => al D (tor0 D cc δ) x * U D (tor0 D cc δ) x F z) ∧ (∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) ∧ (∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A) ∧ A.FG ∧ Submodule.span ℝ (A : Set (VC D N N')) = ⊤ ∧ ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
-  obtain ⟨L, hL⟩ := GlobalTheory.T.exists_periodPair_idealCurveLattice D cc δ hC
-  obtain ⟨hpos, hdual⟩ := GlobalTheory.T.latticeCovolume_pos_and_selfDual L _ hL
+  obtain ⟨L, hL⟩ := _root_.GlobalTheory.CurveLattice.exists_periodPair_lamOf D cc δ hC
+  obtain ⟨hpos, hdual⟩ := _root_.GlobalTheory.PlaneLattice.area_pos_and_selfDual L _ hL
   have hLam : (tor0 D cc δ).abelian₂ = lamOf D cc δ := rfl
   have hgen : ∀ w ∈ lamOf D cc δ, ∀ x ∈ S, w • embV D (tor0 D cc δ) x ∈ A := fun w hw x hx =>
     hA ▸ AddSubgroup.subset_closure ⟨w, hw, x, hx, rfl⟩
@@ -203,7 +206,7 @@ theorem of_dual_families (hG : admG1 D) (hC : Crv D cc δ)
       rwa [im_Hf, hLam, sq_smul_right] at this
   have hq : ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
     intro x hx
-    obtain ⟨a, ha⟩ := GlobalTheory.T.exists_integer_map_eq_halfOneAddSqrt D
+    obtain ⟨a, ha⟩ := _root_.GlobalTheory.NormSum.exists_integer_map_eq_w0 D
     have hx' : w0 D • x ∈ A := hmem _ fun i => by
       rw [sq_smul_left, ← ha]
       exact lam_mul cc δ a (hsq x hx _ (hy' i))

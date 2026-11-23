@@ -1,8 +1,8 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalQuadraticDensityNearOneStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardLocalHaarPropertiesStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalQuadraticDensityNearOne
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardLocalHaarProperties
 import Formalism.LocalRingCardinality.SpanPowerMembership.LocAtA
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -120,7 +120,7 @@ private theorem sigmaFinite_of_isStdV {lam : Measure (Fv F v)} (hstd : IsStdV v 
     SigmaFinite lam := by
   haveI := borel_Fv (F := F) (v := v)
   obtain ⟨π, hπ⟩ := exists_unif v
-  obtain ⟨-, hmap, -, -⟩ := GlobalTheory.T.standard_local_haar_properties F v lam hstd
+  obtain ⟨-, hmap, -, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Vol.volumes_in_completion F v lam hstd
   have hm := hmap π hπ
   have hO : MeasurableSet (v.adicCompletionIntegers F : Set (Fv F v)) :=
     (Valued.isOpen_valuationSubring (Fv F v)).measurableSet
@@ -174,7 +174,7 @@ theorem pi_scale {lam : Measure (Fv F v)} (hstd : IsStdV v lam) {π : Fv F v}
     intro h0
     rw [h0, map_zero] at hπ
     exact WithZero.exp_ne_zero hπ.symm
-  obtain ⟨-, hmap, -, -⟩ := GlobalTheory.T.standard_local_haar_properties F v lam hstd
+  obtain ⟨-, hmap, -, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Vol.volumes_in_completion F v lam hstd
   have hm := hmap π hπ
   have hN : (Ideal.absNorm v.asIdeal : ℝ≥0∞) = ((Ideal.absNorm v.asIdeal : ℝ≥0) : ℝ≥0∞) :=
     (ENNReal.coe_natCast _).symm
@@ -198,7 +198,7 @@ theorem lam_scale {lam : Measure (Fv F v)} (hstd : IsStdV v lam) {π : Fv F v}
   have hmeas : Measurable (fun z : Fv F v => π * (π * z)) :=
     (measurable_const_mul π).comp (measurable_const_mul π)
   refine ⟨hmeas hA, ?_⟩
-  obtain ⟨-, hmap, -, -⟩ := GlobalTheory.T.standard_local_haar_properties F v lam hstd
+  obtain ⟨-, hmap, -, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Vol.volumes_in_completion F v lam hstd
   have hm := hmap π hπ
   have h1 : (lam.map (fun t => π * t)).map (fun t => π * t) A = lam {z | π * (π * z) ∈ A} := by
     rw [Measure.map_map (measurable_const_mul π) (measurable_const_mul π), Measure.map_apply ((measurable_const_mul π).comp (measurable_const_mul π)) hA]
@@ -349,7 +349,7 @@ theorem local_quadratic_density_bound_at_level {lam : Measure (Fv F v)} (hstd : 
   have hq2 : (2 : ℝ) ≤ (Ideal.absNorm v.asIdeal : ℝ) := by
     have : 2 ≤ Ideal.absNorm v.asIdeal := by omega
     exact_mod_cast this
-  obtain ⟨Dp, hDpb, hP⟩ := GlobalTheory.T.local_quadratic_density_near_one F v lam hstd h2 ι B hsym hB hdet M hc (by omega) s hs
+  obtain ⟨Dp, hDpb, hP⟩ := _root_.GlobalTheory.CompanionTheory.SW.LGPrim.density_primitive F v lam hstd h2 ι B hsym hB hdet M hc (by omega) s hs
   have hvs0 : Valued.v s ≠ 0 := (Valuation.ne_zero_iff _).mpr hs0
   have hL : Valued.v s = WithZero.exp (WithZero.log (Valued.v s)) := (WithZero.exp_log hvs0).symm
   have hLn : -(n : ℤ) ≤ WithZero.log (Valued.v s) := by

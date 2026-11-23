@@ -4,10 +4,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmCon
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
 public import Development.AbelianVarietyTheory.Definitions.Divisors.WedgeNrmLeOfWedgeNormLe
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspFormRankLeBergmanBoundGoodCoverStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DeepLevelCoverPrincipalLevelLawsGaloisStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelGeometryWeightBoundStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupConstantLogBoundStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspFormRankLeBergmanBoundGoodCover
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
+public import Development.AbelianVarietyTheory.Definitions.Divisors.CongModRefl
+public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
+public import Development.AbelianVarietyTheory.Definitions.ThetaValues.LeCovCoeff
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DeepLevelCoverPrincipalLevelLawsGalois
+public import Development.AbelianVarietyTheory.Definitions.Foundations.IsProbabilityMeasureMuPart
+public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.TamagawaSpecialUnitary
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelGeometryWeightBound
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHomogeneousCompIdeal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupConstantLogBound
 import Formalism.LocalToGlobal.ProjectiveLattices.NormLaws
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -41,13 +50,9 @@ import Mathlib.Tactic.NormNum.NatSqrt
 import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
 import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
-public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
 import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
-public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
 
 @[expose] public section
 
@@ -117,8 +122,8 @@ end GlobalTheory.BergRank
 
 namespace GlobalTheory.BergRank
 
-/-- Parametric Bergman/sup/rank exponential bound for any constant family `K : ℕ → ℝ → ℝ`
-satisfying the cubic log bound and componentwise `bergOn` bound. -/
+/-- Parametric Bergman, supremum, and rank bounds for a constant family `K : ℝ → ℝ`
+satisfying the cubic log bound and the componentwise Bergman bound. -/
 theorem berg_sup_rank_of_const (D : D7) (T : CoreJ D) (hT : LawsJ T) (j : ℕ)
     (hj : InR D j) (Y : Deep T.toCore j) (e : ℕ) (o : ℝ) (hY : Y.Good e o)
     (Lb : ℝ) (hLb : 1 ≤ Lb) (hsz : fieldSz D.host.E ≤ 3 * Lb)
@@ -133,7 +138,7 @@ theorem berg_sup_rank_of_const (D : D7) (T : CoreJ D) (hT : LawsJ T) (j : ℕ)
     BergLe Z Y.U (fun _ => D.sp.W j) Y.dict la (Real.exp (4000 * ((D.R.f : ℝ) * D.R.r * Lb) ^ 3)) ∧
       SupBdWt Y.U (xiR D) (fun _ => D.sp.W j) Y.dict Z la (Real.exp (4000 * ((D.R.f : ℝ) * D.R.r * Lb) ^ 3)) ∧
       Real.log (Y.rkC la Z) ≤ 4000 * ((D.R.f : ℝ) * D.R.r * Lb) ^ 3 := by
-  have hL := (GlobalTheory.T.deepLevelCover_principalLevel_laws_galois D T j Y e o hT hj hY hY.unit hY.modelW).1
+  have hL := (_root_.GlobalTheory.DeepLaws.laws_galois_pull D T j Y e o hT hj hY hY.unit hY.modelW).1
   set S : ℝ := ∑ τ, ∑ k, |(la τ k : ℝ)| with hSdef
   have hS0 : 0 ≤ S := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
   set n : ℝ := (Module.finrank ℚ D.host.E : ℝ) with hn
@@ -174,7 +179,7 @@ theorem berg_sup_rank_of_const (D : D7) (T : CoreJ D) (hT : LawsJ T) (j : ℕ)
     intro σ hσ g
     obtain ⟨th, hr, -, hd⟩ := hY.dictU σ hσ
     exact Formalism.L2.Pj.dict_dom_of hd g
-  · have hrk := GlobalTheory.T.cuspFormRank_le_bergmanBound_goodCover D T.toCore j Y e o hY la Z β (by linarith) hB
+  · have hrk := _root_.GlobalTheory.RankBergman.rkC_le_of_bergLe D T.toCore j Y e o hY la Z β (by linarith) hB
     have hpos : 0 ≤ 4000 * ((D.R.f : ℝ) * D.R.r * Lb) ^ 3 := by positivity
     rcases (show (0 : ℝ) ≤ Y.rkC la Z by unfold Deep.rkC; positivity).eq_or_lt with h0 | h0
     · rw [← h0, Real.log_zero]; exact hpos
@@ -184,9 +189,9 @@ theorem berg_sup_rank : GlobalTheory.CovTop.Hypotheses2 → ∃ C : ℝ, 0 ≤ C
   fun hP => ⟨4000, by norm_num, fun D T hT j _ _ _ hj Y e o hY Lb hLb hM hsz hfr _ la _ hS Z =>
     berg_sup_rank_of_const D T hT j hj Y e o hY Lb hLb hsz la hS Z
       (GlobalTheory.LevGeo.supConst D.host.E D.R.r D.host.d Y.d.l₂.M)
-      (fun w hw1 hlw => GlobalTheory.T.sup_constant_log_bound D Y.d.l₂.M Lb w
+      (fun w hw1 hlw => _root_.GlobalTheory.ConstSzRows.supConst_size_rows D Y.d.l₂.M Lb w
         (by have := Y.d.l₂.three_le; omega) hLb hM hsz hfr hw1 hlw)
-      (fun hL w hw hsp σ hσ y hy => GlobalTheory.T.level_geometry_weight_bound hP.p6 D j _ _ _ _ _
+      (fun hL w hw hsp σ hσ y hy => _root_.GlobalTheory.BergComp.bergOn_le_supConst hP.p6 D j _ _ _ _ _
         Y.U Y.dict hL σ hσ (wtOf _ la 0) (AllWt.even_wtOf la 0) w hw (hsp σ hσ) Z y hy)⟩
 
 end GlobalTheory.BergRank

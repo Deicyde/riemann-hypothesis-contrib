@@ -3,9 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsThetaDegOfIsLocalModel
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsProbabilityMeasureMuPart
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MeanLogSupNormLowerBoundPrincipalLevelStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SumWeightSpreadLeExponentNormAddStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightedFrameSumPositiveStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MeanLogSupNormLowerBoundPrincipalLevel
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightedFrameSumPositive
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SumWeightSpreadLeExponentNormAdd
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.SupNormDefiniteOnCuspFormsGoodEmbedding
 import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
 import Mathlib.Algebra.Order.Floor.Extended
@@ -97,8 +97,8 @@ theorem mean_log_petersson_ge_of_sup (D : D7) (j : ℕ) (H : ReciprocityTheory.C
           (Module.finrank ℚ c.F : ℝ) := by
   have hFc : (F : Rul Xo c) ∈ cusp Xo c U a n := cuspW_wtZ (Xo := Xo) (c := c) (U := U) a n ▸ F.2
   have hF0' : (F : Rul Xo c) ≠ 0 := fun h => hF0 (Subtype.ext h)
-  have hsup := GlobalTheory.T.meanLogSupNorm_lowerBound_principalLevel D j H Dw l Xo c U dict hL χ hχ a n hD _ hFc hF hF0'
-  have hsp := GlobalTheory.T.sum_weightSpread_le_exponentNorm_add D j H Dw l Xo c U dict hL
+  have hsup := _root_.GlobalTheory.lamSup_of_laws D j H Dw l Xo c U dict hL χ hχ a n hD _ hFc hF hF0'
+  have hsp := _root_.GlobalTheory.LamSpread.sum_spread_laU_le D j H Dw l Xo c U dict hL
   have hdef : Formalism.L2.Pj.SupDef Xo c U :=
     (Formalism.L2.PjFree.supDef_ofPj U).1 (GlobalTheory.supNorm_definite_on_cusp _ H Dw l Xo c _ _ hL.unf)
   set x := xiR D
@@ -145,7 +145,7 @@ theorem mean_log_petersson_ge : GlobalTheory.UCls.MassBound → GlobalTheory.UCl
   fun hM hT D j H Dw l Xo c U dict hL _ χ hχ a n hD F hF hF0 =>
     mean_log_petersson_ge_of_sup D j H Dw l Xo c U dict hL χ hχ a n hD _
       (fun σ hσ la w hw hsp hchi hw_eq => hw_eq ▸
-        GlobalTheory.T.weighted_frame_sum_positive hM hT D j H Dw l Xo c U dict hL σ hσ la w hw hsp hchi)
+        _root_.GlobalTheory.supPet_principal hM hT D j H Dw l Xo c U dict hL σ hσ la w hw hsp hchi)
       F hF hF0
 
 end GlobalTheory.LamPet

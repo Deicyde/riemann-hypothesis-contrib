@@ -1,9 +1,9 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DiscrMulMemOfIsIntegral
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DltEqZero
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardLatticesIdempotentPositionBoundedStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsLatticeIdempotentPositionInvolutionStableStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardLatticesIdempotentPositionBounded
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsLatticeIdempotentPositionInvolutionStable
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DiscrMulMemOfIsIntegral
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -208,8 +208,8 @@ theorem finite_term_ne_zero : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype �
   intro K B ι _ e π S hsep hF I I' hI hI' u s hu hs
   set a : K.O := (Nat.card (IsLocalRing.ResidueField K.O) : K.O)
   have ha : K.Small a := small_card K
-  obtain ⟨N, hN⟩ := GlobalTheory.T.exists_lattice_idempotent_position_involution_stable K B ι e π S a hsep ha hF
-  obtain ⟨C, hC⟩ := GlobalTheory.T.card_lattices_idempotent_position_bounded K B ι e π S a hsep ha hF N
+  obtain ⟨N, hN⟩ := _root_.GlobalTheory.UnitLemma.Desc.exists_pos K B ι e π S a hsep ha hF
+  obtain ⟨C, hC⟩ := _root_.GlobalTheory.UnitLemma.Desc.PosCount.card_pos_le K B ι e π S a hsep ha hF N
   have he : ∀ i, IsIdempotentElem (e i) := fun i => hF.1.1.idem i
   have he0 : ∀ i, e i ≠ 0 := by
     intro i
