@@ -1,7 +1,6 @@
 module
 
 public import Development.EtaleCohomology.EtaleSheaves.LChartPf
-public import Mathlib
 
 @[expose] public section
 

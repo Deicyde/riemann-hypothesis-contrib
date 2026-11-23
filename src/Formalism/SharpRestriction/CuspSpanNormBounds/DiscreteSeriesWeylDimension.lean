@@ -4,7 +4,6 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.StandingHypothesesHo
 public import Formalism.SharpRestriction.CuspSpanNormBounds.NonemptyParameterModels.NumericSettingWithGapSatisfiable
 public import Formalism.SharpRestriction.CuspSpanNormBounds.AutLzFiniteOfLoop
 public import Formalism.SharpRestriction.AdmissibleParameterJoins.SfromGLx
-public import Mathlib
 public import Formalism.FormalDegreeBessel.FinalDS
 
 @[expose] public section

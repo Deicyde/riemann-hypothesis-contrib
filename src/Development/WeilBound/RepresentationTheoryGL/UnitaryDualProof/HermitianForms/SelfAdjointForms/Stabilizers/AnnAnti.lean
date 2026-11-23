@@ -5,7 +5,6 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Herm
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCosetRepsOpenInCompactStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardCosetRepsEqRelIndexStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCharacterSeparatingLatticeStatement
-public import Mathlib
 
 @[expose] public section
 

@@ -80,7 +80,7 @@ theorem dZb_mul_gg (G : ℂ → ℂ) (TT : ℝ) (ζ : ℂ) (hG : DifferentiableA
         (ζ * star ζ - (TT : ℂ)) • fderiv ℝ G ζ) ζ := hG.hasFDerivAt.mul hp
   unfold NF.dZb
   rw [hq.fderiv]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply,
+  simp only [add_apply, smul_apply, ContinuousLinearMap.id_apply,
     ContinuousLinearEquiv.coe_coe, Complex.conjCLE_apply, smul_eq_mul, Complex.star_def, map_one, Complex.conj_I]
   ring_nf
   rw [Complex.I_sq]
@@ -265,7 +265,6 @@ theorem dZb_cont {F : ℂ → ℂ} (hF : ContDiff ℝ 1 F) : Continuous (NF.dZb 
   exact continuous_const.mul ((c.clm_apply continuous_const).add
     (continuous_const.mul (c.clm_apply continuous_const)))
 
-set_option maxHeartbeats 4000000 in
 theorem gauge_reality_holds : GTCReal := by
   intro Wp Wq _ _ _ _ _ _ P Bs X d hH e he hk A Bf hAB hC ρ ζ0 hζ0
   classical

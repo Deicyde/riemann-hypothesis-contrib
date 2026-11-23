@@ -3,7 +3,6 @@ module
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.SphericalEmbeddings.ExtremeSph
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviIntegralFacts
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IrreducibleOfFixedLine
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.OrderedConst
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NontrivialOfIrreducible
 
@@ -122,7 +121,7 @@ theorem sphConst (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
   obtain ⟨s, rfl⟩ := hF y
   have ho : IsOpen {g : GL (Fin n) k | (iP ξ g) (s : _) = s} := hsm s
   have h1 : (1 : GL (Fin n) k) ∈ {g : GL (Fin n) k | (iP ξ g) (s : _) = s} := by
-    rw [Set.mem_setOf_eq, map_one]
+    rw [Set.mem_ofPred_eq, map_one]
     rfl
   refine Filter.mem_of_superset (ho.mem_nhds h1) ?_
   intro g hg

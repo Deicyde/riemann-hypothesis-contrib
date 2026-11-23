@@ -3,7 +3,6 @@ module
 public import Development.WeilBound.CoreStatements.MultihomogeneousSquares.AntisymmetryOfSingularStatement
 public import Development.WeilBound.CoreStatements.MultihomogeneousSquares.GoodTowerAntisymmetryOf
 public import Development.WeilBound.CoreStatements.JacobiBlockDeterminants.StSing
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpPair
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpSt

@@ -2,7 +2,6 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CentreAtOfIsAt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsLogMult
-public import Mathlib
 public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanishingPairs.NadelVanishingLemmas.ExistsSncChartStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSncAdaptedCoordinatesOfMemNhdsStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenericPointNotInSncBoundary

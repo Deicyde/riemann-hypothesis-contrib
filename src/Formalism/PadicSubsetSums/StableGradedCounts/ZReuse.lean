@@ -1,7 +1,6 @@
 module
 
 public import Formalism.PadicSubsetSums.CentralIdempotents.PrimitiveRootFifteenSubOneUnit
-public import Mathlib
 public import Formalism.GaloisIrreducibility.NoSolvableTransitive
 public import Formalism.ResultantValuation.ResultantAdjugateProofs.Window
 public import Formalism.ResultantValuation.ResultantAdjugateProofs.Laplace

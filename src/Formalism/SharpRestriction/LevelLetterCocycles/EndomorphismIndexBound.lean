@@ -7,7 +7,6 @@ public import Formalism.CharacterColumnKernels.IdempotentNormalForms.CharacterCo
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaDetPoly
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.BridgeDet
 public import Formalism.CharacterColumnKernels.IdempotentNormalForms.IsUnitDetOfConst
-public import Mathlib
 public import Formalism.CharacterColumnKernels.IdempotentNormalForms.CharacterColumnKernelLengthBound
 public import Formalism.CharacterColumnKernels.IdempotentNormalForms.MemCcIdealIffForall
 public import Formalism.CharacterColumnKernels.IdempotentNormalForms.SumIteLe
@@ -526,7 +525,7 @@ theorem exists_eO : ∃ e : ℕ, e ≠ 0 ∧ addVal (N.O i) ((N.l i : ℕ) : N.O
   have h1 := l_not_unit N i
   have htop : addVal (N.O i) ((N.l i : ℕ) : N.O i) ≠ ⊤ := fun h =>
     h0 ((IsDiscreteValuationRing.addVal_eq_top_iff).mp h)
-  refine ⟨(addVal (N.O i) ((N.l i : ℕ) : N.O i)).toNat, ?_, (ENat.coe_toNat htop).symm⟩
+  refine ⟨(addVal (N.O i) ((N.l i : ℕ) : N.O i)).toNat, ?_, (ENat.natCast_toNat htop).symm⟩
   intro h
   rcases ENat.toNat_eq_zero.mp h with h | h
   · exact h1 ((IsDiscreteValuationRing.addVal_eq_zero_iff).mp h)

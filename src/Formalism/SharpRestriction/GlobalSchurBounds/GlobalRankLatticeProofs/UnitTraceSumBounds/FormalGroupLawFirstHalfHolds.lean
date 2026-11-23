@@ -3,7 +3,6 @@ module
 public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.ModelShortOf
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BiaddOfCube
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AddIntG
-public import Mathlib
 
 @[expose] public section
 

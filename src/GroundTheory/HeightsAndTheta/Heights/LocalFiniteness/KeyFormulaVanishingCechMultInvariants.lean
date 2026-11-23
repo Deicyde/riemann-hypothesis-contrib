@@ -17,7 +17,6 @@ public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PRegYoDense
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.Assembly
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PChartResidueDegreeAlgClosed
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PChowFormBirationalAlgClosed
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsChowFormSectionPerfect
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsChowFormSectionAlgClosed
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsSectionCycleReduced

@@ -14,7 +14,6 @@ public import Formalism.FormalDegreeBessel.FinalWR
 public import Formalism.HermitianCurvature.Statement
 public import Formalism.LatticeRigidity.HeightMinimum.SqrtAbsNormLeProd
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ChebyshevExtremalPolynomials
-public import Mathlib
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.Herglotz
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AdditiveCharacterPsi
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AffineChangeOfVariables

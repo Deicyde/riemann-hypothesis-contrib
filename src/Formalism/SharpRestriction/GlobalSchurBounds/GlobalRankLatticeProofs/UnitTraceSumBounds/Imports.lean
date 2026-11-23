@@ -3,7 +3,6 @@ module
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLattice
 public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeCSchur
 public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.InducedCmType
-public import Mathlib
 public import Formalism.SharpRestriction.CuspSpanNormBounds.DiscreteSeriesWeylDimension
 public import Formalism.SharpRestriction.AdmissibleParameterJoins.SfromGLe
 public import Formalism.PeriodIntegrals.ExplicitFormulaCounts.WeylForK

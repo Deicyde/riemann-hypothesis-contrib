@@ -1,7 +1,6 @@
 module
 
 public import Formalism.LocalToGlobal.PairingIndexBounds.RowActionCoefficients.CoefProd
-public import Mathlib
 
 @[expose] public section
 

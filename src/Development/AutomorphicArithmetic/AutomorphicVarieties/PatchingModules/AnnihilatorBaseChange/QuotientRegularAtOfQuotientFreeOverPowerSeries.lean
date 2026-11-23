@@ -3,7 +3,6 @@ module
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.AnnihilatorBaseChange.SpecializationMapCompUniversalSection
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.AnnihilatorBaseChange.KjMap
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.QRegPS
-public import Mathlib
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.QRegScal
 
 @[expose] public section

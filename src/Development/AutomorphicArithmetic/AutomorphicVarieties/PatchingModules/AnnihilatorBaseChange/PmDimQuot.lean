@@ -4,7 +4,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.AnnihilatorBaseChange.YPrime
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaCplLift
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaCplFlat
-public import Mathlib
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaCplModfree
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaCmPatch
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaCplMap

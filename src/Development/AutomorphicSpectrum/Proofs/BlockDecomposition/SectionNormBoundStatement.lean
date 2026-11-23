@@ -8,4 +8,4 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.section_norm_bound : PositivityTheory.RgBcC.Fc.SecBound := by
-  first | exact @GlobalTheory.CompanionTheory.SecBd.secBound_main | exact GlobalTheory.CompanionTheory.SecBd.secBound_main | (intros; apply GlobalTheory.CompanionTheory.SecBd.secBound_main <;> assumption)
+  exact @GlobalTheory.CompanionTheory.SecBd.secBound_main

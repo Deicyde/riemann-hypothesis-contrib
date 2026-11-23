@@ -1,7 +1,6 @@
 module
 
 public import Formalism.LocalToGlobal.GlobalTheory.GL6.BwAValIntegralNonneg
-public import Mathlib
 public import Formalism.GL3MeanSquares.FourierTransformKernelSurjective
 public import Formalism.GL3MeanSquares.HookFormulaTorsion.FourierCommutesHeckeScalar
 public import Formalism.GL3MeanSquares.HookFormulaTorsion.LengthQuotientBoundGeneral

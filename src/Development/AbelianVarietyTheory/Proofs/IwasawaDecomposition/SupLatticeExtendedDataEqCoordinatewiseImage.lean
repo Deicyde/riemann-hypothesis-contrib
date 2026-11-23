@@ -83,7 +83,6 @@ namespace GlobalTheory.Mem.R3.MKExt
 open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 
-set_option maxHeartbeats 4000000 in
 theorem mk_ext : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach → GlobalTheory.Published.WeilRepresentationUnitaryPair → GlobalTheory.Published.DiscreteSeriesExists → GlobalTheory.Published.HarishChandraFinite → (StepW Pinned fun K B' f' T' w' => ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T), Enl0 B B' →
   HEq f' f → Pinned K B f T w → HEq w'.px w.px → ∀ (Z : w.Lt) (hX : B.fields.Ok) (Wt : Set B.places.Pl)
     (z : Dat (w.st Z) w.I hX T Wt), GrpTrue Z.N f → GrpAt (w.st Z) w.I → Fine z → HoldsL z.R z.F →
@@ -119,7 +118,7 @@ theorem mk_ext : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Pub
     (congrFun (eq_of_heq hN.nW) j').trans (congrArg z.R.nW (Fin.ext hj.symm))
   have hinj : Function.Injective (w'.st Z').toD7.what₂.embLL := RingHom.injective _
   ext x'
-  simp only [SetLike.mem_coe, Set.mem_setOf_eq]
+  simp only [SetLike.mem_coe, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨h1, h2⟩
     obtain ⟨f', he'⟩ : ∃ f', z'.geo.fw.e j' f' = ⟨x', h1⟩ := ⟨_, LinearEquiv.apply_symm_apply _ _⟩

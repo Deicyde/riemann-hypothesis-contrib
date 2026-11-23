@@ -10,4 +10,4 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.unramifiedGaloisHoms_bounded_classNumber_of_artinReciprocity : GlobalTheory.Published.GlobalArtinReciprocity → ReciprocityTheory.ChartRestriction.T2.VhE := by
-  first | exact @GlobalTheory.UnramifiedClassBound.vhE_of_globalArtinReciprocity | exact GlobalTheory.UnramifiedClassBound.vhE_of_globalArtinReciprocity | (intros; apply GlobalTheory.UnramifiedClassBound.vhE_of_globalArtinReciprocity <;> assumption)
+  exact @GlobalTheory.UnramifiedClassBound.vhE_of_globalArtinReciprocity

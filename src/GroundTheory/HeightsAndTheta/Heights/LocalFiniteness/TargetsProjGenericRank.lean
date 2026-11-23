@@ -10,7 +10,6 @@ public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartEnergyCoc
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PVertPointMultChart
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveSectionQuotFinite
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveVertIndex
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivPushA
 public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffFubiniStudyRatioCompChart0
 public import ReciprocityTheory.AnalyticForms.PotentialTheory.IntegrableOnTargetOfTsupport

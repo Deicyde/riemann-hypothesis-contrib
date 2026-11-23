@@ -1,7 +1,6 @@
 module
 
 public import Formalism.MahlerMeasure.HasOrder
-public import Mathlib
 
 @[expose] public section
 
@@ -727,7 +726,7 @@ theorem IsIntP.one : IsIntP (1 : MvPolynomial σ ℚ_[p]) := by
   rw [← C_1]; exact IsIntP.C (by simp)
 
 theorem IsIntP.X (u : σ) : IsIntP (X u : MvPolynomial σ ℚ_[p]) := by
-  intro β; rw [coeff_X']; split_ifs <;> simp
+  intro β; rw [MvPolynomial.coeff_X]; split_ifs <;> simp
 
 theorem IsIntP.sum {ι : Type} (s : Finset ι) (P : ι → MvPolynomial σ ℚ_[p]) (h : ∀ i ∈ s, IsIntP (P i)) :
     IsIntP (∑ i ∈ s, P i) := by

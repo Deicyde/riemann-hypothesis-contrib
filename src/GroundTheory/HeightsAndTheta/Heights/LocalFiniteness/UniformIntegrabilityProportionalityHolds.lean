@@ -1,7 +1,6 @@
 module
 
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.Assembly
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.OfLeaves
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAdmissibleAE
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAdmissibleAENrm

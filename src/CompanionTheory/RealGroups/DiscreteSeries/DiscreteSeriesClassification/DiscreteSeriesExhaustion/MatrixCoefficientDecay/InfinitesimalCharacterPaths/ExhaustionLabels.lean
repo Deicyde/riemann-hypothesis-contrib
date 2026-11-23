@@ -1,7 +1,6 @@
 module
 
 public import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.InfinitesimalCharacterPaths.HasCharPath
-public import Mathlib
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.JacquetTensorDecomposition
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FamilyFiltration
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FamilyInduction

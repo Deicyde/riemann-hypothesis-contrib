@@ -113,7 +113,7 @@ theorem val_sub_lt_of_hasRes {P : HeightOneSpectrum (𝓞 E)} {z : P.adicComplet
 theorem le_exp_neg_one {P : HeightOneSpectrum (𝓞 E)} {z : P.adicCompletion E} (h : Valued.v z < 1) :
     Valued.v z ≤ WithZero.exp (-1 : ℤ) := by
   by_cases h0 : Valued.v z = 0
-  · rw [h0]; exact zero_le'
+  · rw [h0]; exact zero_le
   rw [← WithZero.exp_log h0] at h ⊢
   rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at h
   rw [WithZero.exp_le_exp]
@@ -221,7 +221,7 @@ theorem core {g m : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} {h : GLG (E :=
       have := congrArg (fun x : GL (Fin n) (P.adicCompletion E) => (x : Matrix (Fin n) (Fin n) (P.adicCompletion E)) r s) e2
       exact this.trans (congrArg (fun M : Matrix (Fin n) (Fin n) (P.adicCompletion E) => M r s) Units.val_one)
     rw [e3, sub_self, map_zero]
-    exact zero_le'
+    exact zero_le
 
 end Gen3
 
@@ -230,7 +230,6 @@ end GlobalTheory.Mem.Col2.AdT.ReadBad
 namespace GlobalTheory.Mem.Col2.AdT.ReadBad
 
 
-set_option maxHeartbeats 4000000 in
 theorem main : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (a : I.ι) (i : ℕ) (hi : i ≤ B.R.m) (bad : Set (HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F))) (Ch : Type) (chOf : (I.stp u a i).Cl → Ch) (K : Charts I l Z u a i hi bad chOf) (k : Ch → GA B (B.R.N i)), ReadsAt I l Z K k → ∀ (c : (I.stp u a i).Cl) (x : GA B (B.R.N i)) (κ' : (I.stp u a i).G c.1), (I.stp u a i).gam c.1 κ' = 1 → PtOf ((show GA B (B.R.N i) from ((K (chOf c)).y ⟨c, rfl⟩).1) * x * k (chOf c)) ((I.stp u a i).act c.1 κ' ((I.stp u a i).rep c)).1.1 → ∀ P : SBof I a, (∀ r s, IntAtA (F := B.host.F) (show HeightOneSpectrum (𝓞 B.host.E) from GlobalTheory.TwU.seamP (sm I l Z) P.1) ((((k (chOf c))⁻¹ * x * k (chOf c) : GA B (B.R.N i)) : Matrix (Fin (B.R.N i)) (Fin (B.R.N i)) (AfE B.host.F B.host.E)) r s)) ∧ (∀ r s, IntAtA (F := B.host.F) (show HeightOneSpectrum (𝓞 B.host.E) from GlobalTheory.TwU.seamP (sm I l Z) P.1) (((((k (chOf c))⁻¹ * x * k (chOf c))⁻¹ : GA B (B.R.N i)) : Matrix (Fin (B.R.N i)) (Fin (B.R.N i)) (AfE B.host.F B.host.E)) r s)) ∧ ∀ g : Sp B.fields.E (B.R.N i) ≃ₗ[B.fields.E] Sp B.fields.E (B.R.N i), LiftsInv I κ' P g → GlobalTheory.TwU.NearAt (show HeightOneSpectrum (𝓞 B.host.E) from GlobalTheory.TwU.seamP (sm I l Z) P.1) ((I.cst a).D P) ((k (chOf c))⁻¹ * x * k (chOf c)) (GlobalTheory.TwU.seamGL (sm I l Z) g) := by
   intro B X I hOk l Z u a i hi bad Ch chOf K k hR c x κ' hγ hpt P
   have hpt0 := hR.pt c
