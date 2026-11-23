@@ -53,26 +53,29 @@ import Mathlib.Topology.Sheaves.Init
 
 namespace UpperTheory.Reformulated.B.Qk36
 
-@[reducible] noncomputable def gl (n : ℕ) : Type :=
-  Matrix (Fin n) (Fin n) ℂ
+@[reducible] noncomputable def gl : ℕ → Type :=
+  fun n => Matrix (Fin n) (Fin n) ℂ
 
-@[reducible] noncomputable def U (n : ℕ) : Type :=
-  letI : LieRing (gl n) := LieRing.ofAssociativeRing
-  letI : LieAlgebra ℂ (gl n) := LieAlgebra.ofAssociativeAlgebra
-  UniversalEnvelopingAlgebra ℂ (gl n)
+@[reducible] noncomputable def U : ℕ → Type :=
+  fun n => by
+    letI : LieRing (gl n) := LieRing.ofAssociativeRing
+    letI : LieAlgebra ℂ (gl n) := LieAlgebra.ofAssociativeAlgebra
+    exact UniversalEnvelopingAlgebra ℂ (gl n)
 
-noncomputable def E {n : ℕ} (a : Fin n × Fin n) : gl n :=
-  Matrix.single a.1 a.2 1
+noncomputable def E : {n : ℕ} → Fin n × Fin n → gl n :=
+  fun {n} a => Matrix.single a.1 a.2 1
 
-noncomputable def e {n : ℕ} (a : Fin n × Fin n) : U n :=
-  letI : LieRing (gl n) := LieRing.ofAssociativeRing
-  letI : LieAlgebra ℂ (gl n) := LieAlgebra.ofAssociativeAlgebra
-  UniversalEnvelopingAlgebra.ι ℂ (E a)
+noncomputable def e : {n : ℕ} → Fin n × Fin n → U n :=
+  fun {n} a => by
+    letI : LieRing (gl n) := LieRing.ofAssociativeRing
+    letI : LieAlgebra ℂ (gl n) := LieAlgebra.ofAssociativeAlgebra
+    exact UniversalEnvelopingAlgebra.ι ℂ (E a)
 
-noncomputable def capelliMatrix {n : ℕ} : Matrix (Fin n) (Fin n) (U n) :=
-  fun i j => e (i, j)
+noncomputable def capelliMatrix : {n : ℕ} →
+  Matrix (Fin n) (Fin n) (U n) :=
+  fun {n} i j => e (i, j)
 
-private theorem commutator_matrix_pow {R : Type*} [Ring R] {n : ℕ}
+private theorem commutator_matrix_pow {R : Type*} [Ring R] {n : Nat}
     (M : Matrix (Fin n) (Fin n) R) (x : R) (a b : Fin n)
     (h : ∀ c d, x * M c d - M c d * x
       = (if b = c then M a d else 0) - (if d = a then M c b else 0))
@@ -99,10 +102,13 @@ private theorem commutator_matrix_pow {R : Type*} [Ring R] {n : ℕ}
     by_cases h1 : b = c <;> by_cases h2 : d = a <;>
       simp only [h1, h2, ite_true, ite_false, Finset.sum_const_zero] <;> abel
 
-private theorem E_comm {n : ℕ} (a b c d : Fin n) :
-    E (a, b) * E (c, d) - E (c, d) * E (a, b)
-      = (if b = c then E (a, d) else 0) - (if d = a then E (c, b) else 0) := by
-  have h : ∀ p q r s : Fin n, E (p, q) * E (r, s) = if q = r then E (p, s) else 0 := by
+private theorem E_comm {n : Nat} (a b c d : Fin n) :
+    E (a, b) * E (c, d)
+        - E (c, d) * E (a, b)
+      = (if b = c then E (a, d) else 0)
+        - (if d = a then E (c, b) else 0) := by
+  have h : ∀ p q r s : Fin n, E (p, q) * E (r, s)
+      = if q = r then E (p, s) else 0 := by
     intro p q r s
     unfold E
     split_ifs with hqr
@@ -111,20 +117,25 @@ private theorem E_comm {n : ℕ} (a b c d : Fin n) :
     · exact Matrix.single_mul_single_of_ne _ _ _ _ hqr _
   rw [h, h]
 
-private theorem e_comm {n : ℕ} (a b c d : Fin n) :
-    e (a, b) * e (c, d) - e (c, d) * e (a, b)
-      = (if b = c then e (a, d) else 0) - (if d = a then e (c, b) else 0) := by
-  let : LieRing (gl n) := LieRing.ofAssociativeRing
-  let : LieRing (U n) := LieRing.ofAssociativeRing
+private theorem e_comm {n : Nat} (a b c d : Fin n) :
+    e (a, b) * e (c, d)
+        - e (c, d) * e (a, b)
+      = (if b = c then e (a, d) else 0)
+        - (if d = a then e (c, b) else 0) := by
+  letI : LieRing (gl n) := LieRing.ofAssociativeRing
+  letI : LieRing (U n) := LieRing.ofAssociativeRing
   unfold e
   rw [← LieRing.of_associative_ring_bracket, ← LieHom.map_lie,
     LieRing.of_associative_ring_bracket, E_comm, map_sub]
   congr 1 <;> split_ifs <;> first | rfl | exact map_zero _
 
-theorem e_mul_sub_mul_capelliMatrix_pow {n : ℕ} (a b : Fin n) (k : ℕ) (c d : Fin n) :
-    e (a, b) * (capelliMatrix ^ k) c d - (capelliMatrix ^ k) c d * e (a, b) =
-      (if b = c then (capelliMatrix ^ k) a d else 0) -
-        (if d = a then (capelliMatrix ^ k) c b else 0) :=
-  commutator_matrix_pow capelliMatrix _ a b (fun c d => e_comm a b c d) k c d
+theorem e_mul_sub_mul_capelliMatrix_pow : ∀ {n : ℕ} (a b : Fin n) (k : ℕ) (c d : Fin n),
+  e (a, b) * (capelliMatrix ^ k) c d -
+      (capelliMatrix ^ k) c d * e (a, b) =
+    (if b = c then (capelliMatrix ^ k) a d else 0) -
+      if d = a then (capelliMatrix ^ k) c b else 0 := by
+  intro n a b k c d
+  exact commutator_matrix_pow capelliMatrix _ a b
+    (fun c d => e_comm a b c d) k c d
 
 end UpperTheory.Reformulated.B.Qk36

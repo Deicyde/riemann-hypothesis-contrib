@@ -67,20 +67,22 @@ public import Mathlib.Analysis.Calculus.Deriv.Pow
 namespace UpperTheory.Reformulated.B.Gwa7
 
 @[reducible] noncomputable def U2 : Type :=
-  ↥(Matrix.unitaryGroup (Fin 2) ℂ)
+↥(Matrix.unitaryGroup (Fin 2) ℂ)
 
-@[reducible] noncomputable def instMeasurableSpaceU2 : MeasurableSpace U2 :=
-  borel U2
+@[reducible] noncomputable def instMeasurableSpaceU2 : MeasurableSpace
+  U2 :=
+borel U2
 
 attribute [local instance] instMeasurableSpaceU2
 
-theorem aux3 : IsTopologicalGroup ↥(unitary (Matrix (Fin 2) (Fin 2) ℂ)) :=
-  (inferInstance : IsTopologicalGroup (Matrix.unitaryGroup (Fin 2) ℂ))
+theorem aux3 : IsTopologicalGroup ↥(unitary (Matrix (Fin 2) (Fin 2) ℂ)) := by
+  exact (inferInstance : IsTopologicalGroup (Matrix.unitaryGroup (Fin 2) ℂ))
 
-theorem aux4 : BorelSpace U2 :=
-  ⟨rfl⟩
+theorem aux4 : BorelSpace U2 := by
+  exact ⟨rfl⟩
 
-private theorem compact_unitary : CompactSpace (Matrix.unitaryGroup (Fin 2) ℂ) := by
+private theorem compact_unitary :
+    CompactSpace (Matrix.unitaryGroup (Fin 2) ℂ) := by
   refine isCompact_iff_compactSpace.1 ?_
   have hK : IsCompact (Set.pi Set.univ fun _ : Fin 2 => Set.pi Set.univ fun _ : Fin 2 =>
       Metric.closedBall (0 : ℂ) 1) :=
@@ -90,18 +92,17 @@ private theorem compact_unitary : CompactSpace (Matrix.unitaryGroup (Fin 2) ℂ)
   intro U hU i _ j _
   simpa using entry_norm_bound_of_unitary hU i j
 
-theorem aux5 : CompactSpace ↥(Matrix.unitaryGroup (Fin 2) ℂ) :=
-  compact_unitary
+theorem aux5 : CompactSpace ↥(Matrix.unitaryGroup (Fin 2) ℂ) := by
+  exact compact_unitary
 
-attribute [local instance] aux4 aux5
+theorem aux6 : Nonempty U2 := by
+  exact ⟨1⟩
 
-theorem aux6 : Nonempty U2 :=
-  ⟨1⟩
-
-noncomputable def μK : MeasureTheory.Measure U2 :=
-  letI := aux3
-  letI := aux6
-  MeasureTheory.Measure.haarMeasure ⊤
+noncomputable def μK : MeasureTheory.Measure U2 := by
+  letI : BorelSpace U2 := aux4
+  letI : CompactSpace U2 := aux5
+  letI : Nonempty U2 := aux6
+  exact MeasureTheory.Measure.haarMeasure ⊤
 
 section Algebra
 variable {A : Type*} [NormedCommRing A] [NormedAlgebra ℂ A]
@@ -119,7 +120,8 @@ private theorem line_deriv (x y : A) :
 
 private theorem step_one (φ : A →L[ℂ] ℂ) (x y c : A) (n : ℕ)
     (h : ∀ s : ℂ, φ ((x + s • y) ^ (n + 1) * c) = 0) : φ (x ^ n * y * c) = 0 := by
-  have h1 := deriv_zero φ (((line_deriv x y).pow (n + 1)).mul_const c) h
+  have h1 := deriv_zero φ
+    (((line_deriv x y).pow (n + 1)).mul_const c) h
   have h2 : ((n + 1 : ℕ) : A) * (x + (0 : ℂ) • y) ^ (n + 1 - 1) * y * c
       = ((n + 1 : ℕ) : ℂ) • (x ^ n * y * c) := by
     simp only [Algebra.smul_def, map_natCast, map_zero, zero_mul, add_zero, Nat.add_sub_cancel]
@@ -132,7 +134,8 @@ private theorem step_two (φ : A →L[ℂ] ℂ) (x x' y y' c Δ : A) (κ : ℂ) 
     (h : ∀ t : ℂ, φ ((x + t • x') ^ (n + 1) * (y + t • y') * c) = 0)
     (h' : φ (x ^ n * Δ * c) = 0) : φ (x ^ (n + 1) * y' * c) = 0 := by
   have h1 := deriv_zero φ
-    ((((line_deriv x x').pow (n + 1)).mul (line_deriv y y')).mul_const c) h
+    ((((line_deriv x x').pow (n + 1)).mul
+      (line_deriv y y')).mul_const c) h
   have h2 : (((n + 1 : ℕ) : A) * (x + (0 : ℂ) • x') ^ (n + 1 - 1) * x' * (y + (0 : ℂ) • y')
       + (x + (0 : ℂ) • x') ^ (n + 1) * y') * c
       = ((n + 2 : ℕ) : ℂ) • (x ^ (n + 1) * y' * c) - (((n + 1 : ℕ) : ℂ) * κ) • (x ^ n * Δ * c) := by
@@ -151,7 +154,8 @@ private theorem mul_lin (φ : A →L[ℂ] ℂ) (p q r s z : A) (D : ℤ → A)
     (hD : ∀ m, D (m + 1) = (p * s - q * r) * D m)
     (h : ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ), φ (lin p q r s a b c d ^ n * D m * z) = 0)
     (a' b' c' d' : ℂ) (n : ℕ) (m : ℤ) (a b c d : ℂ) :
-    φ (lin p q r s a b c d ^ n * D m * (lin p q r s a' b' c' d' * z)) = 0 := by
+    φ (lin p q r s a b c d ^ n * D m *
+      (lin p q r s a' b' c' d' * z)) = 0 := by
   cases n with
   | zero =>
     rw [← h 1 m a' b' c' d']
@@ -223,7 +227,8 @@ private theorem star_eq (k : U2) :
   rw [Matrix.mul_adjugate, Matrix.mul_smul, mul_one] at h2
   rw [← h2, smul_smul, inv_mul_cancel₀ (det_ne k), one_smul]
 
-private theorem entry_lin (i j : Fin 2) : ∃ a b c d : ℂ,
+open UpperTheory.Reformulated.B.Gwa7 in
+private theorem entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
     entry i j = lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
   fin_cases i <;> fin_cases j
   · exact ⟨1, 0, 1, 0, by simp [lin]⟩
@@ -231,7 +236,8 @@ private theorem entry_lin (i j : Fin 2) : ∃ a b c d : ℂ,
   · exact ⟨0, 1, 1, 0, by simp [lin]⟩
   · exact ⟨0, 1, 0, 1, by simp [lin]⟩
 
-private theorem star_entry_lin (i j : Fin 2) : ∃ a b c d : ℂ,
+open UpperTheory.Reformulated.B.Gwa7 in
+private theorem star_entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
     star (entry i j) = detPow (-1) * lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
   have h : ∀ k : U2, star (k.1 i j) = (k.1.det)⁻¹ * k.1.adjugate j i := fun k => by
     have := congrFun (congrFun (star_eq k) j) i
@@ -246,7 +252,8 @@ private theorem star_entry_lin (i j : Fin 2) : ∃ a b c d : ℂ,
   · refine ⟨1, 0, 1, 0, ContinuousMap.ext fun k => (h k).trans ?_⟩
     simp [lin, detPow, entry, Matrix.adjugate_fin_two]
 
-private theorem lin_eq (a b c d : ℂ) :
+open UpperTheory.Reformulated.B.Gwa7 in
+private theorem lin_eq [CompactSpace U2] (a b c d : ℂ) :
     ∃ (r : ℂ) (l₁ l₂ : U2), ∀ k : U2,
     lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d k = r * (l₁ * k * l₂).1 0 0 := by
   obtain ⟨r, α, β, rfl, rfl, h⟩ := unit_vec a b
@@ -266,7 +273,8 @@ private theorem lin_eq (a b c d : ℂ) :
   · simp [lin, entry, Matrix.mul_apply, Fin.sum_univ_two, Matrix.vecMul, dotProduct]
     ring
 
-private theorem functional_zero (φ : C(U2, ℂ) →L[ℂ] ℂ)
+open UpperTheory.Reformulated.B.Gwa7 in
+private theorem functional_zero [CompactSpace U2] (φ : C(U2, ℂ) →L[ℂ] ℂ)
     (h : ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ),
       φ (lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d ^ n * detPow m * 1) = 0)
     (f : C(U2, ℂ)) : φ f = 0 := by
@@ -331,8 +339,8 @@ private theorem functional_zero (φ : C(U2, ℂ) →L[ℂ] ℂ)
   have := hmul x hx 1 h 0 0 0 0 0 0
   simpa [hD0] using this
 
-open MeasureTheory in
-private theorem main (μ : Measure U2)
+open UpperTheory.Reformulated.B.Gwa7 MeasureTheory in
+private theorem main [CompactSpace U2] [BorelSpace U2] (μ : Measure U2)
     [IsFiniteMeasure μ] [μ.IsOpenPosMeasure] {g : U2 → ℂ} (hg : Continuous g)
     (h : ∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
       ∫ k, (l₁ * k * l₂).1 0 0 ^ n * k.1.det ^ q * g k ∂μ = 0) : g = 0 := by
@@ -358,12 +366,20 @@ private theorem main (μ : Measure U2)
   ext k
   simpa [G] using congrArg (fun F : C(U2, ℂ) => F k) h2
 
-theorem eq_zero_of_forall_integral_coeff {g : U2 → ℂ} (hg : Continuous g)
-    (h : ∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
-      ∫ k : U2, (↑(l₁ * k * l₂) : Matrix (Fin 2) (Fin 2) ℂ) 0 0 ^ n *
-        (↑k : Matrix (Fin 2) (Fin 2) ℂ).det ^ q * g k ∂μK = 0) :
-    g = 0 := by
-  have : μK.IsHaarMeasure := MeasureTheory.Measure.isHaarMeasure_haarMeasure _
+theorem eq_zero_of_forall_integral_coeff : ∀
+  {g : U2 → ℂ},
+  Continuous g →
+    (∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
+        ∫ (k : U2),
+            ((l₁ * k * l₂ : U2) : Matrix (Fin 2) (Fin 2) ℂ) 0 0 ^ n *
+              (k : Matrix (Fin 2) (Fin 2) ℂ).det ^ q * g k ∂μK =
+          0) →
+      g = 0 := by
+  intro g hg h
+  haveI : CompactSpace U2 := aux5
+  haveI : BorelSpace U2 := aux4
+  haveI : μK.IsHaarMeasure :=
+    MeasureTheory.Measure.isHaarMeasure_haarMeasure _
   exact main μK hg h
 
 end UpperTheory.Reformulated.B.Gwa7

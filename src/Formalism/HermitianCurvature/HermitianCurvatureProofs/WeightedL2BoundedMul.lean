@@ -341,7 +341,6 @@ theorem csTerm : CSTerm := by
     rwa [hds0] at this
   have hDi := hCI ε hε Y hY p
   have hfac : (0:ℝ) < p.factorial := by exact_mod_cast p.factorial_pos
-  have hσ : 0 < 4 * σ := by linarith
   set K : ℝ := Real.exp 1 * p.factorial * (4 * σ) ^ p with hK
   have hKpos : 0 < K := by positivity
   have hE0 : 0 ≤ S.En ε σ Y := integral_nonneg fun ω => mul_nonneg (hth ω) (sq_nonneg' B _ hd _ ω)

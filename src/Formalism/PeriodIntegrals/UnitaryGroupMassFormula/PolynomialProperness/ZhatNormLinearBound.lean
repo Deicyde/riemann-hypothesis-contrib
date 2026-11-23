@@ -1,5 +1,6 @@
 module
 
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquilinearity
 public import Formalism.HermitianCurvature.FiniteOrderIntersectionInSmooth
 public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -152,24 +153,7 @@ theorem gN_mul_le {k r : ℕ} (a b : B.Mat k r) : B.gN (a * b) ≤ B.gN a * B.gN
   simpa only [gN_eq_frob] using Matrix.frobenius_norm_mul a b
 
 theorem gN_ge_one {k r : ℕ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : 1 ≤ B.gN g := by
-  rw [gN_eq_frob]
-  have hH : Hpk k r ≠ 0 := by
-    intro h0
-    have := hpk_sq k r
-    rw [h0, Matrix.zero_mul] at this
-    exact zero_ne_one this
-  have hpos : 0 < ‖Hpk k r‖ := norm_pos_iff.mpr hH
-  have h1 : ‖Hpk k r‖ ≤ ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by
-    calc ‖Hpk k r‖ = ‖gᴴ * Hpk k r * g‖ := by rw [hg]
-      _ ≤ ‖gᴴ * Hpk k r‖ * ‖g‖ := Matrix.frobenius_norm_mul _ _
-      _ ≤ ‖gᴴ‖ * ‖Hpk k r‖ * ‖g‖ :=
-          mul_le_mul_of_nonneg_right (Matrix.frobenius_norm_mul _ _) (norm_nonneg _)
-      _ = ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by rw [Matrix.frobenius_norm_conjTranspose]
-  by_contra hlt
-  rw [not_le] at hlt
-  have this : ‖g‖ * ‖Hpk k r‖ * ‖g‖ < ‖Hpk k r‖ := by
-    nlinarith [mul_nonneg (norm_nonneg g) hpos.le]
-  linarith
+  apply Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one <;> assumption
 
 end Frob
 

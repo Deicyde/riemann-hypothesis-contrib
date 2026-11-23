@@ -77,66 +77,92 @@ public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 
 namespace UpperTheory.Reformulated.B.RootEquality
 
-@[reducible] noncomputable def G.{u_1, u_2} (F : Type u_1) (Ω : Type u_2)
-    [Field F] [Field Ω] [Algebra F Ω] : Type u_2 :=
-  Ω ≃ₐ[F] Ω
+@[reducible] noncomputable def G.{u_1, u_2} : (F : Type u_1) →
+  (Ω : Type u_2) → [inst : Field F] → [inst_1 : Field Ω] → [Algebra F Ω] → Type u_2 :=
+  fun F Ω [Field F] [Field Ω] [Algebra F Ω] => Gal(Ω/F)
 
-noncomputable def Dec.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
-    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Subgroup (G F Ω) :=
-  ValuationSubring.decompositionSubgroup F A
+noncomputable def Dec.{u_1, u_2} : {F : Type u_1} →
+  {Ω : Type u_2} →
+    [inst : Field F] →
+      [inst_1 : Field Ω] →
+        [inst_2 : Algebra F Ω] → ValuationSubring Ω → Subgroup (G F Ω) :=
+  fun {F} {Ω} [Field F] [Field Ω] [Algebra F Ω] A => ValuationSubring.decompositionSubgroup F A
 
-noncomputable def IsPlaceOver.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
-    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω)
-    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) : Prop :=
-  ∀ x : NumberField.RingOfIntegers F, A.valuation (algebraMap F Ω x.val) < 1 ↔ x ∈ v.asIdeal
+noncomputable def IsPlaceOver.{u_1, u_2} : {F : Type u_1} →
+  {Ω : Type u_2} →
+    [inst : Field F] →
+      [inst_1 : Field Ω] →
+        [Algebra F Ω] → ValuationSubring Ω → IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F) → Prop :=
+  fun {F} {Ω} [Field F] [Field Ω] [Algebra F Ω] A v =>
+    ∀ (x : NumberField.RingOfIntegers F), A.valuation ((Algebra.algebraMap F Ω) ↑x) < 1 ↔ x ∈ v.asIdeal
 
-noncomputable def LC {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) [TopologicalSpace Γ] : Prop :=
-  ∀ m : M, IsLocallyConstant fun g : Γ ↦ ρ g m
+noncomputable def LC : {R Γ M : Type} →
+  [inst : CommRing R] →
+    [inst_1 : Group Γ] →
+      [inst_2 : AddCommGroup M] → [inst_3 : Module R M] → Representation R Γ M → [TopologicalSpace Γ] → Prop :=
+  fun {R Γ M} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M] ρ [TopologicalSpace Γ] =>
+    ∀ (m : M), IsLocallyConstant fun g => (ρ g) m
 
-theorem aux5 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) [TopologicalSpace Γ] {x y : Γ → M}
-    (hx : x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)})
-    (hy : y ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}) :
-    x + y ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)} :=
-  ⟨hx.1.add hy.1, fun g h ↦ by
+theorem aux5 : ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ]
+  [inst_2 : AddCommGroup M] [inst_3 : Module R M] (ρ : Representation R Γ M) [inst_4 : TopologicalSpace Γ]
+  {x y : Γ → M},
+  x ∈ {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)} →
+    y ∈ {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)} →
+      x + y ∈ {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)} := by
+  exact fun ρ _ _ _ hx hy ↦ ⟨hx.1.add hy.1, fun g h ↦ by
     simp only [Pi.add_apply, hx.2 g h, hy.2 g h, map_add (f := _)]; abel⟩
 
-theorem aux6 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) [TopologicalSpace Γ] :
-    IsLocallyConstant (0 : Γ → M) ∧
-      ∀ g h : Γ, (0 : Γ → M) (g * h) = (0 : Γ → M) g + ρ g ((0 : Γ → M) h) :=
-  ⟨IsLocallyConstant.const _, fun _ _ ↦ by simp⟩
+theorem aux6 : ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ]
+  [inst_2 : AddCommGroup M] [inst_3 : Module R M] (ρ : Representation R Γ M) [inst_4 : TopologicalSpace Γ],
+  IsLocallyConstant (0 : Γ → M) ∧
+    ∀ (g h : Γ), (0 : Γ → M) (g * h) = (0 : Γ → M) g + (ρ g) ((0 : Γ → M) h) := by
+  exact fun ρ _ ↦ ⟨IsLocallyConstant.const _, fun g h ↦ by simp⟩
 
-theorem aux7 {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) [TopologicalSpace Γ] (c : R) {x : Γ → M}
-    (hx : x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}) :
-    c • x ∈ {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)} :=
-  ⟨hx.1.comp (fun m ↦ c • m), fun g h ↦ by
+theorem aux7 : ∀ {R Γ M : Type} [inst : CommRing R] [inst_1 : Group Γ]
+  [inst_2 : AddCommGroup M] [inst_3 : Module R M] (ρ : Representation R Γ M) [inst_4 : TopologicalSpace Γ] (c : R)
+  {x : Γ → M},
+  x ∈ {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)} →
+    c • x ∈ {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)} := by
+  exact fun ρ _ c _ hx ↦ ⟨hx.1.comp (fun m ↦ c • m), fun g h ↦ by
     simp only [Pi.smul_apply, hx.2 g h, map_smul, smul_add]⟩
 
-noncomputable def Zl {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) [TopologicalSpace Γ] : Submodule R (Γ → M) where
-  carrier := {z : Γ → M | IsLocallyConstant z ∧ ∀ g h : Γ, z (g * h) = z g + ρ g (z h)}
-  add_mem' := aux5 ρ
-  zero_mem' := aux6 ρ
-  smul_mem' := aux7 ρ
+noncomputable def Zl : {R Γ M : Type} →
+  [inst : CommRing R] →
+    [inst_1 : Group Γ] →
+      [inst_2 : AddCommGroup M] →
+        [inst_3 : Module R M] → Representation R Γ M → [TopologicalSpace Γ] → Submodule R (Γ → M) :=
+  fun {R Γ M} [inst : CommRing R] [inst_1 : Group Γ] [inst_2 : AddCommGroup M] [inst_3 : Module R M] ρ
+      [inst_4 : TopologicalSpace Γ] =>
+    { carrier := {z | IsLocallyConstant z ∧ ∀ (g h : Γ), z (g * h) = z g + (ρ g) (z h)},
+      add_mem' := @aux5 R Γ M inst inst_1 inst_2 inst_3 ρ inst_4,
+      zero_mem' := aux6 ρ,
+      smul_mem' := aux7 ρ }
 
-noncomputable def UnrCount (l : ℕ) (D : Type) [Group D] [TopologicalSpace D] (J : Subgroup D) :
-    Prop :=
-  ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] (ρ : Representation R D M),
-    LC ρ → (∀ m : M, l • m = 0) → (∀ g ∈ J, ρ g = 1) →
-      {z : D → M | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.Finite ∧
-        {z : D → M | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.ncard = Nat.card M
+noncomputable def UnrCount : ℕ →
+  (D : Type) → [inst : Group D] → [TopologicalSpace D] → Subgroup D → Prop :=
+  fun l D [Group D] [TopologicalSpace D] J =>
+    ∀ (R M : Type) [inst_2 : CommRing R] [inst_3 : AddCommGroup M] [inst_4 : Module R M] [Finite M]
+      (ρ : Representation R D M),
+      LC ρ →
+        (∀ (m : M), l • m = 0) →
+          (∀ g ∈ J, ρ g = 1) →
+            {z | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.Finite ∧
+              {z | z ∈ Zl ρ ∧ ∀ g ∈ J, z g = 0}.ncard = Nat.card M
 
-noncomputable def Inertia.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
-    [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Set (G F Ω) :=
-  {σ : G F Ω | σ ∈ ValuationSubring.decompositionSubgroup F A ∧
-    ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x) < 1}
+noncomputable def Inertia.{u_1, u_2} : {F : Type u_1} →
+  {Ω : Type u_2} →
+    [inst : Field F] →
+      [inst_1 : Field Ω] →
+        [inst_2 : Algebra F Ω] → ValuationSubring Ω → Set (G F Ω) :=
+  fun {F} {Ω} [Field F] [Field Ω] [Algebra F Ω] A =>
+    {σ | σ ∈ ValuationSubring.decompositionSubgroup F A ∧ ∀ (x : Ω), A.valuation x ≤ 1 → A.valuation (σ x - x) < 1}
 
-theorem aux11.{u_1, u_2} {F : Type u_1} {Ω : Type u_2} [Field F] [NumberField F]
-    [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) {σ τ : G F Ω}
-    (hσ : σ ∈ Inertia A) (hτ : τ ∈ Inertia A) : σ * τ ∈ Inertia A := by
+theorem aux11.{u_1, u_2} : ∀ {F : Type u_1} {Ω : Type u_2} [inst : Field F]
+  [NumberField F] [inst_2 : Field Ω] [inst_3 : Algebra F Ω] (A : ValuationSubring Ω)
+  {σ τ : G F Ω},
+  σ ∈ Inertia A →
+    τ ∈ Inertia A → σ * τ ∈ Inertia A := by
+  intro F Ω _ _ _ _ A σ τ hσ hτ
   refine ⟨mul_mem hσ.1 hτ.1, fun x hx ↦ ?_⟩
   have h1 := hτ.2 x hx
   have h2 : A.valuation (τ x) ≤ 1 := by
@@ -149,15 +175,16 @@ theorem aux11.{u_1, u_2} {F : Type u_1} {Ω : Type u_2} [Field F] [NumberField F
   rw [this]
   exact Valuation.map_add_lt _ h3 h1
 
-theorem aux12.{u_1, u_2} {F : Type u_2} {Ω : Type u_1} [Field F] [Field Ω] [Algebra F Ω]
-    (A : ValuationSubring Ω) :
-    (1 : G F Ω) ∈ ValuationSubring.decompositionSubgroup F A ∧
-      ∀ x : Ω, A.valuation x ≤ 1 → A.valuation ((1 : G F Ω) x - x) < 1 :=
-  ⟨one_mem _, fun _ _ ↦ by simp⟩
+theorem aux12.{u_1, u_2} : ∀ {F : Type u_2} {Ω : Type u_1} [inst : Field F]
+  [inst_1 : Field Ω] [inst_2 : Algebra F Ω] (A : ValuationSubring Ω),
+  1 ∈ ValuationSubring.decompositionSubgroup F A ∧ ∀ (x : Ω), A.valuation x ≤ 1 → A.valuation ((1 : G F Ω) x - x) < 1 := by
+  exact fun A ↦ ⟨one_mem _, fun x _ ↦ by simp⟩
 
-theorem algebra_smulCommClass_complex.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
-    [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    (A : ValuationSubring Ω) {σ : G F Ω} (hσ : σ ∈ Inertia A) : σ⁻¹ ∈ Inertia A := by
+theorem algebra_smulCommClass_complex.{u_1, u_2} : ∀ {F : Type u_1}
+  {Ω : Type u_2} [inst : Field F] [NumberField F] [inst_2 : Field Ω] [inst_3 : Algebra F Ω] (A : ValuationSubring Ω)
+  {σ : G F Ω},
+  σ ∈ Inertia A → σ⁻¹ ∈ Inertia A := by
+  intro F Ω _ _ _ _ A σ hσ
   have hi := inv_mem hσ.1
   refine ⟨hi, fun x hx ↦ ?_⟩
   have h2 : A.valuation (σ⁻¹ x) ≤ 1 := by
@@ -170,12 +197,18 @@ theorem algebra_smulCommClass_complex.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
   rw [this] at h3
   rwa [Valuation.map_sub_swap]
 
-noncomputable def Ine.{u_1, u_2} {F : Type u_1} {Ω : Type u_2}
-    [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) : Subgroup (G F Ω) where
-  carrier := Inertia (F := F) A
-  mul_mem' := aux11 (F := F) A
-  one_mem' := aux12 (F := F) A
-  inv_mem' := algebra_smulCommClass_complex (F := F) A
+noncomputable def Ine.{u_1, u_2} : {F : Type u_1} →
+  {Ω : Type u_2} →
+    [inst : Field F] →
+      [NumberField F] →
+        [inst_2 : Field Ω] →
+          [inst_3 : Algebra F Ω] → ValuationSubring Ω → Subgroup (G F Ω) :=
+  fun {F} {Ω} [inst : Field F] [inst_1 : NumberField F] [inst_2 : Field Ω] [inst_3 : Algebra F Ω] A =>
+    { carrier := Inertia A,
+      mul_mem' := @aux11 F Ω inst inst_1 inst_2 inst_3 A,
+      one_mem' := aux12 (F := F) A,
+      inv_mem' := @algebra_smulCommClass_complex F Ω inst inst_1 inst_2 inst_3 A }
+
 
 section Grp
 
@@ -370,9 +403,6 @@ private theorem count {l : ℕ} {D C : Type} [Group D] [TopologicalSpace D] [IsT
   have h3 : Finite (ZK ρ (I ⊓ χ.ker)) := Nat.finite_of_card_ne_zero (h2 ▸ Nat.card_pos.ne')
   exact ⟨h3, h2⟩
 
-end UpperTheory.Reformulated.B.RootEquality
-
-namespace UpperTheory.Reformulated.B.RootEquality
 
 open NumberField IsDedekindDomain
 
@@ -579,10 +609,6 @@ private theorem root_eq {N : ℕ} (hN : A.valuation (N : Ω) = 1) {x y : Ω} (hx
 
 end NT
 
-end UpperTheory.Reformulated.B.RootEquality
-
-namespace UpperTheory.Reformulated.B.RootEquality
-
 open NumberField IsDedekindDomain
 
 section Fr
@@ -787,19 +813,20 @@ private theorem ine_normal : ((Ine (F := F) A).subgroupOf (Dec A)).Normal := by
 
 end Fr
 
-end UpperTheory.Reformulated.B.RootEquality
-
-namespace UpperTheory.Reformulated.B.RootEquality
-
-theorem unrBare (l : ℕ) [Fact (Nat.Prime l)] (F Ω : Type) [Field F] [NumberField F]
-    [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω)
-    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) (C : Type)
-    [CommGroup C] [Finite C] (χ : Dec (F := F) A →* C)
-    (h : IsPlaceOver A v) (_ : IsOpen (χ.ker : Set (Dec (F := F) A)))
-    (hl : (Nat.card C).Coprime l) :
-    UnrCount l (Dec (F := F) A) ((Ine (F := F) A).subgroupOf (Dec (F := F) A) ⊓ χ.ker) := by
+theorem unrBare : ∀ (l : ℕ) [Fact (Nat.Prime l)] (F Ω : Type) [inst : Field F]
+  [inst_1 : NumberField F] [inst_2 : Field Ω] [inst_3 : Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω)
+  (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) (C : Type) [inst_5 : CommGroup C] [Finite C]
+  (χ : ↥(Dec (F := F) A) →* C),
+  IsPlaceOver A v →
+    IsOpen (χ.ker.carrier) →
+      (Nat.card C).Coprime l →
+        UnrCount l (↥(Dec A))
+          ((Ine A).subgroupOf (Dec A) ⊓
+            χ.ker) := by
+  intro l _ F Ω _ _ _ _ _ A v C _ _ χ h _ hl
   obtain ⟨φ, hφ, hφ'⟩ := exists_frob h
   have := ine_normal (F := F) (A := A)
-  exact count χ hl _ ⟨φ, hφ⟩ (dense h ⟨φ, hφ⟩ hφ') (levels h ⟨φ, hφ⟩ hφ')
+  exact count χ hl _ ⟨φ, hφ⟩ (dense h ⟨φ, hφ⟩ hφ')
+    (levels h ⟨φ, hφ⟩ hφ')
 
 end UpperTheory.Reformulated.B.RootEquality

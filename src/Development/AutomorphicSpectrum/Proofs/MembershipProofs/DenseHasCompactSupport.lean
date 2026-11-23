@@ -1,5 +1,6 @@
 module
 
+import Mathlib.Analysis.Distribution.SchwartzSpace.CompactSupport
 public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -63,7 +64,6 @@ public import Mathlib.Analysis.Complex.CauchyIntegral
 public import Mathlib.Geometry.Manifold.ContMDiff.Basic
 public import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 public import Mathlib.Geometry.Manifold.ContMDiffMap
-import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.RLLieD
 
 @[expose] public section
 
@@ -73,7 +73,64 @@ open scoped Real ContDiff
 namespace GlobalTheory.CompanionTheory.DiracComb
 
 theorem hadamard_lemma : ∀ (n : ℕ) (f : (Fin n → ℝ) → ℂ), ContDiff ℝ ∞ f → f 0 = 0 → ∃ g : Fin n → (Fin n → ℝ) → ℂ, (∀ i, ContDiff ℝ ∞ (g i)) ∧ ∀ x, f x = ∑ i, (x i : ℂ) * g i x := by
-  exact PositivityTheory.RL.Delta.hadamard_lemma
+  intro n f hf h0
+  have hD : ∀ v : Fin n → ℝ, ContDiff ℝ ∞ (fun w => fderiv ℝ f w v) := fun v =>
+    (hf.fderiv_right (m := ∞) (by simp)).clm_apply contDiff_const
+  have hmean : ∀ h : (Fin n → ℝ) → ℂ, ContDiff ℝ ∞ h →
+      ContDiff ℝ ∞ (fun x : Fin n → ℝ => ∫ s in (0 : ℝ)..1, h (s • x)) := by
+    intro h hh
+    let b : ContDiffBump (0 : ℝ) := ⟨1, 2, by norm_num, by norm_num⟩
+    have hk : IsCompact (Metric.closedBall (0 : ℝ) 2) := isCompact_closedBall _ _
+    have hloc : MeasureTheory.LocallyIntegrable
+        ((Set.Ioc (0 : ℝ) 1).indicator (fun _ => (1 : ℝ))) MeasureTheory.volume :=
+      (MeasureTheory.locallyIntegrable_const (1 : ℝ)).indicator measurableSet_Ioc
+    have hsm : ContDiffOn ℝ ∞ (Function.uncurry fun (p : Fin n → ℝ) (t : ℝ) => b t • h ((-t) • p))
+        (Set.univ ×ˢ Set.univ) := by
+      refine ContDiff.contDiffOn ?_
+      exact (b.contDiff.comp contDiff_snd).smul (hh.comp (contDiff_snd.neg.smul contDiff_fst))
+    have key := MeasureTheory.contDiffOn_convolution_right_with_param_comp (n := (⊤ : ℕ∞))
+      (μ := MeasureTheory.volume) (ContinuousLinearMap.lsmul ℝ ℝ) (s := Set.univ)
+      (v := fun _ : Fin n → ℝ => (0 : ℝ)) contDiffOn_const
+      (g := fun (p : Fin n → ℝ) (t : ℝ) => b t • h ((-t) • p)) isOpen_univ hk
+      (fun p t _ ht => by
+        have : b t = 0 := image_eq_zero_of_notMem_tsupport (by rw [b.tsupport_eq]; exact ht)
+        simp [this]) hloc hsm
+    rw [contDiffOn_univ] at key
+    convert key using 2 with x
+    rw [MeasureTheory.convolution_def, intervalIntegral.integral_of_le zero_le_one,
+      ← MeasureTheory.integral_indicator measurableSet_Ioc]
+    congr 1
+    funext t
+    by_cases ht : t ∈ Set.Ioc (0 : ℝ) 1
+    · have : b (-t) = 1 := b.one_of_mem_closedBall (by
+        rw [mem_closedBall_zero_iff, norm_neg, Real.norm_eq_abs, abs_of_pos ht.1]; exact ht.2)
+      simp [ht, this]
+    · simp [ht]
+  refine ⟨fun i x => ∫ s in (0 : ℝ)..1, fderiv ℝ f (s • x) (Pi.single i 1),
+    fun i => hmean _ (hD _), fun x => ?_⟩
+  have hd : Differentiable ℝ f := hf.differentiable (by simp)
+  have hderiv : ∀ s ∈ Set.uIcc (0 : ℝ) 1,
+      HasDerivAt (fun s : ℝ => f (s • x)) (fderiv ℝ f (s • x) x) s := by
+    intro s _
+    have := (hd (s • x)).hasFDerivAt.comp_hasDerivAt s ((hasDerivAt_id s).smul_const x)
+    rw [one_smul] at this
+    exact this
+  have hcv : ∀ v : Fin n → ℝ, Continuous (fun s : ℝ => fderiv ℝ f (s • x) v) := fun v =>
+    (hD v).continuous.comp (continuous_id.smul continuous_const)
+  have hftc := intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
+    ((hcv x).intervalIntegrable 0 1)
+  simp only [one_smul, zero_smul, h0, sub_zero] at hftc
+  rw [← hftc]
+  have hx : ∀ s : ℝ, fderiv ℝ f (s • x) x =
+      ∑ i, (x i : ℂ) * fderiv ℝ f (s • x) (Pi.single i 1) := by
+    intro s
+    calc fderiv ℝ f (s • x) x = fderiv ℝ f (s • x) (∑ i, x i • (Pi.single i 1 : Fin n → ℝ)) :=
+          congrArg (fderiv ℝ f (s • x)) (pi_eq_sum_univ' x)
+      _ = _ := by simp only [map_sum, map_smul, Complex.real_smul]
+  simp_rw [hx]
+  rw [intervalIntegral.integral_finsetSum]
+  · simp only [intervalIntegral.integral_const_mul]
+  · exact fun i _ => (continuous_const.mul (hcv _)).intervalIntegrable 0 1
 
 theorem summable_weight (n : ℕ) :
     Summable fun m : Fin n → ℤ => ((1 + ‖(fun i => (m i : ℝ))‖) ^ (2 * n))⁻¹ := by
@@ -171,18 +228,90 @@ theorem exists_partition : ∀ (n : ℕ) (f : SchwartzMap (Fin n → ℝ) ℂ), 
     rw [← Finset.sum_smul, ← finsum_eq_sum_of_support_subset _ hsub, h4, one_smul]
   · simp [image_eq_zero_of_notMem_tsupport hx]
 
-theorem dense_hasCompactSupport : ∀ (n : ℕ), Dense {f : SchwartzMap (Fin n → ℝ) ℂ | HasCompactSupport (f : (Fin n → ℝ) → ℂ)} := by
-  exact PositivityTheory.RL.Delta.dense_hasCompactSupport
+theorem dense_hasCompactSupport : ∀ (n : ℕ), Dense {f : SchwartzMap (Fin n → ℝ) ℂ | HasCompactSupport (f : (Fin n → ℝ) → ℂ)} :=
+  fun _ => SchwartzMap.dense_hasCompactSupport
 
 theorem exists_quot : ∃ q : ℝ → ℂ, ContDiffOn ℝ ∞ q (Metric.ball 0 1) ∧
     ∀ t ∈ Metric.ball (0 : ℝ) 1, (t : ℂ) = (cexp (2 * π * I * t) - 1) * q t := by
-  exact PositivityTheory.RL.Delta.exists_quot
+  set E : ℂ → ℂ := fun z => cexp (2 * π * I * z) with hE
+  have hEd : Differentiable ℂ E := by rw [hE]; fun_prop
+  have hd : Differentiable ℂ (dslope E 0) := by
+    rw [← differentiableOn_univ]
+    exact (Complex.differentiableOn_dslope Filter.univ_mem).2 hEd.differentiableOn
+  have hc : ContDiff ℝ ∞ (fun t : ℝ => dslope E 0 (t : ℂ)) :=
+    (hd.contDiff.restrict_scalars ℝ).comp Complex.ofRealCLM.contDiff
+  have hmul : ∀ t : ℝ, (t : ℂ) * dslope E 0 t = cexp (2 * π * I * t) - 1 := by
+    intro t
+    have := sub_smul_dslope E 0 (t : ℂ)
+    simpa [hE] using this
+  have hne : ∀ t ∈ Metric.ball (0 : ℝ) 1, dslope E 0 (t : ℂ) ≠ 0 := by
+    intro t ht h0
+    by_cases h : t = 0
+    · subst h
+      have hD : HasDerivAt E (cexp (2 * π * I * 0) * (2 * π * I * 1)) 0 :=
+        ((hasDerivAt_id (0 : ℂ)).const_mul (2 * π * I)).cexp
+      rw [Complex.ofReal_zero, dslope_same, hD.deriv] at h0
+      simp [Real.pi_ne_zero] at h0
+    · have h1 := hmul t
+      rw [h0, mul_zero, eq_comm, sub_eq_zero, Complex.exp_eq_one_iff] at h1
+      obtain ⟨k, hk⟩ := h1
+      have h2 : (t : ℂ) = k := by
+        have h3 : (2 * π * I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero]
+        apply mul_left_cancel₀ h3
+        rw [hk]; ring
+      have h4 : t = k := by exact_mod_cast h2
+      rw [mem_ball_zero_iff, Real.norm_eq_abs, h4] at ht
+      have h5 : |k| < 1 := by exact_mod_cast ht
+      have h6 : k = 0 := Int.abs_lt_one_iff.1 h5
+      exact h (by rw [h4, h6]; simp)
+  refine ⟨fun t => (dslope E 0 (t : ℂ))⁻¹, hc.contDiffOn.inv hne, fun t ht => ?_⟩
+  rw [← hmul t, mul_assoc, mul_inv_cancel₀ (hne t ht), mul_one]
 
 theorem exists_div (n : ℕ) (f : SchwartzMap (Fin n → ℝ) ℂ)
     (hf : tsupport (f : (Fin n → ℝ) → ℂ) ⊆ Metric.ball 0 1) (h0 : f 0 = 0) :
     ∃ g : Fin n → SchwartzMap (Fin n → ℝ) ℂ, (∀ i, HasCompactSupport (g i : (Fin n → ℝ) → ℂ)) ∧
       ∀ x, f x = ∑ i, (cexp (2 * π * I * x i) - 1) * g i x := by
-  exact PositivityTheory.RL.Delta.exists_div n f hf h0
+  obtain ⟨q, hq, hq'⟩ := exists_quot
+  obtain ⟨h, hh, hh'⟩ := hadamard_lemma n f (f.smooth ⊤) h0
+  have hK : IsCompact (tsupport (f : (Fin n → ℝ) → ℂ)) :=
+    (isCompact_closedBall (0 : Fin n → ℝ) 1).of_isClosed_subset (isClosed_tsupport _)
+      (hf.trans Metric.ball_subset_closedBall)
+  obtain ⟨r, hr, hr'⟩ := exists_lt_subset_ball (isClosed_tsupport _) hf
+  set r' : ℝ := max r (1 / 2) with hr'def
+  have hr1 : r' < 1 := max_lt hr (by norm_num)
+  have hr0 : 0 < r' := lt_max_of_lt_right (by norm_num)
+  let b : ContDiffBump (0 : Fin n → ℝ) := ⟨r', (r' + 1) / 2, hr0, by linarith⟩
+  have hbs : tsupport (b : (Fin n → ℝ) → ℝ) ⊆ Metric.ball 0 1 := by
+    rw [b.tsupport_eq]
+    exact Metric.closedBall_subset_ball (by show (r' + 1) / 2 < 1; linarith)
+  have hcoord : ∀ (i : Fin n), ∀ x ∈ Metric.ball (0 : Fin n → ℝ) 1, x i ∈ Metric.ball (0 : ℝ) 1 := by
+    intro i x hx
+    rw [mem_ball_zero_iff] at hx ⊢
+    exact (norm_le_pi_norm x i).trans_lt hx
+  have hsm : ∀ i, ContDiff ℝ ∞ (fun x : Fin n → ℝ => b x • (q (x i) * h i x)) := by
+    intro i
+    rw [← contMDiff_iff_contDiff]
+    refine contMDiff_of_tsupport fun x hx => ?_
+    rw [contMDiffAt_iff_contDiffAt]
+    have hx' : x ∈ Metric.ball (0 : Fin n → ℝ) 1 := hbs (tsupport_smul_subset_left _ _ hx)
+    refine b.contDiff.contDiffAt.smul (ContDiffAt.mul ?_ (hh i).contDiffAt)
+    exact ContDiffAt.comp x (g := q) (f := fun x : Fin n → ℝ => x i)
+      (hq.contDiffAt (Metric.isOpen_ball.mem_nhds (hcoord i x hx'))) (contDiffAt_apply ℝ (fun _ : Fin n => ℝ) i x)
+  have hcs : ∀ i, HasCompactSupport (fun x : Fin n → ℝ => b x • (q (x i) * h i x)) :=
+    fun i => b.hasCompactSupport.smul_right
+  refine ⟨fun i => (hcs i).toSchwartzMap (hsm i), hcs, fun x => ?_⟩
+  show f x = ∑ i, (cexp (2 * π * I * x i) - 1) * (b x • (q (x i) * h i x))
+  have hb : f x = b x • f x := by
+    by_cases hx : x ∈ tsupport (f : (Fin n → ℝ) → ℂ)
+    · rw [b.one_of_mem_closedBall, one_smul]
+      exact Metric.ball_subset_closedBall (Metric.ball_subset_ball (le_max_left _ _) (hr' hx))
+    · rw [image_eq_zero_of_notMem_tsupport hx, smul_zero]
+  by_cases hx : x ∈ Metric.ball (0 : Fin n → ℝ) 1
+  · rw [hb, hh' x, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [mul_smul_comm, ← mul_assoc, ← hq' _ (hcoord i x hx)]
+  · have : b x = 0 := image_eq_zero_of_notMem_tsupport fun h => hx (hbs h)
+    rw [hb, this]; simp
 
 theorem eq_mul_comb : ∀ (n : ℕ) (T : SchwartzMap (Fin n → ℝ) ℂ →L[ℂ] ℂ), (∀ (i : Fin n) (f g : SchwartzMap (Fin n → ℝ) ℂ), (∀ x, g x = cexp (2 * π * I * x i) * f x) → T g = T f) → (∀ (m : Fin n → ℤ) (f g : SchwartzMap (Fin n → ℝ) ℂ), (∀ x, g x = f (x + fun i => (m i : ℝ))) → T g = T f) → ∃ a : ℂ, ∀ f : SchwartzMap (Fin n → ℝ) ℂ, T f = a * ∑' m : Fin n → ℤ, f (fun i => (m i : ℝ)) := by
   intro n T hχ hτ

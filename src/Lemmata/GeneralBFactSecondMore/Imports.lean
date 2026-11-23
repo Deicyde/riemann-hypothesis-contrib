@@ -1,5 +1,6 @@
 module
 
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.Imports
 public import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -54,26 +55,6 @@ theorem goal1 :
     ∀ (x : U),
       Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
         And (Ne.{1} d 0) (Membership.mem.{0, 0} N (HSMul.hSMul.{0, 0, 0} d x)) := by
-  intro E U _ _ _ _ _ _ N hN x
-  have hx : x ∈ Submodule.span E (N : Set U) := by rw [hN]; exact Submodule.mem_top
-  induction hx using Submodule.span_induction with
-  | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
-  | zero => exact ⟨1, one_ne_zero, by simp⟩
-  | add y z _ _ hy hz =>
-    obtain ⟨d1, hd1, h1⟩ := hy
-    obtain ⟨d2, hd2, h2⟩ := hz
-    refine ⟨d1 * d2, mul_ne_zero hd1 hd2, ?_⟩
-    simpa only [smul_add] using N.add_mem (by rw [mul_comm, mul_smul]; exact N.smul_mem d2 h1)
-      (by rw [mul_smul]; exact N.smul_mem d1 h2)
-  | smul a y _ hy =>
-    obtain ⟨d, hd, h⟩ := hy
-    obtain ⟨⟨n, m⟩, hm⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) a
-    have key : ((m : NumberField.RingOfIntegers E)) • (a • y) = n • y := by
-      rw [← smul_assoc, Algebra.smul_def, mul_comm]
-      simp only at hm
-      rw [hm, algebraMap_smul]
-    refine ⟨d * m, mul_ne_zero hd (nonZeroDivisors.coe_ne_zero m), ?_⟩
-    rw [mul_smul, key, ← mul_smul, mul_comm, mul_smul]
-    exact N.smul_mem n h
+  apply GlobalTheory.TargetStatementBis.main <;> assumption
 
 end Bl.general_b_fact_second'

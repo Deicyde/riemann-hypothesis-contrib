@@ -70,56 +70,11 @@ private theorem pmat_apply_eq_zero_of_sign_eq {ε : Fin n → Bool} (y : PCoord 
 theorem qForm_term {ε : Fin n → Bool} (y : PCoord ε → ℂ) (a b : Fin n) :
     -((((Dvec n a : ℝ) : ℂ) - ((Dvec n b : ℝ) : ℂ)) * (pmat y a b * Lap.Base.partNM ε (Dvec n) (pmat y) b a)) =
       (((if b < a then (((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) * ‖pmat y a b‖ ^ 2 else 0 : ℝ)) : ℂ) := by
-  have hD : ((Dvec n a : ℝ) : ℂ) - ((Dvec n b : ℝ) : ℂ) = ((((b : ℕ) : ℝ) - ((a : ℕ) : ℝ) : ℝ) : ℂ) := by
-    simp only [Dvec]; push_cast; ring
-  by_cases h : b < a ∧ ε a ≠ ε b
-  · have hin : Lap.Base.InNM ε (Dvec n) b a := Or.inr h
-    have hN : Lap.Base.partNM ε (Dvec n) (pmat y) b a = pmat y b a := by
-      rw [Lap.Base.partNM, Matrix.of_apply, if_pos hin]
-    rw [hN, if_pos h.1, hD, pmat_herm_apply y a b, Complex.star_def, Complex.mul_conj,
-      Complex.normSq_eq_norm_sq]
-    push_cast; ring
-  · have h0 : pmat y a b * Lap.Base.partNM ε (Dvec n) (pmat y) b a = 0 := by
-      rw [Lap.Base.partNM, Matrix.of_apply]
-      split_ifs with hin
-      · rcases hin with ⟨_, he, _⟩ | h'
-        · rw [pmat_apply_eq_zero_of_sign_eq y he, zero_mul]
-        · exact absurd h' h
-      · exact mul_zero _
-    rw [h0, mul_zero, neg_zero]
-    split_ifs with hba
-    · have he : ε a = ε b := by
-        by_contra he
-        exact h ⟨hba, he⟩
-      rw [pmat_apply_eq_zero_of_sign_eq y he]; simp
-    · simp
+  apply ReciprocityTheory.ChartRestriction.DS.qForm_term <;> assumption
 
 theorem qForm_pmat {ε : Fin n → Bool} (y : PCoord ε → ℂ) :
     Lap.Base.qForm ε (Dvec n) (pmat y) = ((Qf (0 : Fin n → ℝ) y : ℝ) : ℂ) := by
-  have h1 : Lap.Base.qForm ε (Dvec n) (pmat y) = ∑ a : Fin n, ∑ b : Fin n,
-      -((((Dvec n a : ℝ) : ℂ) - ((Dvec n b : ℝ) : ℂ)) *
-        (pmat y a b * Lap.Base.partNM ε (Dvec n) (pmat y) b a)) := by
-    have e : ∀ a b : Fin n, -((((Dvec n a : ℝ) : ℂ) - ((Dvec n b : ℝ) : ℂ)) *
-        (pmat y a b * Lap.Base.partNM ε (Dvec n) (pmat y) b a)) =
-        -(((Dvec n a : ℝ) : ℂ) * (pmat y a b * Lap.Base.partNM ε (Dvec n) (pmat y) b a)) +
-          ((Dvec n b : ℝ) : ℂ) * (Lap.Base.partNM ε (Dvec n) (pmat y) b a * pmat y a b) :=
-      fun a b => by ring
-    simp_rw [e, Finset.sum_add_distrib, Finset.sum_neg_distrib]
-    rw [Finset.sum_comm (f := fun a b : Fin n =>
-      ((Dvec n b : ℝ) : ℂ) * (Lap.Base.partNM ε (Dvec n) (pmat y) b a * pmat y a b))]
-    simp only [Lap.Base.qForm, Lap.Base.dMat, Matrix.trace, Matrix.diag_apply, Matrix.diagonal_mul]
-    simp only [Matrix.sub_apply, Matrix.mul_apply, mul_sub, Finset.mul_sum, Finset.sum_sub_distrib]
-    ring
-  rw [h1]
-  simp only [qForm_term]
-  have e2 := sum_pairs_pmat_fp (fun a b : Fin n => ((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) y
-  rw [Fintype.sum_prod_type' (f := fun a b : Fin n =>
-    (if b < a then (((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) * ‖pmat y a b‖ ^ 2 else 0 : ℝ))] at e2
-  rw [← Complex.ofReal_inj] at e2
-  simp only [Complex.ofReal_sum] at e2
-  rw [e2, ← Complex.ofReal_sum]
-  congr 1
-  simp only [Qf, wab, Pi.zero_apply, sub_self, zero_add]
+  apply ReciprocityTheory.ChartRestriction.DS.qForm_pmat <;> assumption
 
 theorem matrix_coefficient_pointwise_limit (hB3 : Lap.Base.TangentPairingStatement) {ε : Fin n → Bool} {lam : Fin n → ℝ} (H : ℕ → Type)
     [∀ t, NormedAddCommGroup (H t)] [∀ t, InnerProductSpace ℂ (H t)] [∀ t, CompleteSpace (H t)]

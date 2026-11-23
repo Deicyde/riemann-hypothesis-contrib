@@ -53,52 +53,60 @@ public import Mathlib.Data.Nat.Factorization.Induction
 
 namespace UpperTheory.Reformulated.B.GenericMap
 
-open AlgebraicGeometry CategoryTheory
-
-theorem aux1 {Ω : Type} [Field Ω] : IsLocalRing Ω :=
-  inferInstance
-
-noncomputable def genPt {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) : X :=
-  ξ (IsLocalRing.closedPoint Ω)
-
-noncomputable def Cpt {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) : Type :=
-  {p : X // genPt ξ ⤳ p}
-
-theorem aux4 {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) :
-    genPt ξ ⤳ p.1 :=
-  p.2
-
-theorem aux5 {Ω : Type} [Field Ω] : IsLocalRing (CommRingCat.of Ω) := by
-  show IsLocalRing Ω
+theorem aux1 : ∀ {Ω : Type} [inst : Field Ω], IsLocalRing Ω := by
+  intro Ω inst
   infer_instance
 
-noncomputable def genMap {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) :
-    X.presheaf.stalk p.1 →+* Ω :=
-  letI := aux5 (Ω := Ω)
-  (X.presheaf.stalkSpecializes (aux4 ξ p) ≫ Scheme.stalkClosedPointTo ξ).hom
+noncomputable def genPt : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} → [inst : Field Ω] → (AlgebraicGeometry.Spec ↧Ω ⟶ X) → ↥X :=
+  fun {X} {Ω} [Field Ω] ξ => ξ (IsLocalRing.closedPoint Ω)
 
-noncomputable def regAt {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) : Subring Ω :=
-  (genMap ξ p).range
+noncomputable def Cpt : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} → [inst : Field Ω] → (AlgebraicGeometry.Spec ↧Ω ⟶ X) → Type :=
+  fun {X} {Ω} [Field Ω] ξ => { p // genPt ξ ⤳ p }
 
-noncomputable def unitAt {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) (a : Ω) : Prop :=
-  a ≠ 0 ∧ a ∈ regAt ξ p ∧ a⁻¹ ∈ regAt ξ p
+theorem aux4 : ∀ {X : AlgebraicGeometry.Scheme} {Ω : Type} [inst : Field Ω]
+  (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) (p : Cpt ξ),
+  genPt ξ ⤳ p.val := by
+  intro X Ω inst ξ p
+  exact p.2
 
-noncomputable def InFibre {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : ℕ) (q : Cpt ξ) : Prop :=
-  ¬ unitAt ξ q (p : Ω)
+theorem aux5 : ∀ {Ω : Type} [inst : Field Ω], IsLocalRing (CommRingCat.of Ω) := by
+  intro Ω inst
+  infer_instance
 
-noncomputable def Char0 {X : Scheme} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) : Prop :=
-  ∀ r : ℕ, r.Prime → ¬ InFibre ξ r p
+noncomputable def genMap : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} →
+    [inst : Field Ω] →
+      (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) →
+        (p : Cpt ξ) → ↑(X.presheaf.stalk p.val) →+* Ω :=
+  fun {X} {Ω} [Field Ω] ξ p =>
+    CommRingCat.Hom.hom
+      (CategoryTheory.CategoryStruct.comp (X.presheaf.stalkSpecializes (aux4 ξ p))
+        (AlgebraicGeometry.Scheme.stalkClosedPointTo ξ))
+
+noncomputable def regAt : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} →
+    [inst : Field Ω] → (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) → Cpt ξ → Subring Ω :=
+  fun {X} {Ω} [Field Ω] ξ p => (genMap ξ p).range
+
+noncomputable def unitAt : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} →
+    [inst : Field Ω] → (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) → Cpt ξ → Ω → Prop :=
+  fun {X} {Ω} [Field Ω] ξ p a =>
+    a ≠ 0 ∧ a ∈ regAt ξ p ∧ a⁻¹ ∈ regAt ξ p
+
+noncomputable def InFibre : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} →
+    [inst : Field Ω] → (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) → ℕ → Cpt ξ → Prop :=
+  fun {X} {Ω} [Field Ω] ξ p q => ¬unitAt ξ q ↑p
+
+noncomputable def Char0 : {X : AlgebraicGeometry.Scheme} →
+  {Ω : Type} →
+    [inst : Field Ω] → (ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X) → Cpt ξ → Prop :=
+  fun {X} {Ω} [Field Ω] ξ p => ∀ (r : ℕ), Nat.Prime r → ¬InFibre ξ r p
 
 namespace Hlp
-
 private theorem units_nat {Ω : Type} [Field Ω] (S : Subring Ω)
     (hp : ∀ r : ℕ, r.Prime → ((r : Ω) ≠ 0 ∧ (r : Ω) ∈ S ∧ (r : Ω)⁻¹ ∈ S)) :
     ∀ n : ℕ, n ≠ 0 → ((n : Ω) ≠ 0 ∧ (n : Ω) ∈ S ∧ (n : Ω)⁻¹ ∈ S) := by
@@ -115,15 +123,18 @@ private theorem units_nat {Ω : Type} [Field Ω] (S : Subring Ω)
     obtain ⟨b1, b2, b3⟩ := hb hb0
     refine ⟨by push_cast; exact mul_ne_zero a1 b1, by push_cast; exact S.mul_mem a2 b2, ?_⟩
     push_cast; rw [mul_inv]; exact S.mul_mem a3 b3
-
 end Hlp
 
-theorem main {X : Scheme} {Ω : Type} [Field Ω]
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {q : Cpt ξ} (hq : Char0 ξ q)
-    (n : ℕ) (hn : n ≠ 0) : unitAt ξ q (n : Ω) :=
-  Hlp.units_nat (regAt ξ q) (fun r hr => by
-    have := hq r hr
-    unfold InFibre at this
-    exact not_not.mp this) n hn
+theorem main : ∀ {X : AlgebraicGeometry.Scheme} {Ω : Type} [inst : Field Ω]
+  {ξ : AlgebraicGeometry.Spec ↧Ω ⟶ X} {q : Cpt ξ},
+  Char0 ξ q →
+    ∀ (n : ℕ), n ≠ 0 → unitAt ξ q ↑n := by
+  intro X Ω inst ξ q hq n hn
+  have key := Hlp.units_nat (regAt ξ q)
+    (fun r hr => by
+      have := hq r hr
+      unfold InFibre at this
+      exact not_not.mp this) n hn
+  exact key
 
 end UpperTheory.Reformulated.B.GenericMap

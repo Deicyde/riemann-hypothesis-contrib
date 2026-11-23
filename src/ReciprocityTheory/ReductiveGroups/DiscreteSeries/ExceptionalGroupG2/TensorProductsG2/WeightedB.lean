@@ -70,19 +70,7 @@ theorem wd_psi_memLp (hP : IsPsiFor ε lam T Ψ)
     (hΨw : ∀ μ : Measure (S7.UJ ε), μ.IsHaarMeasure →
       Integrable (fun g : S7.UJ ε => ‖Ψ (S7.toM g)‖ ^ 2 * S7.hs (S7.toM g) ^ ((2 : ℝ) / 2)) μ) :
     MemLp (wdF ε (fun g => ((‖Ψ g‖ : ℝ) : ℂ))) 2 (Formalism.REAL.muG ε) := by
-  have hI := integrable_muG_of_haar ε (fun g => ‖Ψ g‖ ^ 2 * S7.hs g ^ ((2 : ℝ) / 2)) hΨw
-  have hΨm : AEStronglyMeasurable (fun g : Formalism.REAL.UJ ε => Ψ (Formalism.MainNotions.S.umat g)) (Formalism.REAL.muG ε) :=
-    (memLp_muG_of_haar ε Ψ 2 hP.2.2.2.2).aestronglyMeasurable
-  have hm : AEStronglyMeasurable (wdF ε (fun g => ((‖Ψ g‖ : ℝ) : ℂ))) (Formalism.REAL.muG ε) := by
-    unfold wdF
-    exact ((Complex.continuous_ofReal.comp (Real.continuous_sqrt.comp
-      (wd_hs_cont.comp (continuous_umatA ε)))).aestronglyMeasurable).mul
-      (Complex.continuous_ofReal.comp_aestronglyMeasurable hΨm.norm)
-  rw [memLp_two_iff_integrable_sq_norm hm]
-  refine hI.congr (Filter.Eventually.of_forall fun g => ?_)
-  simp only
-  rw [wd_norm_sq, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _),
-    show (2 : ℝ) / 2 = 1 by norm_num, Real.rpow_one, mul_comm]
+  apply ReciprocityTheory.ChartRestriction.DS.wd_psi_memLp <;> assumption
 
 theorem wd_datum_datum (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
     (hΨw : ∀ μ : Measure (S7.UJ ε), μ.IsHaarMeasure →

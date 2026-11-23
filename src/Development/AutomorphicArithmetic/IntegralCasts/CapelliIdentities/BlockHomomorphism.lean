@@ -50,44 +50,61 @@ import Mathlib.Topology.Sheaves.Init
 
 namespace UpperTheory.Reformulated.B.BlockHomomorphism
 
-noncomputable def IsSmooth {k G V : Type} [Field k] [Group G] [AddCommGroup V] [Module k V]
-    [TopologicalSpace G] (ρ : Representation k G V) : Prop :=
-  ∀ v : V, IsOpen {g : G | ρ g v = v}
+noncomputable def IsSmooth : {k G V : Type} →
+  [inst : Field k] →
+    [inst_1 : Group G] →
+      [inst_2 : AddCommGroup V] → [inst_3 : Module k V] → [TopologicalSpace G] → Representation k G V → Prop :=
+  fun {k G V} [Field k] [Group G] [AddCommGroup V] [Module k V] [TopologicalSpace G] ρ =>
+    ∀ (v : V), IsOpen {g | (ρ g) v = v}
 
-noncomputable def glCongr (k : Type) [Field k] {a b : ℕ} (h : a = b) :
-    GL (Fin a) k →* GL (Fin b) k :=
-  Units.map (Matrix.reindexAlgEquiv k k (finCongr h)).toMulEquiv.toMonoidHom
+noncomputable def glCongr : (k : Type) →
+  [inst : Field k] → {a b : ℕ} → a = b → GL (Fin a) k →* GL (Fin b) k :=
+  fun k [Field k] {a b} h => Units.map (Matrix.reindexAlgEquiv k k (finCongr h)).toMulEquiv.toMonoidHom
 
-theorem aux3 (k : Type) [Field k] (n r : ℕ) :
-    Matrix.fromBlocks (1 : Matrix (Fin n) (Fin n) k) 0 0 (1 : Matrix (Fin r) (Fin r) k) = 1 :=
-  Matrix.fromBlocks_one
+theorem aux3 : ∀ (k : Type) [inst : Field k] (n r : ℕ),
+  Matrix.fromBlocks (1 : Matrix (Fin n) (Fin n) k) 0 0
+    (1 : Matrix (Fin r) (Fin r) k) = 1 := by
+  intro k _ n r
+  exact Matrix.fromBlocks_one
 
-theorem aux4 (k : Type) [Field k] (n r : ℕ) (A B : Matrix (Fin n) (Fin n) k) :
-    Matrix.fromBlocks (A * B) 0 0 (1 : Matrix (Fin r) (Fin r) k) =
-      Matrix.fromBlocks A 0 0 1 * Matrix.fromBlocks B 0 0 1 := by
+theorem aux4 : ∀ (k : Type) [inst : Field k] (n r : ℕ)
+  (A B : Matrix (Fin n) (Fin n) k),
+  Matrix.fromBlocks (A * B) 0 0 (1 : Matrix (Fin r) (Fin r) k) =
+    Matrix.fromBlocks A 0 0 1 * Matrix.fromBlocks B 0 0 1 := by
+  intro k _ n r A B
   simp [Matrix.fromBlocks_multiply]
 
-noncomputable def blkHom (k : Type) [Field k] (n r : ℕ) :
-    Matrix (Fin n) (Fin n) k →* Matrix (Fin n ⊕ Fin r) (Fin n ⊕ Fin r) k where
-  toFun A := Matrix.fromBlocks A 0 0 1
-  map_one' := aux3 k n r
-  map_mul' := aux4 k n r
+noncomputable def blkHom : (k : Type) →
+  [inst : Field k] → (n r : ℕ) → Matrix (Fin n) (Fin n) k →* Matrix (Fin n ⊕ Fin r) (Fin n ⊕ Fin r) k :=
+  fun k [Field k] n r =>
+    { toFun := fun A => Matrix.fromBlocks A 0 0 1, map_one' := aux3 k n r,
+      map_mul' := aux4 k n r }
 
-noncomputable def blkGL (k : Type) [Field k] (n r : ℕ) :
-    GL (Fin n) k →* GL (Fin (n + r)) k :=
-  Units.map ((Matrix.reindexAlgEquiv k k finSumFinEquiv).toMulEquiv.toMonoidHom.comp
-    (blkHom k n r))
+noncomputable def blkGL : (k : Type) →
+  [inst : Field k] → (n r : ℕ) → GL (Fin n) k →* GL (Fin (n + r)) k :=
+  fun k [Field k] n r =>
+    Units.map
+      ((Matrix.reindexAlgEquiv k k finSumFinEquiv).toMulEquiv.toMonoidHom.comp
+        (blkHom k n r))
 
-noncomputable def blkAt (k : Type) [Field k] (n N : ℕ) (h : n ≤ N) :
-    GL (Fin n) k →* GL (Fin N) k :=
-  (glCongr k (Nat.add_sub_cancel' h)).comp (blkGL k n (N - n))
+noncomputable def blkAt : (k : Type) →
+  [inst : Field k] → (n N : ℕ) → n ≤ N → GL (Fin n) k →* GL (Fin N) k :=
+  fun k [Field k] n N h =>
+    (glCongr k (Nat.add_sub_cancel' h)).comp
+      (blkGL k n (N - n))
 
-noncomputable def FixK {k : Type} [Field k] {m N : ℕ} (h : m + 1 ≤ N) {V : Type}
-    [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V)
-    (K : Subgroup (GL (Fin (m + 1)) k)) (v : V) : Prop :=
-  ∀ g ∈ K, π (blkAt k (m + 1) N h g) v = v
+noncomputable def FixK : {k : Type} →
+  [inst : Field k] →
+    {m N : ℕ} →
+      m + 1 ≤ N →
+        {V : Type} →
+          [inst_1 : AddCommGroup V] →
+            [inst_2 : Module ℂ V] → Representation ℂ (GL (Fin N) k) V → Subgroup (GL (Fin (m + 1)) k) → V → Prop :=
+  fun {k} [Field k] {m N} h {V} [AddCommGroup V] [Module ℂ V] π K v =>
+    ∀ g ∈ K, (π ((blkAt k (m + 1) N h) g)) v = v
 
-theorem aux9 {m N : ℕ} {h : m + 2 ≤ N} : ¬ m + 1 ≤ N → False := by
+theorem aux9 : ∀ {m N : ℕ} {h : m + 2 ≤ N}, ¬m + 1 ≤ N → False := by
+  intro m N h a
   omega
 
 private theorem continuous_blkAt {k : Type} [Field k] [TopologicalSpace k]
@@ -124,15 +141,21 @@ private def fixer {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
       π a⁻¹ v = π a⁻¹ (π a v) := by rw [ha]
       _ = v := by rw [← mul_apply_eq_comp, ← map_mul, inv_mul_cancel, map_one, one_apply_eq_self]
 
-theorem exists_fixK {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {m N : ℕ} {h : m + 2 ≤ N} {V : Type}
-    [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V}
-    (hπ : IsSmooth π) (v w : V) :
-    ∃ K : Subgroup (GL (Fin (m + 1)) k),
-      IsOpen (K : Set (GL (Fin (m + 1)) k)) ∧ FixK (by omega) π K v ∧ FixK (by omega) π K w := by
+theorem exists_fixK : ∀ {k : Type} [inst : Field k]
+  [inst_1 : ValuativeRel k] [inst_2 : TopologicalSpace k] [IsNonarchimedeanLocalField k] {m N : ℕ} {h : m + 2 ≤ N}
+  {V : Type} [inst_4 : AddCommGroup V] [inst_5 : Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V},
+  IsSmooth π →
+    ∀ (v w : V),
+      ∃ K : Subgroup (GL (Fin (m + 1)) k),
+        IsOpen (K : Set (GL (Fin (m + 1)) k)) ∧
+          FixK
+              (Decidable.byContradiction fun a => aux9 (h := h) a) π K v ∧
+            FixK
+              (Decidable.byContradiction fun a => aux9 (h := h) a) π K w := by
+  intro k _ _ _ _ m N h V _ _ π hπ v w
   have hle : m + 1 ≤ N := by omega
-  refine ⟨(fixer π v ⊓ fixer π w).comap (blkAt k (m + 1) N hle), ?_,
-    fun g hg => hg.1, fun g hg => hg.2⟩
+  refine ⟨(fixer π v ⊓ fixer π w).comap
+    (blkAt k (m + 1) N hle), ?_, fun g hg => hg.1, fun g hg => hg.2⟩
   exact ((hπ v).inter (hπ w)).preimage (continuous_blkAt (m + 1) N hle)
 
 end UpperTheory.Reformulated.B.BlockHomomorphism

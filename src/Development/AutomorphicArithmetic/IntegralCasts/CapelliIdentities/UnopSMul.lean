@@ -45,30 +45,23 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open scoped TensorProduct
-
 namespace UpperTheory.Reformulated.B.Qk3
 
-theorem aux1 {A : Type} [inst : CommRing A] :
-    RingHomInvPair (RingHom.id A) (RingHom.id A) :=
+theorem aux1 {A : Type} [CommRing A] : RingHomInvPair (RingHom.id A) (RingHom.id A) :=
   RingHomInvPair.ids
 
-/-- The `S`-linear map `S ⊗[A] Eᵐᵒᵖ →ₗ[S] S ⊗[A] E` given by base change along
-`A → S` of the `A`-linear equivalence `Eᵐᵒᵖ ≃ₗ[A] E` that reverses multiplication. -/
-noncomputable def unopS (A E S : Type) [inst : CommRing A] [inst_1 : Ring E]
-    [inst_2 : Algebra A E] [inst_3 : CommRing S] [inst_4 : Algebra A S] :
-    S ⊗[A] Eᵐᵒᵖ →ₗ[S] S ⊗[A] E :=
+noncomputable def unopS (A E S : Type) [CommRing A] [Ring E] [Algebra A E]
+    [CommRing S] [Algebra A S] : TensorProduct A S Eᵐᵒᵖ →ₗ[S] TensorProduct A S E :=
   LinearMap.baseChange S (MulOpposite.opLinearEquiv A).symm.toLinearMap
 
-theorem unopS_mul {A E : Type} [inst : CommRing A] [inst_1 : Ring E]
-    [inst_2 : Algebra A E] (S : Type) [inst_3 : CommRing S] [inst_4 : Algebra A S]
-    (x y : S ⊗[A] Eᵐᵒᵖ) : unopS A E S (x * y) = unopS A E S y * unopS A E S x := by
+theorem unopS_mul {A E : Type} [CommRing A] [Ring E] [Algebra A E]
+    (S : Type) [CommRing S] [Algebra A S] (x y : TensorProduct A S Eᵐᵒᵖ) :
+    unopS A E S (x * y) = unopS A E S y * unopS A E S x := by
   induction x using TensorProduct.inductionOn with
   | add x₁ x₂ h₁ h₂ => rw [add_mul, map_add (f := _), map_add (f := _), h₁, h₂, mul_add]
   | tmul s e =>
     induction y using TensorProduct.inductionOn with
     | add y₁ y₂ h₁ h₂ => rw [mul_add, map_add (f := _), map_add (f := _), h₁, h₂, add_mul]
-    | tmul t f =>
-      simp [unopS, Algebra.TensorProduct.tmul_mul_tmul, mul_comm s t]
+    | tmul t f => simp [unopS, Algebra.TensorProduct.tmul_mul_tmul, mul_comm s t]
 
 end UpperTheory.Reformulated.B.Qk3

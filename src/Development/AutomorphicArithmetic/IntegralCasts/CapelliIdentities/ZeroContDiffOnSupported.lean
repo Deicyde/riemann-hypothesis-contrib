@@ -47,79 +47,87 @@ import Mathlib.Topology.Sheaves.Init
 
 namespace UpperTheory.Reformulated.B.H23
 
-noncomputable section
+@[reducible] noncomputable def Pl : (E : Type) → [inst : Field E] → [NumberField E] → Type :=
+  fun E [Field E] [NumberField E] => IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)
 
-@[reducible] def Pl (E : Type) [Field E] [NumberField E] : Type :=
-  IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)
+@[reducible] noncomputable def GLw : {E : Type} →
+  [inst : Field E] → [inst_1 : NumberField E] → ℕ → Pl E → Type :=
+  fun {E} [Field E] [NumberField E] n w => GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion E w)
 
-@[reducible] def GLw {E : Type} [Field E] [NumberField E] (n : ℕ) (w : Pl E) : Type :=
-  Matrix.GeneralLinearGroup (Fin n) (w.adicCompletion E)
+theorem aux3 : ∀ (k : Type) [inst : Field k], SubsemiringClass (Subring k) k := by
+  intro k _
+  infer_instance
 
-theorem aux3 (k : Type) [Field k] : SubsemiringClass (Subring k) k :=
-  inferInstance
+theorem aux4 : ∀ (k : Type) [inst : Field k] [inst_1 : ValuativeRel k]
+  [inst_2 : TopologicalSpace k] [IsNonarchimedeanLocalField k], IsLocalRing ↥(ValuativeRel.valuation k).integer := by
+  intro k _ _ _ _
+  infer_instance
 
-theorem aux4 (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] :
-    IsLocalRing (ValuativeRel.valuation k).integer :=
-  inferInstance
+noncomputable def blk : {α n : Type} → {m : α → Type} → (a : α) × m a ≃ n → n → α :=
+  fun {α n} {m} e i => (e.symm i).fst
 
-def blk {α n : Type} {m : α → Type} (e : (a : α) × m a ≃ n) (i : n) : α :=
-  (e.symm i).fst
+theorem aux6 : ∀ (R : Type) [inst : CommRing R] {α n : Type} {m : α → Type}
+  [inst_1 : LinearOrder α] [inst_2 : Fintype n] [inst_3 : DecidableEq n] (e : (a : α) × m a ≃ n) {x y : GL n R},
+  x ∈ {g : GL n R | g.val.BlockTriangular (blk e)} →
+    y ∈ {g : GL n R | g.val.BlockTriangular (blk e)} →
+      x * y ∈ {g : GL n R | g.val.BlockTriangular (blk e)} := by
+  intro R _ α n m _ _ _ e x y hx hy
+  exact Matrix.BlockTriangular.mul hx hy
 
-theorem aux6 (R : Type) [CommRing R] {α n : Type} {m : α → Type}
-    [LinearOrder α] [Fintype n] [DecidableEq n] (e : (a : α) × m a ≃ n)
-    {x y : Matrix.GeneralLinearGroup n R}
-    (hx : x ∈ {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)})
-    (hy : y ∈ {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)}) :
-    x * y ∈ {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)} :=
-  Matrix.BlockTriangular.mul hx hy
+theorem aux7 : ∀ (R : Type) [inst : CommRing R] {α n : Type} {m : α → Type}
+  [inst_1 : LinearOrder α] [inst_2 : Fintype n] [inst_3 : DecidableEq n] (e : (a : α) × m a ≃ n),
+  1 ∈ {g : GL n R | g.val.BlockTriangular (blk e)} := by
+  intro R _ α n m _ _ _ e
+  exact Matrix.blockTriangular_one
 
-theorem aux7 (R : Type) [CommRing R] {α n : Type} {m : α → Type}
-    [LinearOrder α] [Fintype n] [DecidableEq n] (e : (a : α) × m a ≃ n) :
-    (1 : Matrix.GeneralLinearGroup n R) ∈
-      {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)} :=
-  Matrix.blockTriangular_one
-
-theorem aux8 (R : Type) [CommRing R] {α n : Type} {m : α → Type}
-    [LinearOrder α] [Fintype n] [DecidableEq n] (e : (a : α) × m a ≃ n)
-    {x : Matrix.GeneralLinearGroup n R}
-    (hx : x ∈ {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)}) :
-    x⁻¹ ∈ {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)} := by
+theorem aux8 : ∀ (R : Type) [inst : CommRing R] {α n : Type} {m : α → Type}
+  [inst_1 : LinearOrder α] [inst_2 : Fintype n] [inst_3 : DecidableEq n] (e : (a : α) × m a ≃ n) {x : GL n R},
+  x ∈ {g : GL n R | g.val.BlockTriangular (blk e)} →
+    x⁻¹ ∈ {g : GL n R | g.val.BlockTriangular (blk e)} := by
+  intro R _ α n m _ _ _ e x hx
   change Matrix.BlockTriangular (x⁻¹ : Matrix.GeneralLinearGroup n R).val _
   rw [Matrix.coe_units_inv]
-  let := x.invertible
+  letI := x.invertible
   exact Matrix.blockTriangular_inv_of_blockTriangular hx
 
-def parab (R : Type) [CommRing R] {α n : Type} {m : α → Type}
-    [LinearOrder α] [Fintype n] [DecidableEq n] (e : (a : α) × m a ≃ n) :
-    Subgroup (Matrix.GeneralLinearGroup n R) where
-  carrier := {g : Matrix.GeneralLinearGroup n R | g.val.BlockTriangular (blk e)}
-  mul_mem' := aux6 R e
-  one_mem' := aux7 R e
-  inv_mem' := aux8 R e
+noncomputable def parab : (R : Type) →
+  [inst : CommRing R] →
+    {α n : Type} →
+      {m : α → Type} →
+        [LinearOrder α] → [inst_2 : Fintype n] → [inst_3 : DecidableEq n] → (a : α) × m a ≃ n → Subgroup (GL n R) :=
+  fun R [inst : CommRing R] {α n} {m} [inst_1 : LinearOrder α] [inst_2 : Fintype n] [inst_3 : DecidableEq n] e =>
+    { carrier := {g : GL n R | g.val.BlockTriangular (blk e)},
+      mul_mem' := @aux6 R inst α n m inst_1 inst_2 inst_3 e,
+      one_mem' := aux7 R e,
+      inv_mem' := @aux8 R inst α n m inst_1 inst_2 inst_3 e }
 
-def points (n : Type) : (_ : n) × Unit ≃ n :=
-  Equiv.sigmaUnique n (fun _ => Unit)
+noncomputable def points : (n : Type) → (_ : n) × Unit ≃ n :=
+  fun n => Equiv.sigmaUnique n fun x => Unit
 
-def borel (R : Type) [CommRing R] (n : Type)
-    [Fintype n] [DecidableEq n] [LinearOrder n] :
-    Subgroup (Matrix.GeneralLinearGroup n R) :=
-  parab R (points n)
+noncomputable def borel : (R : Type) →
+  [inst : CommRing R] →
+    (n : Type) → [inst_1 : Fintype n] → [inst_2 : DecidableEq n] → [LinearOrder n] → Subgroup (GL n R) :=
+  fun R [CommRing R] n [Fintype n] [DecidableEq n] [LinearOrder n] =>
+    parab R (points n)
 
-def iwahori (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n] [LinearOrder n] :
-    Subgroup (Matrix.GeneralLinearGroup n k) :=
-  Subgroup.map
-    (Matrix.GeneralLinearGroup.map (algebraMap (ValuativeRel.valuation k).integer k))
-    (Subgroup.comap
-      (Matrix.GeneralLinearGroup.map (IsLocalRing.residue (ValuativeRel.valuation k).integer))
-      (borel (IsLocalRing.ResidueField (ValuativeRel.valuation k).integer) n))
+noncomputable def iwahori : (k : Type) →
+  [inst : Field k] →
+    [inst_1 : ValuativeRel k] →
+      [inst_2 : TopologicalSpace k] →
+        [IsNonarchimedeanLocalField k] →
+          (n : Type) → [inst_4 : Fintype n] → [inst_5 : DecidableEq n] → [LinearOrder n] → Subgroup (GL n k) :=
+  fun k [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] n [Fintype n] [DecidableEq n]
+      [LinearOrder n] =>
+    Subgroup.map (Matrix.GeneralLinearGroup.map (Algebra.algebraMap (↥(ValuativeRel.valuation k).integer) k))
+      (Subgroup.comap (Matrix.GeneralLinearGroup.map (IsLocalRing.residue ↥(ValuativeRel.valuation k).integer))
+        (borel (IsLocalRing.ResidueField ↥(ValuativeRel.valuation k).integer) n))
 
-@[reducible] def complRel {F : Type} [Field F] [NumberField F]
-    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) :
-    ValuativeRel (p.adicCompletion F) :=
-  ValuativeRel.ofValuation
-    (Valued.v : Valuation (p.adicCompletion F) (WithZero (Multiplicative ℤ)))
+@[reducible] noncomputable def complRel : {F : Type} →
+  [inst : Field F] →
+    [inst_1 : NumberField F] →
+      (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) →
+        ValuativeRel (IsDedekindDomain.HeightOneSpectrum.adicCompletion F p) :=
+  fun {F} [Field F] [NumberField F] p => ValuativeRel.ofValuation Valued.v
 
 open IsDedekindDomain NumberField in
 private theorem exists_global_approx {F : Type} [Field F] [NumberField F]
@@ -192,13 +200,12 @@ private theorem locallyCompact {F : Type} [Field F] [NumberField F]
   exact hc'.locallyCompactSpace_of_mem_nhds_of_addGroup (x := 0)
     ((Valued.isOpen_integer (p.adicCompletion F)).mem_nhds (zero_mem _))
 
-section
-attribute [local instance high] complRel
-
-theorem zero_contDiffOn_supported {F : Type} [Field F] [NumberField F]
-    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) :
-    IsNonarchimedeanLocalField (p.adicCompletion F) := by
-  have : (Valued.v : Valuation (p.adicCompletion F) (WithZero (Multiplicative ℤ))).Compatible :=
+theorem zero_contDiffOn_supported : ∀ {F : Type} [inst : Field F]
+  [inst_1 : NumberField F] (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)),
+  IsNonarchimedeanLocalField (IsDedekindDomain.HeightOneSpectrum.adicCompletion F p) := by
+  intro F _ _ p
+  letI := complRel p
+  haveI : (Valued.v : Valuation (p.adicCompletion F) (WithZero (Multiplicative ℤ))).Compatible :=
     Valuation.Compatible.ofValuation _
   exact
     { toIsValuativeTopology :=
@@ -210,31 +217,38 @@ theorem zero_contDiffOn_supported {F : Type} [Field F] [NumberField F]
           (Valued.v : Valuation (p.adicCompletion F) (WithZero (Multiplicative ℤ)))).mpr
           inferInstance }
 
-attribute [local instance high] zero_contDiffOn_supported
+noncomputable def iwGL : {E : Type} →
+  [inst : Field E] →
+    [inst_1 : NumberField E] →
+      (n : ℕ) → (w : Pl E) → Subgroup (GLw n w) :=
+  fun {E} [Field E] [NumberField E] n w => by
+    letI := complRel w
+    haveI := zero_contDiffOn_supported w
+    exact iwahori (IsDedekindDomain.HeightOneSpectrum.adicCompletion E w) (Fin n)
 
-def iwGL {E : Type} [Field E] [NumberField E] (n : ℕ) (w : Pl E) :
-    Subgroup (GLw n w) :=
-  iwahori (w.adicCompletion E) (Fin n)
+noncomputable def dcos : {E : Type} →
+  [inst : Field E] →
+    [inst_1 : NumberField E] →
+      (n : ℕ) →
+        (w : Pl E) →
+          GLw n w → GLw n w → ℂ :=
+  fun {E} [Field E] [NumberField E] n w t y => by
+    classical
+    exact if ∃ x ∈ iwGL n w, ∃ z ∈ iwGL n w, y = x * t * z then 1 else 0
 
-end
-
-open scoped Classical in
-def dcos {E : Type} [Field E] [NumberField E] (n : ℕ) (w : Pl E)
-    (t y : GLw n w) : ℂ :=
-  if ∃ x ∈ iwGL n w, ∃ z ∈ iwGL n w, y = x * t * z then 1 else 0
-
-theorem dcos_right {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
-    {m : ℕ} {w : Pl E} (t k g : GLw m w) (hk : k ∈ iwGL m w) :
+theorem dcos_right : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E]
+  [NumberField.IsCMField E] {m : ℕ} {w : Pl E}
+  (t k g : GLw m w),
+  k ∈ iwGL m w →
     dcos m w t (g * k) = dcos m w t g := by
-  classical
+  intro E _ _ _ m w t k g hk
   unfold dcos
-  refine if_congr ⟨?_, ?_⟩ rfl rfl
+  refine @if_congr _ _ _ (Classical.propDecidable _) (Classical.propDecidable _) _ _ _ _
+    ⟨?_, ?_⟩ rfl rfl
   · rintro ⟨x, hx, z, hz, h⟩
     exact ⟨x, hx, z * k⁻¹, Subgroup.mul_mem _ hz (Subgroup.inv_mem _ hk), by
       rw [← mul_assoc, ← h, mul_inv_cancel_right]⟩
   · rintro ⟨x, hx, z, hz, h⟩
     exact ⟨x, hx, z * k, Subgroup.mul_mem _ hz hk, by rw [h, mul_assoc (x * t)]⟩
-
-end
 
 end UpperTheory.Reformulated.B.H23

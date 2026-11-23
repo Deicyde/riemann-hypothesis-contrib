@@ -110,8 +110,6 @@ theorem val_eq_of_le_right
     have hcard : #R ≤ m.val - b.val := by
       have := card_le_card hsub
       rwa [Fin.card_Ioc] at this
-    have hbm := Fin.lt_def.1 hm.2.1
-    have hwbm := Fin.lt_def.1 hm.2.2
     exact val_eq_of_le_of_le hB ((w m).val - (w b).val) b m (by omega) (le_of_lt hm.2.1) x hbx
       (Fin.le_iff_val_le_val.2 (by omega))
   · rw [not_nonempty_iff_eq_empty] at hne
@@ -137,8 +135,6 @@ theorem val_add_eq_of_le_left
     have hcard : #L ≤ b.val - m.val := by
       have := card_le_card hsub
       rwa [Fin.card_Ico] at this
-    have hmb := Fin.lt_def.1 hm.2.1
-    have hwmb := Fin.lt_def.1 hm.2.2
     have h1 := val_eq_of_le_of_le hB ((w b).val - (w m).val) m b (by omega) (le_of_lt hm.2.1) x
       (Fin.le_iff_val_le_val.2 (by omega)) hxb
     have h2 := val_eq_of_le_of_le hB ((w b).val - (w m).val) m b (by omega) (le_of_lt hm.2.1) b
@@ -185,7 +181,6 @@ theorem relevant_involution
   set c := Fin.rev (w b) with hc
   have hcv : c.val = n - (↑(w b) + 1) := by rw [hc, Fin.val_rev]
   have hb := b.isLt
-  have hwb := (w b).isLt
   apply Fin.ext
   rw [Fin.val_rev]
   by_cases hcb : b.val ≤ c.val
