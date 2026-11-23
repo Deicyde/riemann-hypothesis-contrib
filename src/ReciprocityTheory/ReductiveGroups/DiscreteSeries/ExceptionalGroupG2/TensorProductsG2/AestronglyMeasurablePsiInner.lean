@@ -7,6 +7,7 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.AnyDec
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.DataGenSubIrred
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.HasGelfandCharSigLam
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.AestronglyMeasurablePsiInner
 
 @[expose] public section
 
@@ -18,10 +19,6 @@ open scoped Matrix
 namespace ReciprocityTheory.ChartRestriction.DS.G2
 
 variable {n : ℕ}
-
-def ob3PsiCoef (dual : Bool) {ε : Fin n → Bool} {Λ : Fin n → ℝ} {T : S7.KType ε Λ}
-    (Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)) (ξ ζ : Fin n → T.V) (g : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
-  ∑ c, inner ℂ (ξ c) (∑ d, (cond dual ((g⁻¹) d c) (g c d)) • Ψ g (ζ d))
 
 section Psi
 
@@ -53,46 +50,6 @@ theorem psi_weighted_memLp {v₀ : T.V} (hgap : StdGap ε lam) (hP : IsPsiFor ε
     field_simp
 
 end Psi
-
-theorem norm_unitary_inv_entry {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) (c d : Fin n) :
-    ‖(Formalism.MainNotions.S.umat g)⁻¹ d c‖ = ‖Formalism.MainNotions.S.umat g c d‖ := by
-  have hg : inUJ ε (Formalism.MainNotions.S.umat g) := g.2
-  have h1 : (Jm ε * (Formalism.MainNotions.S.umat g)ᴴ * Jm ε) * Formalism.MainNotions.S.umat g = 1 := by
-    calc (Jm ε * (Formalism.MainNotions.S.umat g)ᴴ * Jm ε) * Formalism.MainNotions.S.umat g
-        = Jm ε * ((Formalism.MainNotions.S.umat g)ᴴ * Jm ε * Formalism.MainNotions.S.umat g) := by simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [hg, S7.Jm_mul_self]
-  rw [Matrix.inv_eq_left_inv h1]
-  simp only [Jm, Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.conjTranspose_apply]
-  split_ifs <;> simp
-
-theorem norm_unitary_entry_le_sqrt_hs {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) (c d : Fin n) :
-    ‖Formalism.MainNotions.S.umat g c d‖ ≤ Real.sqrt (S7.hs (Formalism.MainNotions.S.umat g)) := by
-  rw [← Real.sqrt_sq (norm_nonneg (Formalism.MainNotions.S.umat g c d))]
-  apply Real.sqrt_le_sqrt
-  unfold S7.hs
-  calc ‖Formalism.MainNotions.S.umat g c d‖ ^ 2 ≤ ∑ j, ‖Formalism.MainNotions.S.umat g c j‖ ^ 2 :=
-        Finset.single_le_sum (f := fun j => ‖Formalism.MainNotions.S.umat g c j‖ ^ 2) (fun j _ => sq_nonneg _) (mem_univ d)
-    _ ≤ ∑ i, ∑ j, ‖Formalism.MainNotions.S.umat g i j‖ ^ 2 :=
-        Finset.single_le_sum (f := fun i => ∑ j, ‖Formalism.MainNotions.S.umat g i j‖ ^ 2)
-          (fun i _ => Finset.sum_nonneg fun j _ => sq_nonneg _) (mem_univ c)
-
-theorem norm_dual_entry_le_sqrt_hs (dual : Bool) {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) (c d : Fin n) :
-    ‖cond dual ((Formalism.MainNotions.S.umat g)⁻¹ d c) (Formalism.MainNotions.S.umat g c d)‖ ≤ Real.sqrt (S7.hs (Formalism.MainNotions.S.umat g)) := by
-  cases dual
-  · exact norm_unitary_entry_le_sqrt_hs g c d
-  · simp only [cond]; rw [norm_unitary_inv_entry]; exact norm_unitary_entry_le_sqrt_hs g c d
-
-theorem continuous_dual_entry (dual : Bool) {ε : Fin n → Bool} (c d : Fin n) :
-    Continuous (fun g : Formalism.REAL.UJ ε => cond dual ((Formalism.MainNotions.S.umat g)⁻¹ d c) (Formalism.MainNotions.S.umat g c d)) := by
-  cases dual
-  · exact (continuous_apply d).comp ((continuous_apply c).comp ((Units.continuous_val (M := Matrix (Fin n) (Fin n) ℂ)).comp continuous_subtype_val))
-  · have e : (fun g : Formalism.REAL.UJ ε => cond true ((Formalism.MainNotions.S.umat g)⁻¹ d c) (Formalism.MainNotions.S.umat g c d)) =
-        fun g : Formalism.REAL.UJ ε => ((((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) :
-          Matrix (Fin n) (Fin n) ℂ) d c) := by
-      funext g
-      simp only [cond, Formalism.MainNotions.S.umat, Matrix.coe_units_inv]
-    rw [e]
-    exact (continuous_apply c).comp ((continuous_apply d).comp ((Units.continuous_coe_inv (M := Matrix (Fin n) (Fin n) ℂ)).comp continuous_subtype_val))
 
 section Psi2
 
@@ -140,58 +97,10 @@ theorem psi_pairing_integrable (dual : Bool) (hP : IsPsiFor ε lam T Ψ) (hP' : 
 
 end Psi2
 
-theorem clm_mul_apply_eq_comp {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] (A B : E →L[ℂ] E) (x : E) :
-    (A * B) x = A (B x) := rfl
-
-theorem dual_entry_mul_sum (dual : Bool) (K H : Matrix (Fin n) (Fin n) ℂ) (c d : Fin n) :
-    cond dual ((K * H)⁻¹ d c) ((K * H) c d) =
-      ∑ e, cond dual (K⁻¹ e c) (K c e) * cond dual (H⁻¹ d e) (H e d) := by
-  cases dual
-  · simp only [cond, Matrix.mul_apply]
-  · simp only [cond, Matrix.mul_inv_rev, Matrix.mul_apply]
-    exact Finset.sum_congr rfl fun e _ => mul_comm _ _
-
 section Psi3
 
 variable {ε : Fin n → Bool} {lam lam' : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)} {T' : S7.KType ε (lowK ε lam')}
   {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {Ψ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V)}
-
-theorem psi_k_left_equivariant {Λ : Fin n → ℝ} {T : S7.KType ε Λ} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
-    (hK : ∀ (k₁ k₂ : S7.KG ε) (g : Matrix (Fin n) (Fin n) ℂ), inUJ ε g →
-      Ψ (S7.toMK k₁ * g * S7.toMK k₂) = T.op k₁ * Ψ g * T.op k₂) (k : S7.KG ε) (h : Formalism.REAL.UJ ε) :
-    Ψ (S7.toMK k * Formalism.MainNotions.S.umat h) = T.op k * Ψ (Formalism.MainNotions.S.umat h) := by
-  have e := hK k 1 (Formalism.MainNotions.S.umat h) h.2
-  have h1 : S7.toMK (1 : S7.KG ε) = 1 := rfl
-  have h2 : T.op 1 = 1 := by simp [S7.KType.op]
-  rwa [h1, mul_one, h2, mul_one] at e
-
-theorem psi_coef_k_left_translate (dual : Bool) (hP : IsPsiFor ε lam T Ψ) (k : S7.KG ε) (h : Formalism.REAL.UJ ε)
-    (ξ ζ : Fin n → T.V) :
-    ob3PsiCoef dual Ψ ξ ζ (S7.toMK k * Formalism.MainNotions.S.umat h) =
-      ob3PsiCoef dual Ψ (fun e => ∑ c, starRingEnd ℂ (cond dual ((S7.toMK k)⁻¹ e c) (S7.toMK k c e)) •
-        (ContinuousLinearMap.adjoint (T.op k)) (ξ c)) ζ (Formalism.MainNotions.S.umat h) := by
-  have hΨ := psi_k_left_equivariant hP.1 k h
-  have hL : ob3PsiCoef dual Ψ ξ ζ (S7.toMK k * Formalism.MainNotions.S.umat h) = ∑ c, ∑ d, ∑ e,
-      cond dual ((S7.toMK k)⁻¹ e c) (S7.toMK k c e) *
-        cond dual ((Formalism.MainNotions.S.umat h)⁻¹ d e) (Formalism.MainNotions.S.umat h e d) *
-          inner ℂ (ξ c) (T.op k (Ψ (Formalism.MainNotions.S.umat h) (ζ d))) := by
-    simp only [ob3PsiCoef, hΨ, dual_entry_mul_sum, clm_mul_apply_eq_comp, inner_sum, inner_smul_right,
-      Finset.sum_mul]
-  have hR : ob3PsiCoef dual Ψ (fun e => ∑ c, starRingEnd ℂ (cond dual ((S7.toMK k)⁻¹ e c) (S7.toMK k c e)) •
-        (ContinuousLinearMap.adjoint (T.op k)) (ξ c)) ζ (Formalism.MainNotions.S.umat h) = ∑ e, ∑ d, ∑ c,
-      cond dual ((S7.toMK k)⁻¹ e c) (S7.toMK k c e) *
-        cond dual ((Formalism.MainNotions.S.umat h)⁻¹ d e) (Formalism.MainNotions.S.umat h e d) *
-          inner ℂ (ξ c) (T.op k (Ψ (Formalism.MainNotions.S.umat h) (ζ d))) := by
-    simp only [ob3PsiCoef, inner_sum, inner_smul_right, sum_inner, inner_smul_left,
-      ContinuousLinearMap.adjoint_inner_left, RCLike.conj_conj, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun e _ => Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun c _ => by ring
-  rw [hL, hR]
-  calc _ = ∑ c, ∑ e, ∑ d, cond dual ((S7.toMK k)⁻¹ e c) (S7.toMK k c e) *
-        cond dual ((Formalism.MainNotions.S.umat h)⁻¹ d e) (Formalism.MainNotions.S.umat h e d) *
-          inner ℂ (ξ c) (T.op k (Ψ (Formalism.MainNotions.S.umat h) (ζ d))) :=
-        Finset.sum_congr rfl fun c _ => Finset.sum_comm
-    _ = _ := Finset.sum_comm
-    _ = _ := Finset.sum_congr rfl fun e _ => Finset.sum_comm
 
 theorem psi_pairing_vanishing_spread (dual : Bool) (hP : IsPsiFor ε lam T Ψ) (hP' : IsPsiFor ε lam' T' Ψ') {v₀' : T'.V} (hv₀' : v₀' ≠ 0)
     (hWT : ∀ v w : T.V, MemLp (fun g : Formalism.REAL.UJ ε => ((Real.sqrt (S7.hs (Formalism.MainNotions.S.umat g)) : ℝ) : ℂ) *

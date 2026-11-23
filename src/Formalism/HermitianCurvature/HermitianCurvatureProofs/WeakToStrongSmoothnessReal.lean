@@ -22,14 +22,12 @@ def Norming {V I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (lam : I →
 lemma Norming.nonempty {V I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {lam : I → V →L[ℝ] E}
     (hN : Norming lam) : Nonempty I := by
   by_contra h
-  have := hN 0 (-1) (fun i => (h ⟨i⟩).elim)
-  rw [norm_zero] at this
+  have h1 : (0 : ℝ) ≤ -1 := by simpa using hN 0 (-1) (fun i => (h ⟨i⟩).elim)
   linarith
 
 lemma Norming.eq {V I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {lam : I → V →L[ℝ] E}
     (hN : Norming lam) {v w : V} (h : ∀ i, lam i v = lam i w) : v = w := by
-  have := hN (v - w) 0 (fun i => by rw [map_sub, h i, sub_self, norm_zero])
-  exact sub_eq_zero.1 (norm_le_zero_iff.1 this)
+  exact sub_eq_zero.1 (norm_le_zero_iff.1 (hN (v - w) 0 (fun i => by rw [map_sub, h i, sub_self, norm_zero])))
 
 lemma lip_ball {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : X → F} {x₀ : X} {r M : ℝ}
     (hd : ∀ y ∈ Metric.ball x₀ r, DifferentiableAt ℝ f y)
@@ -135,8 +133,7 @@ lemma norm_iter_comp {F G : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] [No
 lemma iter_congr {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] {f g : X → F} {Ω : Set X}
     (hΩ : IsOpen Ω) (h : ∀ y ∈ Ω, f y = g y) {x : X} (hx : x ∈ Ω) (q : ℕ) :
     iteratedFDeriv ℝ q f x = iteratedFDeriv ℝ q g x := by
-  rw [← iteratedFDerivWithin_of_isOpen q hΩ hx, ← iteratedFDerivWithin_of_isOpen q hΩ hx]
-  exact iteratedFDerivWithin_congr (fun y hy => h y hy) hx q
+  simpa only [← iteratedFDerivWithin_of_isOpen q hΩ hx] using iteratedFDerivWithin_congr (fun y hy => h y hy) hx q
 
 lemma norm_apply_le {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (h : X) (hh : ‖h‖ ≤ 1) :
     ‖ContinuousLinearMap.apply ℝ F h‖ ≤ 1 :=
@@ -146,10 +143,9 @@ lemma norm_apply_le {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (h : X
 
 lemma loc {Ω : Set X} {bd : X → ℝ} (hΩ : IsOpen Ω) (hbd : ContinuousOn bd Ω) {x₀ : X} (hx : x₀ ∈ Ω) :
     ∃ r > 0, ∀ y ∈ Metric.ball x₀ r, y ∈ Ω ∧ bd y ≤ bd x₀ + 1 := by
-  have h2 : ∀ᶠ y in 𝓝 x₀, bd y ∈ Iic (bd x₀ + 1) :=
-    Filter.Tendsto.eventually (hbd.continuousAt (hΩ.mem_nhds hx)) (Iic_mem_nhds (lt_add_one _))
-  have h1 : ∀ᶠ y in 𝓝 x₀, y ∈ Ω ∧ bd y ≤ bd x₀ + 1 := Filter.Eventually.and (hΩ.mem_nhds hx) h2
-  exact Metric.eventually_nhds_iff_ball.1 h1
+  exact Metric.eventually_nhds_iff_ball.1 <|
+    Filter.Eventually.and (hΩ.mem_nhds hx)
+      (Filter.Tendsto.eventually (hbd.continuousAt (hΩ.mem_nhds hx)) (Iic_mem_nhds (lt_add_one _)))
 
 variable [FiniteDimensional ℝ X]
 
@@ -329,10 +325,8 @@ lemma lamC_apply (M : U.CCModel k ρ E a mm S V) (t : Idx k ρ mm) (w : V) :
 lemma lamC_norming (M : U.CCModel k ρ E a mm S V) (w : V) (c : ℝ) (h : ∀ t, ‖lamC M t w‖ ≤ c) : ‖w‖ ≤ c := by
   refine M.least w c ⟨(M.mem w).1, fun u v hu hv hl g hg => ?_⟩
   have := h ⟨(u, v, g), hu, hv, hl, hg⟩
-  have e : ‖lamC M ⟨(u, v, g), hu, hv, hl, hg⟩ w‖ = B.gN g ^ a * ‖B.dLR u v (M.ev w) g‖ := by
-    show ‖((B.gN g ^ a : ℝ) : ℂ) • B.dLR u v (M.ev w) g‖ = _
-    rw [norm_smul, Complex.norm_real, Real.norm_of_nonneg (gNa_nonneg _ _)]
-  exact (le_of_eq e.symm).trans this
+  change ‖((B.gN g ^ a : ℝ) : ℂ) • B.dLR u v (M.ev w) g‖ ≤ c at this
+  rwa [norm_smul, Complex.norm_real, Real.norm_of_nonneg (gNa_nonneg g a)] at this
 
 def sc (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (c : ℝ) : E →L[ℝ] E :=
   ((c : ℂ) • ContinuousLinearMap.id ℂ E).restrictScalars ℝ

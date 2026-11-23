@@ -13,8 +13,6 @@ open CategoryTheory AlgebraicGeometry
 namespace CrystallineSemistableComparison.Pb.EtaleIntegralityFacts
 
 
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
 theorem exists_integral_nbhd {K : Type} [Field K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
     [Smooth q]
     (hE : ∀ (A : Type) [CommRing A] [Algebra K A] [Algebra.Smooth K A] (p : Ideal A) [p.IsPrime],
@@ -33,9 +31,11 @@ theorem exists_integral_nbhd {K : Type} [Field K] {X : Scheme.{0}} (q : X ⟶ Sp
   have : Algebra.Smooth K Γ(X, V) := hφ
   obtain ⟨r, hr, hdom⟩ := hE Γ(X, V) (hV.primeIdealOf ⟨x, hxV⟩).asIdeal
   have hxW : x ∈ X.basicOpen r := by
-    rwa [← PrimeSpectrum.mem_basicOpen, IsAffineOpen.primeIdealOf,
-      ← hV.fromSpec_preimage_basicOpen, Scheme.Hom.mem_preimage, ← Scheme.Hom.comp_apply,
-      IsAffineOpen.isoSpec_hom, IsAffineOpen.toSpecΓ_fromSpec] at hr
+    have hr' : hV.primeIdealOf ⟨x, hxV⟩ ∈ hV.fromSpec ⁻¹ᵁ X.basicOpen r := by
+      rw [hV.fromSpec_preimage_basicOpen]
+      exact hr
+    have hfx : hV.fromSpec (hV.primeIdealOf ⟨x, hxV⟩) = x := hV.fromSpec_primeIdealOf ⟨x, hxV⟩
+    exact hfx ▸ (hr' : hV.fromSpec (hV.primeIdealOf ⟨x, hxV⟩) ∈ X.basicOpen r)
   refine ⟨X.basicOpen r, hxW, ?_⟩
   have hW : IsAffineOpen (X.basicOpen r) := hV.basicOpen r
   have : IsAffine (X.basicOpen r) := hW

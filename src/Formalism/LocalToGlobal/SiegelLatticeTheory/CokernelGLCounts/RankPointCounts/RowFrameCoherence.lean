@@ -128,8 +128,7 @@ theorem rowForm_alg (c S n0c g κ nc α mR : ℝ) (hN : nc = n0c * g / (α * κ)
     (hm : 0 < mR) (hg : 0 < g) : c * (S / mR) = n0c * (g / (κ * (nc * α) * mR) * (c * S)) := by
   have hn0 : n0c ≠ 0 := by
     rintro rfl
-    rw [hN] at hnc
-    simp at hnc
+    simp [hN] at hnc
   subst hN
   field_simp
   try ring

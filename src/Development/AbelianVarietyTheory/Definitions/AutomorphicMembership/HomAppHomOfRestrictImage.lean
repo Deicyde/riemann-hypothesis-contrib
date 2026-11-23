@@ -5,6 +5,33 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonemptyOfModToModIso
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExactAndSurjectiveAppOfExactOfEpi
 
+/-!
+# Pointwise norms and generic-fiber isomorphisms
+
+This file studies the pointwise size of sheaf sections at a map
+`z : Spec (intO C.S) ⟶ X`. Here `intO C.S` is the ring of elements of norm
+at most one, and `gen X p` is the open where p is invertible.
+
+The norm is described by testing sections against semilinear forms that are
+bounded by one on integral sections. For a generic-fiber line bundle, a
+nonzero generating form can be normalized by an attained maximum. This
+turns the norm into an explicit quotient. Applying the quotient formula to
+an isomorphism and its inverse gives reciprocal positive norms.
+
+The supporting constructions are:
+* `homPi`: internal Hom sections in a finite frame are tuples of sections;
+* `homOfRestrict`: a morphism on a restricted scheme gives an internal Hom section;
+* `exists_extend` and `form_ext`: affine base change transports semilinear forms;
+* `exists_isGreatest`: finite generation and the ultrametric inequality give
+  an attained maximum;
+* `nrmSet_eq`: the denominator-clearing definition equals the description
+  using bounded forms on any suitable fixed affine open.
+
+The final results are `sSup_compSec_mul` and `sSup_compSec_eq`.
+This overview describes the local mathematics; it makes no claim about
+which downstream results use this file.
+-/
+
 @[expose] public section
 
 set_option autoImplicit false
@@ -23,6 +50,55 @@ namespace GlobalTheory.PtNorm
 
 variable {X : Scheme.{0}} {F G H : X.Modules} {U V W : X.Opens} {ι : Type} [Fintype ι]
 
+/-! ## General ultrametric algebra
+These results depend on finite modules and normed fields, independently of
+schemes or pointwise norms. They are candidates for later extraction.
+-/
+section UltrametricAlgebra
+
+/-- A semilinear form on a finitely generated module has an attained maximum
+norm when scalar images have norm at most one and the target field is
+ultrametric. Maximize on a finite generating set with zero adjoined;
+span induction bounds every other value. No compactness is used. -/
+theorem exists_isGreatest {A M C : Type} [CommRing A] [AddCommGroup M] [Module A M] [Module.Finite A M]
+    [NormedField C] [IsUltrametricDist C] {ε : A →+* C} (hε : ∀ a, ‖ε a‖ ≤ 1) (ν : M →ₛₗ[ε] C) :
+    ∃ c, IsGreatest (Set.range fun m => ‖ν m‖) c := by
+  classical
+  obtain ⟨S, hS⟩ := Module.Finite.fg_top (R := A) (M := M)
+  obtain ⟨m₀, -, hm₀⟩ := (insert 0 S).exists_max_image (fun m => ‖ν m‖) ⟨0, Finset.mem_insert_self _ _⟩
+  refine ⟨‖ν m₀‖, ⟨m₀, rfl⟩, ?_⟩
+  rintro _ ⟨m, rfl⟩
+  have hm : m ∈ Submodule.span A (S : Set M) := hS ▸ Submodule.mem_top
+  induction hm using Submodule.span_induction with
+  | mem x hx => exact hm₀ x (Finset.mem_insert_of_mem hx)
+  | zero => simp
+  | add x y _ _ hx hy =>
+    simp only [map_add (f := _)]
+    exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hx hy)
+  | smul a x _ hx =>
+    simp only [ν.map_smulₛₗ, smul_eq_mul, norm_mul]
+    exact (mul_le_of_le_one_left (norm_nonneg _) (hε a)).trans hx
+
+theorem isLocalRing_intO (C : Type) [NormedField C] [IsUltrametricDist C] : IsLocalRing (intO C) := by
+  have key (a : intO C) (h : ‖(a : C)‖ = 1) : IsUnit a := by
+    have h0 : (a : C) ≠ 0 := fun e => by simp [e] at h
+    exact IsUnit.of_mul_eq_one ⟨(a : C)⁻¹, show ‖_‖ ≤ 1 by simp [h]⟩ (Subtype.ext (mul_inv_cancel₀ h0))
+  refine .of_isUnit_or_isUnit_one_sub_self fun a => ?_
+  rcases (show ‖(a : C)‖ ≤ 1 from a.2).eq_or_lt with h | h
+  · exact .inl (key a h)
+  · refine .inr (key _ ?_)
+    have : ‖(1 : C)‖ ≠ ‖-(a : C)‖ := by simpa using h.ne'
+    rw [AddSubgroupClass.coe_sub, OneMemClass.coe_one, sub_eq_add_neg,
+      IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm this]
+    simpa using h.le
+
+end UltrametricAlgebra
+
+/-! ## Sheaf machinery: coordinates for internal Hom -/
+section HomCoordinates
+
+/-- Evaluate an internal Hom section at a fixed section of the source module.
+The resulting map is linear over the ring of sections on the same open. -/
 def homEval (G : X.Modules) (s : Γ(F, V)) : Γ(homMod F G, V) →ₗ[Γ(X, V)] Γ(G, V) where
   toFun ψ := homApp ψ le_rfl s
   map_add' _ _ := rfl
@@ -30,6 +106,9 @@ def homEval (G : X.Modules) (s : Γ(F, V)) : Γ(homMod F G, V) →ₗ[Γ(X, V)] 
 
 @[simp] theorem homEval_apply (s : Γ(F, V)) (ψ : Γ(homMod F G, V)) : homEval G s ψ = homApp ψ le_rfl s := rfl
 
+/-- Insert a target section into the i-th coordinate of an internal Hom section.
+On each smaller open, take the i-th frame coordinate and multiply it by
+the restricted target section. -/
 def homIns {e : ι → Γ(F, U)} (he : IsFrame e) (h : V ≤ U) (i : ι) : Γ(G, V) →ₗ[Γ(X, V)] Γ(homMod F G, V) where
   toFun n := homMk (fun _ hW => ((he.basis (hW.trans h)).coord i).smulRight (resM G hW n)) fun W W' hW h' s => by
     simp only [LinearMap.smulRight_apply, Module.Basis.coord_apply, resM_smul, resM_resM]
@@ -52,6 +131,9 @@ theorem sum_homIns {e : ι → Γ(F, U)} (he : IsFrame e) (h : V ≤ U) (ψ : Γ
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [homApp_homIns, map_smul, ← homApp_resM, resM_resM, IsFrame.basis_apply]
 
+/-- Identify internal Hom sections with tuples of target sections by evaluating
+on a finite frame of the source. The inverse sums the coordinate insertions
+`homIns`; `sum_homIns` proves reconstruction. -/
 def homPi {e : ι → Γ(F, U)} (he : IsFrame e) (h : V ≤ U) : Γ(homMod F G, V) ≃ₗ[Γ(X, V)] (ι → Γ(G, V)) :=
   LinearEquiv.ofLinear (LinearMap.pi fun i => homEval G (resM F h (e i)))
     (∑ i, homIns he h i ∘ₗ LinearMap.proj i)
@@ -109,6 +191,11 @@ theorem isVB_homMod {r : ℕ} (hF : IsVB F 1) (hG : IsVB G r) : IsVB (homMod F G
   rw [homPi_res he hle hT, LinearEquiv.apply_symm_apply, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply]
   rfl
 
+end HomCoordinates
+
+/-! ## Sheaf machinery: morphisms on an open subscheme -/
+section RestrictedMorphisms
+
 theorem image_preimage_ι (h : W ≤ U) : U.ι ''ᵁ U.ι ⁻¹ᵁ W = W := by
   rw [Scheme.Hom.image_preimage_eq_opensRange_inf, Scheme.Opens.opensRange_ι]
   exact inf_eq_right.2 h
@@ -125,6 +212,9 @@ theorem appIm_res (φ : F.restrict U.ι ⟶ G.restrict U.ι) {T T' : U.toScheme.
     appIm φ T' (resM F (U.ι.image_mono h) s) = resM G (U.ι.image_mono h) (appIm φ T s) :=
   app_resM φ h s
 
+/-- Turn a morphism between the restrictions of F and G to U into a section
+of their internal Hom on U. The image/preimage equalities transport its
+components back to opens of the original scheme. -/
 def homOfRestrict (φ : F.restrict U.ι ⟶ G.restrict U.ι) : Γ(homMod F G, U) :=
   homMk (fun W h =>
     { toFun s := resM G (image_preimage_ι h).ge (appIm φ (U.ι ⁻¹ᵁ W) (resM F (image_preimage_ι h).le s))
@@ -150,6 +240,9 @@ theorem homOfRestrict_id (h : W ≤ U) (s : Γ(F, W)) : homApp (homOfRestrict (�
   have (T : U.toScheme.Opens) (t : Γ(F, U.ι ''ᵁ T)) : appIm (𝟙 (F.restrict U.ι)) T t = t := rfl
   rw [homApp_homOfRestrict, this, resM_resM, resM_self]
 
+/-- An isomorphism of restricted modules induces a linear equivalence of
+sections on every smaller open. Its inverse is induced by the inverse
+restricted morphism. -/
 def equivOfRestrict (φ : F.restrict U.ι ≅ G.restrict U.ι) (h : W ≤ U) : Γ(F, W) ≃ₗ[Γ(X, W)] Γ(G, W) :=
   LinearEquiv.ofLinear (homApp (homOfRestrict φ.hom) h) (homApp (homOfRestrict φ.inv) h)
     (LinearMap.ext fun s => by
@@ -157,10 +250,16 @@ def equivOfRestrict (φ : F.restrict U.ι ≅ G.restrict U.ι) (h : W ≤ U) : �
     (LinearMap.ext fun s => by
       rw [LinearMap.comp_apply, homOfRestrict_comp, φ.hom_inv_id, homOfRestrict_id]; rfl)
 
-section Value
+end RestrictedMorphisms
+
+/-! ## Sheaf machinery: evaluation and transport of semilinear forms -/
+section ScalarForms
 
 variable {R R' : Type} [CommRing R] [CommRing R']
 
+/-- Evaluate functions on U along z, assuming the entire image of z lies in U.
+The canonical identification of global functions on Spec R with R makes
+this evaluation a ring homomorphism into R. -/
 def evz (z : Sp R ⟶ X) (h : ⊤ ≤ z ⁻¹ᵁ U) : Γ(X, U) →+* R :=
   (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom.comp (z.appLE U ⊤ h).hom
 
@@ -183,12 +282,18 @@ theorem top_le_preimage_iff [IsLocalRing R] (z : Sp R ⟶ X) :
     ⊤ ≤ z ⁻¹ᵁ U ↔ z (IsLocalRing.closedPoint R) ∈ U :=
   ⟨fun h => h (Set.mem_univ _), fun h => ((IsLocalRing.closedPoint_mem_iff (z ⁻¹ᵁ U)).1 h).ge⟩
 
+/-- Precompose a semilinear form with restriction of sections. The compatibility
+hypothesis identifies the two scalar evaluations, so the result has the
+required semilinearity on the larger open. -/
 def resForm (h : V ≤ U) {ε : Γ(X, V) →+* R} {ε' : Γ(X, U) →+* R} (hε : ∀ a, ε (resG X h a) = ε' a)
     (μ : Γ(F, V) →ₛₗ[ε] R) : Γ(F, U) →ₛₗ[ε'] R where
   toFun s := μ (resM F h s)
   map_add' a b := by rw [map_add (f := _), map_add (f := _)]
   map_smul' a s := by rw [resM_smul, μ.map_smulₛₗ, hε]
 
+/-- Extend a semilinear form from sections on an affine open U to sections
+on a smaller affine open V, with compatible scalar evaluation. This uses
+quasicoherent affine base change, not surjectivity of restriction. -/
 theorem exists_extend [F.IsQuasicoherent] (hU : IsAffineOpen U) (hV : IsAffineOpen V) (h : V ≤ U)
     {ε : Γ(X, V) →+* R} {ε' : Γ(X, U) →+* R} (hε : ∀ a, ε (resG X h a) = ε' a) (l : Γ(F, U) →ₛₗ[ε'] R) :
     ∃ μ : Γ(F, V) →ₛₗ[ε] R, ∀ s, μ (resM F h s) = l s := by
@@ -202,6 +307,9 @@ theorem exists_extend [F.IsQuasicoherent] (hU : IsAffineOpen U) (hV : IsAffineOp
   let μ := (QCoh.isBaseChange_resLinear F hU hV h).lift l'
   exact ⟨⟨⟨μ, μ.map_add⟩, μ.map_smul⟩, fun s => (QCoh.isBaseChange_resLinear F hU hV h).lift_eq l' s⟩
 
+/-- Two semilinear forms on an affine open V agree if they agree on sections
+restricted from a larger affine open U. Quasicoherent base change says
+those restricted sections generate over the smaller open's ring. -/
 theorem form_ext [F.IsQuasicoherent] (hU : IsAffineOpen U) (hV : IsAffineOpen V) (h : V ≤ U)
     {ε : Γ(X, V) →+* R} {μ μ' : Γ(F, V) →ₛₗ[ε] R} (H : ∀ s, μ (resM F h s) = μ' (resM F h s)) : μ = μ' := by
   letI := QCoh.resAlgebra h
@@ -212,6 +320,9 @@ theorem form_ext [F.IsQuasicoherent] (hU : IsAffineOpen U) (hV : IsAffineOpen V)
   · rw [μ.map_smulₛₗ, μ'.map_smulₛₗ, ht]
   · rw [map_add (f := _), map_add (f := _), ha, hb]
 
+/-- A nonzero semilinear form that generates all such forms by target scalars.
+Over a field this expresses that the space of forms is one-dimensional.
+For the general ring-valued definition, scalar uniqueness is not asserted. -/
 def IsLineForm {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] {ε : A →+* R} (μ₀ : M →ₛₗ[ε] R) : Prop :=
   μ₀ ≠ 0 ∧ ∀ μ : M →ₛₗ[ε] R, ∃ c : R, μ = c • μ₀
 
@@ -243,41 +354,14 @@ theorem exists_isLineForm [IsLocalRing R] [F.IsQuasicoherent] (z : Sp R ⟶ X) (
     conv_lhs => rw [← b.sum_repr (resM F h₁ s)]
     rw [Fin.sum_univ_one, μ'.map_smulₛₗ, hν, smul_eq_mul, mul_comm]
 
-end Value
+end ScalarForms
 
-theorem exists_isGreatest {A M C : Type} [CommRing A] [AddCommGroup M] [Module A M] [Module.Finite A M]
-    [NormedField C] [IsUltrametricDist C] {ε : A →+* C} (hε : ∀ a, ‖ε a‖ ≤ 1) (ν : M →ₛₗ[ε] C) :
-    ∃ c, IsGreatest (Set.range fun m => ‖ν m‖) c := by
-  classical
-  obtain ⟨S, hS⟩ := Module.Finite.fg_top (R := A) (M := M)
-  obtain ⟨m₀, -, hm₀⟩ := (insert 0 S).exists_max_image (fun m => ‖ν m‖) ⟨0, Finset.mem_insert_self _ _⟩
-  refine ⟨‖ν m₀‖, ⟨m₀, rfl⟩, ?_⟩
-  rintro _ ⟨m, rfl⟩
-  have hm : m ∈ Submodule.span A (S : Set M) := hS ▸ Submodule.mem_top
-  induction hm using Submodule.span_induction with
-  | mem x hx => exact hm₀ x (Finset.mem_insert_of_mem hx)
-  | zero => simp
-  | add x y _ _ hx hy =>
-    simp only [map_add (f := _)]
-    exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hx hy)
-  | smul a x _ hx =>
-    simp only [ν.map_smulₛₗ, smul_eq_mul, norm_mul]
-    exact (mul_le_of_le_one_left (norm_nonneg _) (hε a)).trans hx
-
-theorem isLocalRing_intO (C : Type) [NormedField C] [IsUltrametricDist C] : IsLocalRing (intO C) := by
-  have key (a : intO C) (h : ‖(a : C)‖ = 1) : IsUnit a := by
-    have h0 : (a : C) ≠ 0 := fun e => by simp [e] at h
-    exact IsUnit.of_mul_eq_one ⟨(a : C)⁻¹, show ‖_‖ ≤ 1 by simp [h]⟩ (Subtype.ext (mul_inv_cancel₀ h0))
-  refine .of_isUnit_or_isUnit_one_sub_self fun a => ?_
-  rcases (show ‖(a : C)‖ ≤ 1 from a.2).eq_or_lt with h | h
-  · exact .inl (key a h)
-  · refine .inr (key _ ?_)
-    have : ‖(1 : C)‖ ≠ ‖-(a : C)‖ := by simpa using h.ne'
-    rw [AddSubgroupClass.coe_sub, OneMemClass.coe_one, sub_eq_add_neg,
-      IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm this]
-    simpa using h.le
-
-section Norm
+/-! ## Pointwise norms
+First define the candidate set and compute it on a fixed affine open.
+Then normalize a generating form and apply the resulting quotient formula
+to generic-fiber isomorphisms.
+-/
+section PointwiseNorms
 
 
 variable (X) in
@@ -287,6 +371,11 @@ def oneSec (V : X.Opens) : Γ(structureModule X, V) := (1 : Γ(X, V))
 
 variable {p : ℕ} {C : SCF p} (z : Sp (intO C.S) ⟶ X)
 
+/-- Candidate pointwise sizes of f obtained by clearing powers of p on an
+affine neighborhood of z and evaluating against an integral-valued form.
+The factor p^k compensates for the norm of the denominator-clearing factor.
+This definition is a set of candidates; later results identify its maximum
+under additional hypotheses. -/
 def nrmSet (F : X.Modules) (f : Γ(F, gen X p)) : Set ℝ :=
   {r | ∃ (U : X.Opens) (_ : IsAffineOpen U) (h : ⊤ ≤ z ⁻¹ᵁ U) (k : ℕ) (g : Γ(F, U))
     (lam : Γ(F, U) →ₛₗ[evz z h] ↥(intO ↥C.S)),
@@ -333,6 +422,8 @@ theorem evq_res (h : ⊤ ≤ z ⁻¹ᵁ U) (a : Γ(X, U)) :
     evq z hp h (resG X inf_le_left a) = ((intO C.S).subtype.comp (evz z h)) a :=
   (evz_res (zq z) _ (fun x _ => h (Set.mem_univ _)) _ a).trans (evz_comp _ z h _ a)
 
+/-- A form on the p-inverted open is integral if it has norm at most one
+on every section restricted from the original open. -/
 def IsInt {h : ⊤ ≤ z ⁻¹ᵁ U} (μ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S) : Prop :=
   ∀ m : Γ(F, U), ‖μ (resM F inf_le_left m)‖ ≤ 1
 
@@ -342,6 +433,9 @@ theorem norm_nsmul_mul {M A : Type} [CommRing A] [AddCommGroup M] [Module A M] {
   rw [map_nsmul, nsmul_eq_mul, norm_mul, Nat.cast_pow, norm_pow, C.norm_p, mul_right_comm, ← mul_pow,
     inv_mul_cancel₀ this, one_pow, one_mul]
 
+/-- Compute the candidate set using bounded forms on one fixed suitable
+affine open. One direction compares affine neighborhoods through a common
+smaller affine open; the other clears a power of p using quasicoherence. -/
 theorem nrmSet_eq [F.IsQuasicoherent] (hU : IsAffineOpen U) (h : ⊤ ≤ z ⁻¹ᵁ U) (f : Γ(F, gen X p)) :
     nrmSet z F f = {r | ∃ μ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S, IsInt z hp μ ∧ r = ‖μ (resM F inf_le_right f)‖} := by
   have := isLocalRing_intO C.S
@@ -392,12 +486,16 @@ theorem exists_isGreatest_vals [IsFiniteQC F] (hU : IsAffineOpen U) (μ : Γ(F, 
   have := QCoh.finite_sections F hU
   exists_isGreatest (fun a => (evz z h a).2) (resForm inf_le_left (evq_res z hp h) μ)
 
-section Line
+/-! ### Normalizing a generating form and computing the maximum -/
+section LineNormalization
 
 variable [F.IsQuasicoherent] (hU : IsAffineOpen U) {μ₀ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S}
   (h₀ : IsLineForm μ₀) {c : ℝ} (hc : IsGreatest (vals z hp μ₀) c)
 include hU h₀ hc
 
+/-- The attained maximum for a line form on integral sections is positive.
+Otherwise all those values vanish, and affine base-change extensionality
+would force the supposedly nonzero form to vanish everywhere. -/
 theorem pos_of_isGreatest : 0 < c := by
   by_contra hn
   refine h₀.1 (form_ext hU (isAffineOpen_inf_gen hU) inf_le_left fun s => ?_)
@@ -413,6 +511,10 @@ theorem norm_le_of_isInt {μ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S} (
   rw [le_div_iff₀ (pos_of_isGreatest z hp hU h₀ hc)]
   nlinarith [norm_nonneg (μ₀ v)]
 
+/-- Normalize a line form using the inverse of its value on a maximizing
+integral section. The normalized form is integral and its value norms are
+the original value norms divided by the positive maximum. Using an actual
+field value avoids any assumption about which real norms occur in the field. -/
 theorem exists_isInt : ∃ μ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S, IsInt z hp μ ∧ ∀ v, ‖μ v‖ = ‖μ₀ v‖ / c := by
   obtain ⟨m, hm⟩ := hc.1
   have key (v) : ‖((μ₀ (resM F inf_le_left m))⁻¹ • μ₀) v‖ = ‖μ₀ v‖ / c := by
@@ -420,6 +522,9 @@ theorem exists_isInt : ∃ μ : Γ(F, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S, 
     rw [hm, div_eq_inv_mul]
   exact ⟨_, fun n => (key _).trans_le ((div_le_one (pos_of_isGreatest z hp hU h₀ hc)).2 (hc.2 ⟨n, rfl⟩)), key⟩
 
+/-- For a generating line form with integral-section maximum c, the candidate
+norm set has greatest element equal to its value norm divided by c.
+The normalized form attains this bound. -/
 theorem isGreatest_nrmSet (f : Γ(F, gen X p)) : IsGreatest (nrmSet z F f) (‖μ₀ (resM F inf_le_right f)‖ / c) := by
   rw [nrmSet_eq z hp hU h]
   obtain ⟨μ, hμ, e⟩ := exists_isInt z hp hU h₀ hc
@@ -427,6 +532,10 @@ theorem isGreatest_nrmSet (f : Γ(F, gen X p)) : IsGreatest (nrmSet z F f) (‖�
   rintro r ⟨μ, hμ, rfl⟩
   exact norm_le_of_isInt z hp hU h₀ hc hμ _
 
+/-- Compute the size of an internal Hom section into a generic-fiber line
+using a frame of its source. Coordinate insertions and the ultrametric
+inequality give the upper bound; evaluation on a maximizing source section
+attains it. -/
 theorem isGreatest_nrmSet_hom [(homMod G F).IsQuasicoherent] {e : ι → Γ(G, U)} (he : IsFrame e)
     (ψ : Γ(homMod G F, gen X p)) {c₁ : ℝ} (hc₁ : IsGreatest (vals z hp (μ₀.comp (homApp ψ inf_le_right))) c₁) :
     IsGreatest (nrmSet z (homMod G F) ψ) (c₁ / c) := by
@@ -453,11 +562,18 @@ theorem isGreatest_nrmSet_hom [(homMod G F).IsQuasicoherent] {e : ι → Γ(G, U
     refine (norm_le_of_isInt z hp hU h₀ hc hi _).trans (div_le_div_of_nonneg_right ?_ hpos.le)
     exact hc₁.2 ⟨e i, rfl⟩
 
-end Line
+end LineNormalization
+
+/-! ### Isomorphisms and vector-bundle presentations -/
+section PresentationComparisons
 
 def compSec {E : X.Modules} (π : E ⟶ F) (φ : F.restrict U.ι ⟶ G.restrict U.ι) : Γ(homMod E G, U) :=
   (homMap π (𝟙 G)).app U (homOfRestrict φ)
 
+/-- For an isomorphism on the p-inverted open, precomposed with an epimorphism
+from a vector bundle, the candidate norm maximum is the quotient of the
+source and target form maxima. Surjectivity on affine sections removes
+the chosen presentation from the value range. -/
 theorem isGreatest_nrmSet_compSec {E : X.Modules} {r : ℕ} (hE : IsVB E r) (π : E ⟶ F) [Epi π] [IsFiniteQC F]
     [IsFiniteQC G] (hU : IsAffineOpen U) {e : ι → Γ(E, U)} (he : IsFrame e)
     (φ : F.restrict (gen X p).ι ≅ G.restrict (gen X p).ι) {μ : Γ(G, U ⊓ gen X p) →ₛₗ[evq z hp h] C.S}
@@ -478,6 +594,9 @@ theorem exists_isLineForm_gen [F.IsQuasicoherent] (hF : IsVB (F.restrict (gen X 
   obtain ⟨T, e, hx, he⟩ := hF ⟨zq z (IsLocalRing.closedPoint _), zq_le_gen z hp (Set.mem_univ _)⟩
   exact exists_isLineForm (zq z) (isAffineOpen_inf_gen hU) _ ((isFrame_restrict_iff _ e).1 he) ⟨_, hx, rfl⟩
 
+/-- The pointwise sizes attached to a generic-fiber line isomorphism and its
+inverse, using vector-bundle presentations, are positive reciprocals.
+Both sizes are attained maxima: the quotient formula gives c1/c2 and c2/c1. -/
 theorem sSup_compSec_mul {E E' : X.Modules} {r r' : ℕ} (hE : IsVB E r) (hE' : IsVB E' r') (π : E ⟶ F) [Epi π]
     (π' : E' ⟶ G) [Epi π'] [IsFiniteQC F] [IsFiniteQC G] (hG : IsVB (G.restrict (gen X p).ι) 1)
     (φ : F.restrict (gen X p).ι ≅ G.restrict (gen X p).ι) :
@@ -498,6 +617,9 @@ theorem sSup_compSec_mul {E E' : X.Modules} {r r' : ℕ} (hE : IsVB E r) (hE' : 
   exact ⟨div_pos (pos_of_isGreatest z hp hU hμ' hc₁) (pos_of_isGreatest z hp hU hμ hc₂),
     (isGreatest_nrmSet_compSec z hp hE' π' hU he' φ.symm hμ' (e₀.symm ▸ hc₂) hc₁).csSup_eq⟩
 
+/-- When F has a global rank-one frame generated by u, compute the size of
+an isomorphism either by applying it to u or by precomposing with a
+vector-bundle epimorphism. Both computations give the same quotient. -/
 theorem sSup_compSec_eq {E : X.Modules} {r : ℕ} (hE : IsVB E r) (π : E ⟶ F) [Epi π] [IsFiniteQC G]
     {u : Γ(F, ⊤)} (hu : IsFrame fun _ : Fin 1 => u) (φ : F.restrict (gen X p).ι ≅ G.restrict (gen X p).ι) :
     sSup (nrmSet z G (homApp (homOfRestrict φ.hom) le_rfl (resM F le_top u))) =
@@ -522,6 +644,8 @@ theorem sSup_compSec_eq {E : X.Modules} {r : ℕ} (hE : IsVB E r) (π : E ⟶ F)
     ← homApp_resM, resM_resM]
   rfl
 
-end Norm
+end PresentationComparisons
+
+end PointwiseNorms
 
 end GlobalTheory.PtNorm

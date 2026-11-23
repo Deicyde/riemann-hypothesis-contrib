@@ -192,8 +192,8 @@ lemma psi_le {p q : ι} (hpq : p ≠ q) {k : ℕ} (hk : Fintype.card ι = k + 1)
     intro z hz
     rw [Complex.normSq_apply] at hz
     constructor
-    · nlinarith [sq_abs z.re, abs_nonneg z.re, mul_self_nonneg z.im]
-    · nlinarith [sq_abs z.im, abs_nonneg z.im, mul_self_nonneg z.re]
+    · exact abs_le_one_iff_mul_self_le_one.2 (by linarith [mul_self_nonneg z.im])
+    · exact abs_le_one_iff_mul_self_le_one.2 (by linarith [mul_self_nonneg z.re])
   have hnsq : ∀ z : ℂ, Complex.normSq z = ‖z‖ ^ 2 := by
     intro z
     first
@@ -203,10 +203,10 @@ lemma psi_le {p q : ι} (hpq : p ≠ q) {k : ℕ} (hk : Fintype.card ι = k + 1)
   have hsmall : ∀ i, i ≠ q → Complex.normSq (x i) ≤ 1 := by
     intro i hi
     have h1 := normSq_le_tW q x i hi
-    nlinarith [htpos]
+    linarith [pow_le_one₀ (n := 2) htpos.le ht2]
   have hqsmall : Complex.normSq (x q) ≤ 1 := by
     rw [hnsq]
-    nlinarith [norm_nonneg (x q)]
+    exact pow_le_one₀ (norm_nonneg _) hxq
 
   have hnnj : ∀ j ∈ Finset.univ, 0 ≤ (if j = q then 0 else Complex.normSq (x j)) := by
     intro j _
@@ -252,12 +252,12 @@ lemma psi_le {p q : ι} (hpq : p ≠ q) {k : ℕ} (hk : Fintype.card ι = k + 1)
     rw [hnsq (x p)] at hsum
     have hre2 : 2 * (|(x i).re| * |(x i).im|) ≤ Complex.normSq (x i) := by
       rw [Complex.normSq_apply]
-      nlinarith [sq_abs (x i).re, sq_abs (x i).im, sq_nonneg (|(x i).re| - |(x i).im|)]
+      linarith [sq_abs (x i).re, sq_abs (x i).im, sq_nonneg (|(x i).re| - |(x i).im|)]
     have hr0 := norm_nonneg (x p)
     have hni := Complex.normSq_nonneg (x i)
-    have hrt : ‖x p‖ ≤ tW q x := by nlinarith
+    have hrt : ‖x p‖ ≤ tW q x := (pow_le_pow_iff_left₀ hr0 htpos.le two_ne_zero).1 (by linarith)
     have hm : |(x i).re| * |(x i).im| ≤ tW q x - ‖x p‖ := by
-      nlinarith [mul_nonneg (sub_nonneg.2 hrt) (by linarith : (0 : ℝ) ≤ 2 - tW q x - ‖x p‖)]
+      linarith [mul_nonneg (sub_nonneg.2 hrt) (by linarith : (0 : ℝ) ≤ 2 - tW q x - ‖x p‖)]
     have hd : ‖x p‖ / tW q x ≤ 1 - tW q x + ‖x p‖ := by
       first
       | (rw [div_le_iff₀ htpos]; nlinarith [mul_nonneg (sub_nonneg.2 ht2) (sub_nonneg.2 hrt)])

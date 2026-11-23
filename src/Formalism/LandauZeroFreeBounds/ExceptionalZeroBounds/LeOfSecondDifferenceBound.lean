@@ -28,7 +28,7 @@ lemma le_of_second_difference_bound {y c₀ C N eY ey h : ℝ} (hy : 2 ≤ y) (h
   set s := Real.sqrt L with hsdef
   have hs0 : 0 ≤ s := Real.sqrt_nonneg _
   have hss : s ^ 2 = L := Real.sq_sqrt hL0.le
-  have hs_half : 1 / 2 ≤ s := by nlinarith
+  have hs_half : 1 / 2 ≤ s := (Real.le_sqrt (by norm_num) hL0.le).2 (by linarith)
   set g := Real.exp (-(c₀ / 4) * s) with hgdef
   have hg0 : 0 < g := Real.exp_pos _
   have hg1 : g ≤ 1 := by
@@ -44,7 +44,7 @@ lemma le_of_second_difference_bound {y c₀ C N eY ey h : ℝ} (hy : 2 ≤ y) (h
     have hyL : y = Real.exp L := (Real.exp_log hy0).symm
     rw [hgdef, hyL, ← Real.exp_add]
     apply Real.exp_le_exp.mpr
-    nlinarith [mul_le_mul_of_nonneg_right hc01 hs0, mul_nonneg hs0 (sub_nonneg.mpr hs_half)]
+    linarith [mul_le_mul_of_nonneg_right hc01 hs0, mul_nonneg hs0 (sub_nonneg.mpr hs_half)]
   have hq := Real.quadratic_le_exp_of_nonneg (by positivity : (0 : ℝ) ≤ s ^ 2 / 2)
   have hB : L + 1 ≤ 2 * (y * g) := by
     have : 0 ≤ (s ^ 2 / 2) ^ 2 / 2 := by positivity
@@ -141,8 +141,8 @@ lemma mul_le_of_log_bounds {y c₀ K lq : ℝ} (hy : 2 ≤ y) (hc0 : 0 < c₀) (
   set s := Real.sqrt L with hsdef
   have hs0 : 0 ≤ s := Real.sqrt_nonneg _
   have hss : s ^ 2 = L := Real.sq_sqrt hL0.le
-  have hs_half : 1 / 2 ≤ s := by nlinarith
-  have hKL : K ≤ 2 * L := by nlinarith
+  have hs_half : 1 / 2 ≤ s := (Real.le_sqrt (by norm_num) hL0.le).2 (by linarith)
+  have hKL : K ≤ 2 * L := by linarith [mul_nonneg hK0 (by linarith : (0 : ℝ) ≤ Real.log 2 - 1 / 2)]
   have hlq' : lq ≤ s / 4 := by
     have : c₀ / 4 * s ≤ 1 / 4 * s := mul_le_mul_of_nonneg_right (by linarith) hs0
     linarith
@@ -150,10 +150,10 @@ lemma mul_le_of_log_bounds {y c₀ K lq : ℝ} (hy : 2 ≤ y) (hc0 : 0 < c₀) (
   have hexp : Real.exp (s ^ 2 / 2) ≤ y * Real.exp (-(c₀ / 4) * s) := by
     rw [hyL, ← Real.exp_add]
     apply Real.exp_le_exp.mpr
-    nlinarith [mul_le_mul_of_nonneg_right hc01 hs0, mul_nonneg hs0 (sub_nonneg.mpr hs_half)]
+    linarith [mul_le_mul_of_nonneg_right hc01 hs0, mul_nonneg hs0 (sub_nonneg.mpr hs_half)]
   have hq := Real.quadratic_le_exp_of_nonneg (by positivity : (0 : ℝ) ≤ s ^ 2 / 2)
   have hpoly : (2 * L) * (s / 4) ≤ 16 * (1 + s ^ 2 / 2 + (s ^ 2 / 2) ^ 2 / 2) := by
-    rw [← hss]; nlinarith [sq_nonneg (s ^ 2 - s), sq_nonneg s]
+    rw [← hss]; linarith [sq_nonneg (s ^ 2 - s), sq_nonneg s, sq_nonneg (s ^ 2)]
   have e : 16 * y * Real.exp (-(c₀ / 4) * s) = 16 * (y * Real.exp (-(c₀ / 4) * s)) := by ring
   rw [e]
   linarith

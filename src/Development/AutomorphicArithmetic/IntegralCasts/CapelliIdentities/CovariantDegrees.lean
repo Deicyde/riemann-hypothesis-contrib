@@ -2991,8 +2991,7 @@ theorem UpperTheory.Reformulated.B.CovariantDegrees.blockM_mul_alt :
                           inst_3)
                         (@UpperTheory.Reformulated.B.CovariantDegrees.Dec E Ω inst inst_2 inst_3 A))))))))) := by
   intro l hl E Ω _ _ _ _ _ _ _ j A hj
-  refine Subtype.ext (AlgEquiv.ext fun x => j.injective ?_)
-  exact UpperTheory.Reformulated.B.CovariantDegrees.j_resE (E := E) j 1 (Subgroup.one_mem _) x
+  exact Subtype.ext (AlgEquiv.ext fun x => j.injective (UpperTheory.Reformulated.B.CovariantDegrees.j_resE (E := E) j 1 (Subgroup.one_mem _) x))
 
 theorem UpperTheory.Reformulated.B.CovariantDegrees.conj_invariant_character_mem :
     ∀ {l : Nat} [hl : Fact (Nat.Prime l)] {E Ω : Type} [inst : Field E] [inst_1 : @NumberField E inst] [inst_2 : Field Ω]

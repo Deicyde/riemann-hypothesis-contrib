@@ -85,16 +85,16 @@ theorem step {G ι : Type} [DecidableEq ι] (B : Finset ι) (q : G → ℝ) (�
         ‖ψ g‖ * Q g ^ (k + 1) ≤ X2 * q g ^ A * T by
       have e1 : 0 ≤ X1 * q g ^ A * T := by positivity
       have e2 : 0 ≤ X2 * q g ^ A * T := mul_nonneg (mul_nonneg hX2 hqA) hT0
-      rcases h with h | h <;> nlinarith
+      rcases h with h | h <;> linarith
     rcases hcase with hδ0 | ⟨Ω, hΩ, hbound⟩
     · left
       have hQM : Q g ≤ M := by
-        rw [hM, le_div_iff₀ hδ₀]; nlinarith [hQ0 g]
+        rw [hM, le_div_iff₀ hδ₀]; linarith [mul_le_mul_of_nonneg_left hδ0 (hQ0 g)]
       have h0 : ‖ψ g‖ ≤ c [] * q g ^ A := by simpa using hc [] (nil_mem B _) g
       have hcT : c [] ≤ T := single_le_sum (f := c) (fun l hl => hc0 l hl) (nil_mem B _)
       have hQk : Q g ^ (k + 1) ≤ X1 := pow_le_pow_left₀ (hQ0 g) hQM _
       calc ‖ψ g‖ * Q g ^ (k + 1) ≤ (c [] * q g ^ A) * X1 :=
-            mul_le_mul h0 hQk (pow_nonneg (hQ0 g) _) (by nlinarith [norm_nonneg (ψ g)])
+            mul_le_mul h0 hQk (pow_nonneg (hQ0 g) _) ((norm_nonneg _).trans h0)
         _ ≤ (T * q g ^ A) * X1 := by gcongr
         _ = X1 * q g ^ A * T := by ring
     · right

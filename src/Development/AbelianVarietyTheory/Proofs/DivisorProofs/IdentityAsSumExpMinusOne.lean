@@ -122,7 +122,7 @@ theorem hasTemperateGrowth_quot (a : ℝ) : (fun t : ℝ => quot a t).HasTempera
       refine (neg_le_abs _).trans ?_
       rw [abs_mul]
       gcongr
-    nlinarith [norm_nonneg (quot a z)]
+    linarith [mul_le_mul_of_nonneg_right h.le (norm_nonneg (quot a z))]
 
 theorem quot_neg (a t : ℝ) : quot (-a) t = (starRingEnd ℂ) (quot a t) := by
   by_cases ht : t = 0
@@ -148,7 +148,7 @@ theorem norm_exp_sub_one_ge (x : ℝ) :
   have hp := Real.pi_pos
   have e : 2 * Real.pi * d / 2 = Real.pi * d := by ring
   have h3 : |Real.pi * d| ≤ Real.pi / 2 := by
-    rw [abs_mul, abs_of_pos hp]; nlinarith
+    rw [abs_mul, abs_of_pos hp]; linarith [mul_le_mul_of_nonneg_left h2 hp.le]
   have h4 := Real.mul_abs_le_abs_sin h3
   rw [abs_mul, abs_of_pos hp] at h4
   have e2 : 2 / Real.pi * (Real.pi * |d|) = 2 * |d| := by field_simp
@@ -164,12 +164,12 @@ theorem dioph (t : ℝ) (hp : round t ≠ 0) :
   have h2 : |√2 * t - q| ≤ 1 / 2 := abs_sub_round _
   have hs : √2 * √2 = 2 := Real.mul_self_sqrt (by norm_num)
   have hs0 : 0 < √2 := by positivity
-  have hs2 : √2 ≤ 3 / 2 := by nlinarith
+  have hs2 : √2 ≤ 3 / 2 := Real.sqrt_le_iff.2 ⟨by norm_num, by norm_num⟩
   have hne : (2 * p ^ 2 - q ^ 2 : ℤ) ≠ 0 := by
     intro h
     have hr : (2 : ℝ) * p ^ 2 - q ^ 2 = 0 := by exact_mod_cast h
     have hp' : (p : ℝ) ≠ 0 := by exact_mod_cast hp
-    have : (√2 * p - q) * (√2 * p + q) = 0 := by nlinarith
+    have : (√2 * p - q) * (√2 * p + q) = 0 := by linear_combination hr + (p : ℝ) ^ 2 * hs
     have hirr := irrational_sqrt_two
     rcases mul_eq_zero.1 this with h' | h'
     · exact hirr ⟨(q : ℚ) / p, by push_cast; field_simp; linarith⟩
@@ -177,14 +177,16 @@ theorem dioph (t : ℝ) (hp : round t ≠ 0) :
   have h3 : (1 : ℝ) ≤ |(2 : ℝ) * p ^ 2 - q ^ 2| := by
     have := Int.one_le_abs hne
     exact_mod_cast this
-  have h4 : (2 : ℝ) * p ^ 2 - q ^ 2 = (√2 * p - q) * (√2 * p + q) := by nlinarith
+  have h4 : (2 : ℝ) * p ^ 2 - q ^ 2 = (√2 * p - q) * (√2 * p + q) := by
+    linear_combination (-(p : ℝ) ^ 2) * hs
   rw [h4, abs_mul] at h3
   have h5 : |√2 * p - q| ≤ 2 * (|t - p| + |√2 * t - q|) := by
     have : √2 * p - q = (√2 * t - q) - √2 * (t - p) := by ring
     rw [this]
     refine (abs_sub _ _).trans ?_
     rw [abs_mul, abs_of_pos hs0]
-    nlinarith [abs_nonneg (t - p), abs_nonneg (√2 * t - q)]
+    linarith [mul_le_mul_of_nonneg_right hs2 (abs_nonneg (t - p)), abs_nonneg (t - p),
+      abs_nonneg (√2 * t - q)]
   have h6 : |√2 * p + q| ≤ 3 * (1 + |t|) := by
     have : √2 * p + q = 2 * √2 * t - (√2 * t - q) - √2 * (t - p) := by ring
     rw [this]
@@ -192,7 +194,8 @@ theorem dioph (t : ℝ) (hp : round t ≠ 0) :
     have := abs_sub (2 * √2 * t) (√2 * t - q)
     rw [abs_mul, abs_mul, abs_of_pos hs0, abs_two] at this
     rw [abs_mul, abs_of_pos hs0]
-    nlinarith [abs_nonneg (t - p), abs_nonneg t]
+    linarith [mul_le_mul_of_nonneg_right hs2 (abs_nonneg t),
+      mul_le_mul hs2 h1 (abs_nonneg _) (by norm_num : (0 : ℝ) ≤ 3 / 2), abs_nonneg t]
   calc (1 : ℝ) ≤ _ := h3
     _ ≤ (2 * (|t - p| + |√2 * t - q|)) * (3 * (1 + |t|)) := by gcongr
     _ = _ := by ring
@@ -220,17 +223,17 @@ theorem lower (t : ℝ) :
         simp only [Int.cast_zero, sub_zero] at e1
         have : 0 < |t| := abs_pos.2 ht
         by_contra hh
-        nlinarith
-    have h2 : 1 ≤ (1 + |t|) ^ 2 := by nlinarith
-    nlinarith
+        linarith [mul_lt_mul_of_pos_left (not_le.1 hh) this]
+    have h2 : 1 ≤ (1 + |t|) ^ 2 := one_le_pow₀ (by linarith)
+    linarith [mul_le_mul h2 h1 zero_le_one (by positivity), mul_nonneg (by positivity : (0 : ℝ) ≤ (1 + |t|) ^ 2) n2]
   · have h := dioph t hp
     set s := ‖quot (2 * Real.pi) t‖ + ‖quot (2 * Real.pi * √2) t‖ with hs
     have hs0 : 0 ≤ s := by positivity
     have h1 : 4 * (|t - round t| + |√2 * t - round (√2 * t)|) ≤ (1 + |t|) * s := by
-      rw [hs]; nlinarith
+      rw [hs]; linarith
     have h2 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ 1 + |t| by positivity)
     have h3 : 0 ≤ (1 + |t|) ^ 2 * s := by positivity
-    nlinarith
+    linarith
 
 theorem exists_division : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ → ℂ),
     (∀ j, Function.HasTemperateGrowth (A j)) ∧
@@ -254,7 +257,7 @@ theorem exists_division : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ �
     rw [hn, Real.norm_eq_abs]
     have h2 := one_le_pow₀ (n := 2) h
     have h3 : (‖quot a t‖ + ‖quot b t‖) ^ 2 ≤ 2 * (‖quot a t‖ ^ 2 + ‖quot b t‖ ^ 2) := by
-      nlinarith [sq_nonneg (‖quot a t‖ - ‖quot b t‖)]
+      linarith [sq_nonneg (‖quot a t‖ - ‖quot b t‖)]
     calc (1 : ℝ) ≤ _ := h2
       _ = 4 * (1 + |t|) ^ 4 * (‖quot a t‖ + ‖quot b t‖) ^ 2 := by ring
       _ ≤ 4 * (1 + |t|) ^ 4 * (2 * (‖quot a t‖ ^ 2 + ‖quot b t‖ ^ 2)) := by gcongr

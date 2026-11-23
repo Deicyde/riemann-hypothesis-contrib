@@ -6,7 +6,6 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameBoundSpaces.FrameBound
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameReading.GelfandValueContinuity.ReadLimitOfEfinal
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.AdelicHeckeBlocks.PFrameOk
-public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.InfinitesimalCharacterLimits.EFinalNEHolds
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameEx0Plug
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.SatakeRigidity.LWeightEx
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.SatakeRigidity.LPermSub
@@ -14,6 +13,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.FiniteDiscreteFamilies.PFinFamOf
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DiagonalAlgebraHoldsStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteDiscreteSpectrumStatement
+import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.BciOfAlt
 
 @[expose] public section
 
@@ -25,8 +25,6 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F PositivityTheory.Rg.B
 
 theorem bci_of (h1 : FrameEx) (h3 : FrameBound)
     (h4 : FrameRead) : PositivityTheory.Rg.BcN.BaseChangeIsobaricN :=
-  PositivityTheory.Rg.BcB.F.Rig.fieldN_of_run
-    (runFin_chain (finFamOf_holds levelFactor GlobalTheory.T.finite_discrete_spectrum) PositivityTheory.Rg.BcB.F.Rig.weightEx PositivityTheory.Rg.BcB.F.Rig.permSat
-      GlobalTheory.T.diagonal_algebra_holds (genEx_of (PositivityTheory.Rg.BcB.F.Rd.P.readLimit_of_efinal PositivityTheory.Rg.BcB.SpectralAccumulation.eFinal_holds) GlobalTheory.T.diagonal_algebra_holds PositivityTheory.Rg.BcB.F.Ex0.frameEx0 h1 frameOk₀ h3 h4))
+  PositivityTheory.Rg.BcB.Plug2B.bci_of h1 h3 h4
 
 end PositivityTheory.Rg.BcB.Plug2

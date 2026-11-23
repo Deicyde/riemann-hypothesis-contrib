@@ -108,11 +108,10 @@ theorem approx_id {K : Type} [Group K] [TopologicalSpace K] [CompactSpace K] [T2
 
 theorem finAlg_sep_KG {n : ℕ} (ε : Fin n → Bool) : (Mult1.Down.KF.finAlg (S7.KG ε)).SeparatesPoints := by
   intro k k' hne
-  have hne' : S7.toMK k ≠ S7.toMK k' := fun h => hne (Subtype.ext (Subtype.ext (Units.ext h)))
   obtain ⟨i, j, hij⟩ : ∃ i j, S7.toMK k i j ≠ S7.toMK k' i j := by
     by_contra hc
     push Not at hc
-    exact hne' (Matrix.ext hc)
+    exact hne (Subtype.ext (Subtype.ext (Units.ext (Matrix.ext hc))))
   have hcont : ∀ a b : Fin n, Continuous fun κ : S7.KG ε => S7.toMK κ a b := fun a b =>
     (continuous_apply b).comp ((continuous_apply a).comp S7.IdA.continuous_toMK)
   refine ⟨_, ⟨⟨fun κ => S7.toMK κ i j, hcont i j⟩, ?_, rfl⟩, hij⟩

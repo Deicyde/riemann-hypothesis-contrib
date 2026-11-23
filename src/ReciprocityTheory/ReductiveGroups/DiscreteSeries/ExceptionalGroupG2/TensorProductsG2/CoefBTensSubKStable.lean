@@ -12,6 +12,7 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.AnyDec
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.DataGenSubIrred
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.HasGelfandCharSigLam
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CoefBTensSubKStable
 
 @[expose] public section
 
@@ -114,13 +115,6 @@ section Tr
 
 variable {D : Type*} [NormedAddCommGroup D] [InnerProductSpace ℂ D]
 
-def coefTr (A : Module.End ℂ (Fin n → D)) : Module.End ℂ (WithLp 2 (Fin n → D)) :=
-  (WithLp.linearEquiv 2 ℂ (Fin n → D)).symm.toLinearMap ∘ₗ A ∘ₗ
-    (WithLp.linearEquiv 2 ℂ (Fin n → D)).toLinearMap
-
-theorem coefTr_apply (A : Module.End ℂ (Fin n → D)) (u : WithLp 2 (Fin n → D)) :
-    coefTr A u = WithLp.toLp 2 (A (WithLp.ofLp u)) := rfl
-
 theorem coefTr_casimirK (ε : Fin n → Bool) (A : Fin n → Fin n → Module.End ℂ (Fin n → D)) :
     casimirK ε (fun a b => coefTr (A a b)) = coefTr (casimirK ε A) := by
   refine LinearMap.ext fun u => ?_
@@ -180,13 +174,6 @@ theorem coefB_casimirK_mem {X : Type*} [AddCommGroup X] [Module ℂ X]
   refine Submodule.sum_mem _ fun a _ => Submodule.sum_mem _ fun b hb => ?_
   have hb' : ε b = ε a := (Finset.mem_filter.mp hb).2
   exact hS a b hb'.symm _ (hS b a hb' _ hx)
-
-theorem coefB_locFin (hE : IsGlRep E) {V : Submodule ℂ D} (hVf : FiniteDimensional ℂ V)
-    (hVk : IsKStableSub ε E V) : CoefLocFin (casimirK ε E) (genSub E V) := by
-  intro y hy
-  obtain ⟨m, hm⟩ := exists_layer_of_mem_genSub hE hVk hy
-  exact ⟨layer ε E V m, finiteDimensional_layer hVf m, layer_le_genSub m,
-    fun x hx => casimirK_mem_of_kStable (layer_kStable hE hVk m) hx, hm⟩
 
 theorem coefB_ι_casimirK (dual : Bool) {S' : Submodule ℂ D} {ι : D →ₗ[ℂ] (Fin n → D)}
     (hS' : ∀ a b, ∀ v ∈ S', E a b v ∈ S')

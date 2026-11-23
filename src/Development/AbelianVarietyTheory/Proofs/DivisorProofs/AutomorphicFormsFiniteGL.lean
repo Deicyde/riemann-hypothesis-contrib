@@ -2,14 +2,13 @@ module
 
 public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSpanFormsNeBot
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessAutomorphicGLOfEigenStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessTotallyComplexGLProofStatement
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.TemperedLocalComponents.FormsFiniteGL
 
 @[expose] public section
 
 namespace GlobalTheory
 
 theorem automorphicFormsFiniteGL : GlobalTheory.Published.AutomorphicFormsFiniteGL :=
-  GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen GlobalTheory.T.harishChandraFinitenessTotallyComplexGL_proof
+  UpperTheory.V.Af.formsFiniteGL
 
 end GlobalTheory

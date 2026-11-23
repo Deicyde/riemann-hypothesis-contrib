@@ -308,7 +308,7 @@ lemma far_term {u T C E : ℝ} {n : ℕ} (hu : 2 ≤ u) (hT : 0 < T) (hn : 0 < n
     have h2 : 2 * L * a = 1 := by rw [ha]; field_simp
     calc Real.log n = 2 * L * (a * Real.log n) := by rw [← mul_assoc, h2, one_mul]
       _ ≤ 2 * L * ((n : ℝ) ^ a - 1) := mul_le_mul_of_nonneg_left h1 (by linarith)
-      _ ≤ 2 * L * (n : ℝ) ^ a := by nlinarith
+      _ ≤ 2 * L * (n : ℝ) ^ a := by linarith [hL0]
   have he : Real.exp 1 < 3 := by have := Real.exp_one_lt_d9; linarith
   have hgoal : C * (12 * u * L / T * (1 / (n : ℝ) ^ (1 + a)))
       = (12 * C * u * L) / (T * (n : ℝ) ^ (1 + a)) := by
@@ -321,7 +321,7 @@ lemma far_term {u T C E : ℝ} {n : ℕ} (hu : 2 ≤ u) (hT : 0 < T) (hn : 0 < n
         exact mul_le_mul key3 key1 (mul_nonneg hE hT.le) (mul_nonneg (by linarith) hQ.le)
     _ = 4 * C * L * ((u / n) ^ (1 + 1 / L) * ((n : ℝ) ^ (1 + a) * (n : ℝ) ^ a)) := by ring
     _ = 4 * C * L * (u * Real.exp 1) := by rw [key2]
-    _ ≤ 12 * C * u * L := by nlinarith
+    _ ≤ 12 * C * u * L := by linarith [mul_le_mul_of_nonneg_left he.le h0]
 
 lemma near_term {u T C E : ℝ} {n : ℕ} (hu : 2 ≤ u) (hT : 0 < T) (hC : 0 ≤ C)
     (hE : 0 ≤ E) (h0 : E ≤ C * (u / n) ^ (1 + 1 / Real.log u))
@@ -367,7 +367,7 @@ lemma near_term {u T C E : ℝ} {n : ℕ} (hu : 2 ≤ u) (hT : 0 < T) (hC : 0 �
     intro hw1
     have h1 : Real.log n * E ≤ 2 * L * (6 * C) :=
       mul_le_mul hlogn (h0.trans hCM) hE (by linarith)
-    nlinarith [mul_le_mul_of_nonneg_left hw1 hCL]
+    linarith [hCL, mul_le_mul_of_nonneg_left hw1 hCL]
   have core : ∀ k : ℝ, 0 < k → k / (2 * u) ≤ |Real.log (u / n)| → B * (1 / k) ≤ w N B n →
       Real.log n * E ≤ C * (16 * L * w N B n) := by
     intro k hk hlog hwk
@@ -386,7 +386,7 @@ lemma near_term {u T C E : ℝ} {n : ℕ} (hu : 2 ≤ u) (hT : 0 < T) (hC : 0 �
       rw [show 12 * C * L * (B * (1 / k)) = (12 * C * L * B) / k by ring, le_div_iff₀ hk]
       linarith
     have hbk : 0 ≤ B * (1 / k) := mul_nonneg hB0 (by positivity)
-    nlinarith [mul_le_mul_of_nonneg_left hwk hCL, mul_nonneg hCL hbk]
+    linarith [mul_le_mul_of_nonneg_left hwk hCL, mul_nonneg hCL hbk]
   have hNu : (N : ℝ) ≤ u := Nat.floor_le hu0.le
   have huN : u < (N : ℝ) + 1 := Nat.lt_floor_add_one u
   rcases lt_trichotomy n N with hlt | heq | hgt
@@ -598,7 +598,7 @@ theorem truncated_perron_psi : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (
   have b3 : 12 * u * L / T * (1 + 2 * L) + 16 * L * (2 + B * (2 * (1 + L)))
       ≤ 240 * (u * L ^ 2 / T + L) := by
     rw [e1, e2, e3]
-    nlinarith [mul_nonneg (mul_nonneg hL0.le hX.le) (show (0 : ℝ) ≤ 2 * L - 1 by linarith),
+    linarith [hL0, mul_nonneg (mul_nonneg hL0.le hX.le) (show (0 : ℝ) ≤ 2 * L - 1 by linarith),
       mul_nonneg (mul_nonneg hL0.le hL0.le) hX.le]
   have b4 : 12 * u * L / T * ∑' n : ℕ, 1 / (n : ℝ) ^ (1 + 1 / (2 * L))
       + 16 * L * ∑ n ∈ Finset.range (N + 1 + (N + 1)), w N B n ≤ 240 * (u * L ^ 2 / T + L) := by

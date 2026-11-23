@@ -228,11 +228,10 @@ theorem length_quot_add {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
 theorem length_zero_of_le {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
     {N P : Submodule R M} (h : P ≤ N) : Module.length R (↥P ⧸ N.comap P.subtype) = 0 := by
   rw [Module.length_eq_zero_iff]
-  refine ⟨fun a b => ?_⟩
-  obtain ⟨a, rfl⟩ := Submodule.mkQ_surjective _ a
-  obtain ⟨b, rfl⟩ := Submodule.mkQ_surjective _ b
-  rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
-  exact h (a - b).2
+  exact Submodule.Quotient.subsingleton_iff.mpr (by
+    rw [eq_top_iff]
+    intro x _
+    exact h x.2)
 
 
 set_option synthInstance.maxHeartbeats 400000 in
